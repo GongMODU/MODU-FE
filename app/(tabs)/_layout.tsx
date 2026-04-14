@@ -40,6 +40,13 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="schedule/index"
+        options={{
+          href: null, // 탭바에 아이콘 안 보이게
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 }
