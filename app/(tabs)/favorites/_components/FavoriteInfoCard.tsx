@@ -21,7 +21,7 @@ export default function FavoriteInfoCard({ top }: Props) {
 const styles = StyleSheet.create({
   card: {
     position: "absolute",
-    left: spacing.contentArea,
+    width: "80%",
     right: spacing.contentArea,
     backgroundColor: colors.white,
     borderRadius: 10,
