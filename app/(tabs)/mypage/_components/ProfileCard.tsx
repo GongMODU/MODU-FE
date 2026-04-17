@@ -1,0 +1,66 @@
+import { colors, spacing, typography } from "@/styles";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+export default function ProfileCard() {
+  return (
+    <View style={styles.profileCard}>
+      <View style={styles.avatar} />
+      <View style={styles.profileInfo}>
+        <Text style={styles.nickname}>사용자 닉네임</Text>
+        <View style={styles.bioBadge}>
+          <Text style={styles.bio}>gongjjonku@email.com</Text>
+        </View>
+      </View>
+      <TouchableOpacity style={styles.editButtonWrapper} onPress={() => {}}>
+        <Text style={styles.editButton}>프로필 편집</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  profileCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: spacing.md,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    gap: 12,
+    marginBottom: 20,
+  },
+  editButtonWrapper: {
+    position: "absolute",
+    top: spacing.md,
+    right: spacing.md,
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.gray200,
+  },
+  profileInfo: {
+    flex: 1,
+    gap: spacing.xs,
+  },
+  nickname: {
+    ...typography.footerBold12,
+    color: colors.gray600,
+  },
+  bioBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.gray50,
+    borderRadius: 2,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
+  },
+  bio: {
+    ...typography.captionMedium9,
+    color: colors.gray500,
+  },
+  editButton: {
+    ...typography.captionRegular9,
+    color: colors.gray400,
+  },
+});
