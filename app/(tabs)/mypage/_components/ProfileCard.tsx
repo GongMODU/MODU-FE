@@ -5,15 +5,13 @@ export default function ProfileCard() {
   return (
     <View style={styles.profileCard}>
       <View style={styles.avatar} />
-
       <View style={styles.profileInfo}>
         <Text style={styles.nickname}>사용자 닉네임</Text>
-        <Text style={styles.bio} numberOfLines={1}>
-          소셜 로그인 상태 등 추가로 표시할 내용
-        </Text>
+        <View style={styles.bioBadge}>
+          <Text style={styles.bio}>gongjjonku@email.com</Text>
+        </View>
       </View>
-
-      <TouchableOpacity onPress={() => {}}>
+      <TouchableOpacity style={styles.editButtonWrapper} onPress={() => {}}>
         <Text style={styles.editButton}>프로필 편집</Text>
       </TouchableOpacity>
     </View>
@@ -31,6 +29,11 @@ const styles = StyleSheet.create({
     gap: 12,
     marginBottom: 20,
   },
+  editButtonWrapper: {
+    position: "absolute",
+    top: spacing.md,
+    right: spacing.md,
+  },
   avatar: {
     width: 48,
     height: 48,
@@ -43,7 +46,14 @@ const styles = StyleSheet.create({
   },
   nickname: {
     ...typography.footerBold12,
-    color: colors.gray900,
+    color: colors.gray600,
+  },
+  bioBadge: {
+    alignSelf: "flex-start",
+    backgroundColor: colors.gray50,
+    borderRadius: 2,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
   },
   bio: {
     ...typography.captionMedium9,
