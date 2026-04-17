@@ -1,7 +1,7 @@
 import { colors, spacing, typography } from "@/styles";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export function ProfileCard() {
+export default function ProfileCard() {
   return (
     <View style={styles.profileCard}>
       <View style={styles.avatar} />

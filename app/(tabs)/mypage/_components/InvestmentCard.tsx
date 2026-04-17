@@ -1,7 +1,7 @@
 import { colors, spacing, typography } from "@/styles";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export function InvestmentCard() {
+export default function InvestmentCard() {
   return (
     <View style={styles.investmentCard}>
       <View style={styles.chartPlaceholder} />

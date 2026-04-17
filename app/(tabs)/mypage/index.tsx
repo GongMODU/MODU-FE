@@ -1,9 +1,9 @@
 import { colors, spacing, typography } from "@/styles";
 import { ScrollView, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { InvestmentCard } from "./components/InvestmentCard";
-import { MenuList } from "./components/MenuList";
-import { ProfileCard } from "./components/ProfileCard";
+import InvestmentCard from "./_components/InvestmentCard";
+import MenuList from "./_components/MenuList";
+import ProfileCard from "./_components/ProfileCard";
 
 export default function MypageScreen() {
   return (

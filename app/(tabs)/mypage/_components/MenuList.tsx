@@ -8,7 +8,7 @@ const MENU_ITEMS = [
   { label: "로그아웃" },
 ];
 
-export function MenuList() {
+export default function MenuList() {
   return (
     <View style={styles.menuList}>
       {MENU_ITEMS.map((item, index) => (
