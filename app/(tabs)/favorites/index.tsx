@@ -1,11 +1,11 @@
 import { colors, spacing, typography } from "@/styles";
 import { useState } from "react";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FavoriteCard from "./_components/FavoriteCard";
@@ -70,15 +70,7 @@ export default function FavoritesScreen() {
   const [infoVisible, setInfoVisible] = useState(false);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* 헤더 */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>관심 공모주</Text>
-        <TouchableOpacity onPress={() => setInfoVisible((v) => !v)}>
-          <Text style={styles.infoIcon}>ⓘ</Text>
-        </TouchableOpacity>
-      </View>
-
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
       {/* 안내 카드 */}
       {infoVisible && (
         <FavoriteInfoCard onClose={() => setInfoVisible(false)} />
@@ -89,6 +81,14 @@ export default function FavoritesScreen() {
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* 헤더 */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>관심 공모주</Text>
+          <TouchableOpacity onPress={() => setInfoVisible((v) => !v)}>
+            <Text style={styles.infoIcon}>ⓘ</Text>
+          </TouchableOpacity>
+        </View>
+
         {MOCK_DATA.map((item) => (
           <FavoriteCard key={item.id} item={item} />
         ))}
@@ -102,13 +102,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
+  listContent: {
+    paddingHorizontal: spacing.contentArea,
+    paddingTop: 72,
+    paddingBottom: 60,
+    gap: 12,
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: spacing.safeArea,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
   },
   headerTitle: {
     ...typography.largeTitleMedium20,
@@ -117,10 +120,5 @@ const styles = StyleSheet.create({
   infoIcon: {
     fontSize: 17,
     color: colors.gray400,
-  },
-  listContent: {
-    paddingHorizontal: spacing.safeArea,
-    paddingBottom: spacing.md,
-    gap: 12,
   },
 });
