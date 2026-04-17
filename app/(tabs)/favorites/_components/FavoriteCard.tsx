@@ -1,5 +1,5 @@
 import { colors, spacing, typography } from "@/styles";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FavoriteItem } from "../index";
 
 // ─── 증권사 태그 ──────────────────────────────────────────────
@@ -31,22 +31,24 @@ function BrokerTags({ brokers }: { brokers: string[] }) {
 // ─── 카드 ─────────────────────────────────────────────────────
 export default function FavoriteCard({ item }: { item: FavoriteItem }) {
   return (
-    <View style={styles.card}>
-      <Text style={styles.cardTitle}>{item.name}</Text>
+    <TouchableOpacity onPress={() => {}}>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>{item.name}</Text>
 
-      <View style={styles.infoSection}>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>청약시작일</Text>
-          <Text style={styles.infoValue}>{item.subscriptionStartDate}</Text>
+        <View style={styles.infoSection}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>청약시작일</Text>
+            <Text style={styles.infoValue}>{item.subscriptionStartDate}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>공모예정가</Text>
+            <Text style={styles.infoValue}>{item.offeringPrice}</Text>
+          </View>
         </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>공모예정가</Text>
-          <Text style={styles.infoValue}>{item.offeringPrice}</Text>
-        </View>
+
+        <BrokerTags brokers={item.brokers} />
       </View>
-
-      <BrokerTags brokers={item.brokers} />
-    </View>
+    </TouchableOpacity>
   );
 }
 

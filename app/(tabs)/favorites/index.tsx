@@ -1,6 +1,8 @@
 import { colors, spacing, typography } from "@/styles";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
+  Modal,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -68,15 +70,18 @@ const MOCK_DATA: FavoriteItem[] = [
 // ─── 메인 화면 ───────────────────────────────────────────────
 export default function FavoritesScreen() {
   const [infoVisible, setInfoVisible] = useState(false);
+  const [infoCardTop, setInfoCardTop] = useState(0);
+  const infoButtonRef = useRef<View>(null);
+
+  const handleInfoPress = () => {
+    infoButtonRef.current?.measure((_x, _y, _width, height, _pageX, pageY) => {
+      setInfoCardTop(pageY + height - 13);
+      setInfoVisible((v) => !v);
+    });
+  }; // 인포 버튼 아래 어디에 인포 카드가 보여지는지
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      {/* 안내 카드 */}
-      {infoVisible && (
-        <FavoriteInfoCard onClose={() => setInfoVisible(false)} />
-      )}
-
-      {/* 카드 리스트 */}
       <ScrollView
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
@@ -84,7 +89,7 @@ export default function FavoritesScreen() {
         {/* 헤더 */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>관심 공모주</Text>
-          <TouchableOpacity onPress={() => setInfoVisible((v) => !v)}>
+          <TouchableOpacity ref={infoButtonRef} onPress={handleInfoPress}>
             <Text style={styles.infoIcon}>ⓘ</Text>
           </TouchableOpacity>
         </View>
@@ -93,6 +98,22 @@ export default function FavoritesScreen() {
           <FavoriteCard key={item.id} item={item} />
         ))}
       </ScrollView>
+
+      {/* 안내 카드 */}
+      {infoVisible && (
+        <Modal
+          transparent
+          animationType="none"
+          onRequestClose={() => setInfoVisible(false)}
+        >
+          <Pressable
+            style={styles.overlay}
+            onPress={() => setInfoVisible(false)}
+          >
+            <FavoriteInfoCard top={infoCardTop} />
+          </Pressable>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -120,5 +141,8 @@ const styles = StyleSheet.create({
   infoIcon: {
     fontSize: 17,
     color: colors.gray400,
+  },
+  overlay: {
+    flex: 1,
   },
 });
