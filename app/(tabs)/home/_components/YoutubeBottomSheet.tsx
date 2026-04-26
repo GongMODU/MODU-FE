@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 22,
     right: spacing.lg,
+    zIndex: 1,
   },
   closeText: {
     fontSize: 16,
