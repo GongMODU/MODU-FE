@@ -5,7 +5,7 @@ export default function TabLayout() {
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
-        name="index"
+        name="home/index"
         options={{
           title: "홈",
           tabBarIcon: ({ color }) => (
