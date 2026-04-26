@@ -1,26 +1,27 @@
 import { colors, spacing, typography } from "@/styles";
 import { type YoutubeCardData } from "@/types/youtube";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
-    Animated,
-    Dimensions,
-    Linking,
-    Modal,
-    PanResponder,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Animated,
+  Dimensions,
+  Linking,
+  Modal,
+  PanResponder,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 /** 1단계 스냅 포인트 - 버튼 누를 때 올라오는 높이 */
 const SNAP_PARTIAL = 455;
 /** 2단계 스냅 포인트 - 끌어올렸을 때 최대 높이 */
-const SNAP_FULL = SCREEN_HEIGHT * 0.9;
+const SNAP_FULL = SCREEN_HEIGHT * 0.95;
 /** 드래그 방향 판단 임계값 */
 const DRAG_THRESHOLD = 50;
 
@@ -36,7 +37,10 @@ export default function YoutubeBottomSheet({
   onClose,
 }: YoutubeBottomSheetProps) {
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-  const currentSnap = useRef<"partial" | "full">("partial");
+  const [snapState, setSnapState] = useState<"partial" | "full">("partial");
+  const snapRef = useRef<"partial" | "full">("partial");
+
+  const insets = useSafeAreaInsets();
 
   const animateTo = useCallback(
     (toValue: number) => {
@@ -56,18 +60,18 @@ export default function YoutubeBottomSheet({
 
   const panResponder = useRef(
     PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: (_, gestureState) =>
         Math.abs(gestureState.dy) > 5,
       onPanResponderRelease: (_, gestureState) => {
         const { dy } = gestureState;
 
-        if (currentSnap.current === "partial") {
+        if (snapRef.current === "partial") {
           if (dy < -DRAG_THRESHOLD) {
-            // 위로 드래그 → 2단계
-            currentSnap.current = "full";
+            snapRef.current = "full";
+            setSnapState("full");
             animateTo(SCREEN_HEIGHT - SNAP_FULL);
           } else if (dy > DRAG_THRESHOLD) {
-            // 아래로 드래그 → 닫기
             animateTo(SCREEN_HEIGHT);
             setTimeout(onClose, 300);
           } else {
@@ -75,8 +79,8 @@ export default function YoutubeBottomSheet({
           }
         } else {
           if (dy > DRAG_THRESHOLD) {
-            // 위에서 아래로 드래그 → 1단계로
-            currentSnap.current = "partial";
+            snapRef.current = "partial";
+            setSnapState("partial");
             animateTo(SCREEN_HEIGHT - SNAP_PARTIAL);
           } else {
             animateTo(SCREEN_HEIGHT - SNAP_FULL);
@@ -130,12 +134,16 @@ export default function YoutubeBottomSheet({
           </Pressable>
 
           {/* 스크롤 콘텐츠 */}
-          <View style={styles.scrollContainer} {...panResponder.panHandlers}>
+          <View style={styles.scrollContainer}>
             <ScrollView
               style={styles.scrollView}
-              contentContainerStyle={styles.scrollContent}
+              contentContainerStyle={[
+                styles.scrollContent,
+                { paddingBottom: spacing.xl + insets.bottom },
+              ]}
               showsVerticalScrollIndicator={false}
               scrollEventThrottle={16}
+              scrollEnabled={snapState === "full"}
             >
               {data.sections.map((section, index) => (
                 <View key={index} style={styles.section}>
@@ -182,7 +190,7 @@ const styles = StyleSheet.create({
   handleArea: {
     alignItems: "center",
     paddingTop: spacing.md,
-    paddingBottom: spacing.xs,
+    paddingBottom: spacing.md,
   },
   handle: {
     width: 62,
@@ -208,7 +216,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xl,
+    paddingTop: 45,
+    paddingBottom: 80,
     gap: 36,
   },
   section: {
