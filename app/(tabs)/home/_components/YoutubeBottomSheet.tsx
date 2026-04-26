@@ -1,9 +1,11 @@
 import { colors, spacing, typography } from "@/styles";
+import { type YoutubeCardData } from "@/types/youtube";
 import { useCallback, useEffect, useRef } from "react";
 import {
     Animated,
     Dimensions,
     Linking,
+    Modal,
     PanResponder,
     Pressable,
     ScrollView,
@@ -12,7 +14,6 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { YoutubeCardData } from "./types";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -90,59 +91,71 @@ export default function YoutubeBottomSheet({
   }, [data.videoUrl]);
 
   return (
-    <View style={StyleSheet.absoluteFill}>
-      {/* 딤 배경 */}
-      <Pressable
-        style={styles.dim}
-        onPress={() => {
-          animateTo(SCREEN_HEIGHT);
-          setTimeout(onClose, 300);
-        }}
-      />
-
-      {/* 바텀 시트 */}
-      <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
-        {/* 핸들 영역 - 드래그 가능 */}
-        <View style={styles.handleArea} {...panResponder.panHandlers}>
-          <View style={styles.handle} />
-        </View>
-
-        {/* X 버튼 */}
-        <TouchableOpacity
-          style={styles.closeButton}
+    <Modal
+      visible={true}
+      transparent
+      animationType="none"
+      onRequestClose={() => {
+        animateTo(SCREEN_HEIGHT);
+        setTimeout(onClose, 300);
+      }}
+    >
+      <View style={StyleSheet.absoluteFill}>
+        {/* 딤 배경 */}
+        <Pressable
+          style={styles.dim}
           onPress={() => {
             animateTo(SCREEN_HEIGHT);
             setTimeout(onClose, 300);
           }}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Text style={styles.closeText}>×</Text>
-        </TouchableOpacity>
+        />
 
-        {/* 스크롤 콘텐츠 */}
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {data.summaries.map((summary, index) => (
-            <View key={index} style={styles.section}>
-              <Text style={styles.sectionTitle}>{`섹션 ${index + 1}`}</Text>
-              <Text style={styles.sectionBody}>{summary}</Text>
-            </View>
-          ))}
-
-          {/* 출처 영역 */}
-          <View style={styles.sourceArea}>
-            <Text style={styles.sourceChannel}>{data.channelName}</Text>
-            <Text style={styles.sourceTitle}>{data.videoTitle}</Text>
-            <TouchableOpacity onPress={handlePressUrl}>
-              <Text style={styles.sourceUrl}>{data.videoUrl}</Text>
-            </TouchableOpacity>
+        {/* 바텀 시트 */}
+        <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
+          {/* 핸들 영역 */}
+          <View style={styles.handleArea} {...panResponder.panHandlers}>
+            <View style={styles.handle} />
           </View>
-        </ScrollView>
-      </Animated.View>
-    </View>
+
+          {/* X 버튼 */}
+          <Pressable
+            style={styles.closeButton}
+            onPress={() => {
+              animateTo(SCREEN_HEIGHT);
+              setTimeout(onClose, 300);
+            }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.closeText}>×</Text>
+          </Pressable>
+
+          {/* 스크롤 콘텐츠 */}
+          <View style={styles.scrollContainer} {...panResponder.panHandlers}>
+            <ScrollView
+              style={styles.scrollView}
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              scrollEventThrottle={16}
+            >
+              {data.sections.map((section, index) => (
+                <View key={index} style={styles.section}>
+                  <Text style={styles.sectionTitle}>{section.title}</Text>
+                  <Text style={styles.sectionBody}>{section.body}</Text>
+                </View>
+              ))}
+
+              <View style={styles.sourceArea}>
+                <Text style={styles.sourceChannel}>{data.channelName}</Text>
+                <Text style={styles.sourceTitle}>{data.videoTitle}</Text>
+                <TouchableOpacity onPress={handlePressUrl}>
+                  <Text style={styles.sourceUrl}>{data.videoUrl}</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </Animated.View>
+      </View>
+    </Modal>
   );
 }
 
@@ -187,11 +200,14 @@ const styles = StyleSheet.create({
     color: colors.gray400,
     fontFamily: "SF Pro",
   },
+  scrollContainer: {
+    flex: 1,
+  },
   scrollView: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
   },
   scrollContent: {
+    paddingHorizontal: spacing.lg,
     paddingBottom: spacing.xl,
     gap: 36,
   },

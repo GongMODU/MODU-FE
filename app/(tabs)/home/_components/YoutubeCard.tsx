@@ -1,12 +1,12 @@
 import { colors, spacing, typography } from "@/styles";
+import { type YoutubeCardData } from "@/types/youtube";
 import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
-    ViewProps,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewProps,
 } from "react-native";
-import { YoutubeCardData } from "./types";
 
 type YoutubeCardProps = ViewProps & {
   /** 카드 데이터 */
