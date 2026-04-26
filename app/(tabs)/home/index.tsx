@@ -203,11 +203,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sectionTitle: {
-    ...typography.subtitleMedium14,
+    ...typography.largeTitleMedium20,
     color: colors.gray800,
   },
   sectionArrow: {
-    ...typography.subtitleMedium14,
+    fontSize: 16,
     color: colors.gray400,
   },
   cardWrapper: {
