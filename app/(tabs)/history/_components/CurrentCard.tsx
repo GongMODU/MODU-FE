@@ -1,11 +1,11 @@
 import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import {
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { DetailData } from "./HistoryCard";
 
@@ -26,7 +26,7 @@ export default function CurrentCard({
   onPress,
   onChange,
 }: Props) {
-  const fields: { label: string; key: keyof DetailData }[][] = [
+  const fieldRows: { label: string; key: keyof DetailData }[][] = [
     [
       { label: "증권사", key: "증권사" },
       { label: "매도일", key: "매도일" },
@@ -58,10 +58,16 @@ export default function CurrentCard({
 
       {isOpen && (
         <View style={styles.detailContainer}>
-          {fields.map((row, rowIndex) => (
+          {fieldRows.map((row, rowIndex) => (
             <View key={rowIndex} style={styles.detailRow}>
-              {row.map((field) => (
-                <View key={field.key} style={styles.detailItem}>
+              {row.map((field, fieldIndex) => (
+                <View
+                  key={field.key}
+                  style={[
+                    styles.detailBox,
+                    fieldIndex < row.length - 1 && styles.detailBoxGap,
+                  ]}
+                >
                   <Text style={styles.detailLabel}>{field.label}</Text>
                   <TextInput
                     style={styles.detailValue}
@@ -72,7 +78,6 @@ export default function CurrentCard({
                   />
                 </View>
               ))}
-              {row.length === 1 && <View style={styles.detailItem} />}
             </View>
           ))}
         </View>
@@ -112,17 +117,23 @@ const styles = StyleSheet.create({
   },
   detailContainer: {
     marginTop: spacing.md,
+    gap: 4,
   },
   detailRow: {
     flexDirection: "row",
-    borderTopWidth: 1,
-    borderColor: "rgba(255,255,255,0.2)",
-    paddingVertical: spacing.sm,
   },
-  detailItem: {
+  detailBox: {
     flex: 1,
-    paddingHorizontal: spacing.sm,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    backgroundColor: "rgba(255,255,255,0.08)",
     gap: 6,
+  },
+  detailBoxGap: {
+    marginRight: 4,
   },
   detailLabel: {
     ...typography.bodyRegular10,
