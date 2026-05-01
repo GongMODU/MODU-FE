@@ -52,7 +52,7 @@ export default function CurrentCard({
         <Ionicons
           name={isOpen ? "chevron-up" : "chevron-down"}
           size={20}
-          color={colors.white}
+          color={colors.gray500}
         />
       </View>
 
@@ -74,7 +74,7 @@ export default function CurrentCard({
                     value={data[field.key]}
                     onChangeText={(value) => onChange(id, field.key, value)}
                     placeholder="-"
-                    placeholderTextColor="rgba(255,255,255,0.4)"
+                    placeholderTextColor={colors.gray300}
                   />
                 </View>
               ))}
@@ -91,9 +91,11 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.contentArea,
     marginBottom: spacing.xs,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.gray200,
     paddingHorizontal: spacing.md,
     paddingVertical: 14,
-    backgroundColor: colors.gray300,
+    backgroundColor: colors.gray100,
   },
   itemHeader: {
     flexDirection: "row",
@@ -109,15 +111,15 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray500,
   },
   itemName: {
     ...typography.subtitleMedium14,
-    color: colors.white,
+    color: colors.gray500,
   },
   detailContainer: {
     marginTop: spacing.md,
-    gap: 4,
+    gap: 8,
   },
   detailRow: {
     flexDirection: "row",
@@ -125,23 +127,23 @@ const styles = StyleSheet.create({
   detailBox: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
+    borderColor: colors.gray200,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: colors.white,
     gap: 6,
   },
   detailBoxGap: {
-    marginRight: 4,
+    marginRight: 8,
   },
   detailLabel: {
     ...typography.bodyRegular10,
-    color: "rgba(255,255,255,0.7)",
+    color: colors.gray500,
   },
   detailValue: {
     ...typography.subtitleMedium14,
-    color: colors.white,
+    color: colors.gray700,
     padding: 0,
     minHeight: 24,
   },

@@ -1,5 +1,6 @@
 import { colors, spacing, typography } from "@/styles";
 import { type YoutubeCardData } from "@/types/youtube";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -11,8 +12,39 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ScheduleCard, {
+  type ScheduleCardData,
+} from "./_components/ScheduleCard";
 import YoutubeBottomSheet from "./_components/YoutubeBottomSheet";
 import YoutubeCard from "./_components/YoutubeCard";
+
+// TODO: API 연동 시 교체
+const MOCK_SCHEDULE_CARDS: ScheduleCardData[] = [
+  {
+    id: "1",
+    dday: 11,
+    companyName: "키움히어로제2호기업인수목적",
+    startDate: "04/14(화)",
+    priceRange: "2,000~2,000원",
+    broker: "신한투자증권",
+  },
+  {
+    id: "2",
+    dday: 12,
+    companyName: "채비",
+    startDate: "04/15(수)",
+    priceRange: "12,000~14,000원",
+    broker: "신한투자증권",
+  },
+  {
+    id: "3",
+    dday: 13,
+    companyName: "예시종목",
+    startDate: "04/16(목)",
+    priceRange: "5,000~6,000원",
+    broker: "미래에셋증권",
+  },
+];
 
 // TODO: API 연동 시 교체
 const MOCK_YOUTUBE_CARDS: YoutubeCardData[] = [
@@ -112,9 +144,19 @@ export default function HomeScreen() {
             onPress={() => router.push("/schedule")}
           >
             <Text style={styles.sectionTitle}>이번주 청약 일정</Text>
-            <Text style={styles.sectionArrow}>{">"}</Text>
+            <Ionicons name="chevron-forward" size={24} color={colors.gray400} />
           </TouchableOpacity>
-          {/* TODO: 청약 일정 카드 컴포넌트 연동 */}
+
+          {/* 청약 일정 카드 슬라이더 */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.scheduleScrollContent}
+          >
+            {MOCK_SCHEDULE_CARDS.map((card) => (
+              <ScheduleCard key={card.id} data={card} />
+            ))}
+          </ScrollView>
         </View>
 
         {/* 오늘의 유튜브 핵심 요약 */}
@@ -206,9 +248,9 @@ const styles = StyleSheet.create({
     ...typography.largeTitleMedium20,
     color: colors.gray800,
   },
-  sectionArrow: {
-    fontSize: 16,
-    color: colors.gray400,
+
+  scheduleScrollContent: {
+    gap: spacing.sm,
   },
   cardWrapper: {
     width: SCREEN_WIDTH - spacing.lg * 2,
