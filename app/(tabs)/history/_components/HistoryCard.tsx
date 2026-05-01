@@ -69,7 +69,7 @@ export default function HistoryCard({
         <Ionicons
           name={isOpen ? "chevron-up" : "chevron-down"}
           size={20}
-          color={colors.gray400}
+          color={colors.gray500}
         />
       </View>
 
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   cardOpen: {
-    borderColor: colors.gray300,
+    borderColor: colors.gray200,
   },
   itemHeader: {
     flexDirection: "row",
@@ -131,15 +131,15 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.gray300,
+    backgroundColor: colors.gray500,
   },
   itemName: {
     ...typography.subtitleMedium14,
-    color: colors.gray800,
+    color: colors.gray500,
   },
   detailContainer: {
     marginTop: spacing.md,
-    gap: 4,
+    gap: 8,
   },
   detailRow: {
     flexDirection: "row",
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   detailBox: {
     flex: 1,
     borderWidth: 1,
-    borderColor: "#F5F5F5",
+    borderColor: colors.gray200,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
@@ -155,15 +155,15 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   detailBoxGap: {
-    marginRight: 4,
+    marginRight: 8,
   },
   detailLabel: {
     ...typography.bodyRegular10,
-    color: colors.gray400,
+    color: colors.gray500,
   },
   detailValue: {
     ...typography.subtitleMedium14,
-    color: colors.gray800,
+    color: colors.gray700,
     padding: 0,
     minHeight: 24,
   },
