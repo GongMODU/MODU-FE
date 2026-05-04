@@ -63,24 +63,35 @@ export type CompanyTabInfo = {
 };
 
 // ─── 공시 리포트 ───────────────────────────────────────────────
+export type ReportSubItem = {
+  /** 소제목 */
+  subTitle: string;
+  /** 본문 */
+  body: string;
+};
+
+export type ReportSection = {
+  /** 대섹션 타이틀 */
+  title: string;
+  /** 요약박스 텍스트 */
+  summary?: string;
+  /** 소제목+본문 목록 */
+  items: ReportSubItem[];
+};
+
 export type CompanySummary = {
-  /** 기업명 */
   companyName: string;
-  /** 기업 유형 */
   companyType: string;
-  /** 주요 목적 */
   mainPurpose: string;
-  /** 설립일 */
   establishedDate: string;
-  /** 상장일 */
   listingDate: string;
 };
 
 export type DisclosureReport = {
-  /** 기업 요약 */
   companySummary: CompanySummary;
-  /** 재무제표 요약 텍스트 */
   financialSummary: string;
+  /** 더보기 섹션들 */
+  sections: ReportSection[];
 };
 
 // ─── 상세 페이지 전체 데이터 ───────────────────────────────────
