@@ -1,4 +1,5 @@
 import { colors, spacing, typography } from "@/styles";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FavoriteItem } from "../index";
 
@@ -30,8 +31,10 @@ function BrokerTags({ brokers }: { brokers: string[] }) {
 
 // ─── 카드 ─────────────────────────────────────────────────────
 export default function FavoriteCard({ item }: { item: FavoriteItem }) {
+  const router = useRouter();
+
   return (
-    <TouchableOpacity onPress={() => {}}>
+    <TouchableOpacity onPress={() => router.push(`/ipo/${item.id}`)}>
       <View style={styles.card}>
         <Text style={styles.cardTitle}>{item.name}</Text>
 

@@ -103,3 +103,5 @@ export type IPODetail = {
   companyTab: CompanyTabInfo;
   disclosure: DisclosureReport;
 };
+
+export default {};

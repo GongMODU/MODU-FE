@@ -154,7 +154,11 @@ export default function HomeScreen() {
             contentContainerStyle={styles.scheduleScrollContent}
           >
             {MOCK_SCHEDULE_CARDS.map((card) => (
-              <ScheduleCard key={card.id} data={card} />
+              <ScheduleCard
+                key={card.id}
+                data={card}
+                onPress={() => router.push(`/ipo/${card.id}`)}
+              />
             ))}
           </ScrollView>
         </View>
