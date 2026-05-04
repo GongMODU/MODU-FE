@@ -6,9 +6,9 @@ import PredictionTab from "./PredictionTab";
 import SegmentControl, { type SegmentTab } from "./SegmentControl";
 import SubscriptionTab from "./SubscriptionTab";
 import {
-    type CompanyTabInfo,
-    type PredictionInfo,
-    type SubscriptionInfo,
+  type CompanyTabInfo,
+  type PredictionInfo,
+  type SubscriptionInfo,
 } from "./types";
 
 type Props = ViewProps & {
@@ -42,7 +42,12 @@ export default function DetailInfoSection({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: spacing.contentArea,
+    marginHorizontal: spacing.contentArea,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    backgroundColor: colors.white,
+    padding: 16,
     gap: 12,
   },
   title: {
