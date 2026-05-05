@@ -1,5 +1,5 @@
 import { colors, spacing, typography } from "@/styles";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // TODO: API 연동 시 @/types/schedule 로 분리
 export type ScheduleCardData = {
@@ -13,38 +13,41 @@ export type ScheduleCardData = {
 
 type Props = {
   data: ScheduleCardData;
+  onPress?: () => void;
 };
 
-export default function ScheduleCard({ data }: Props) {
+export default function ScheduleCard({ data, onPress }: Props) {
   return (
-    <View style={styles.card}>
-      {/* D-day 뱃지 */}
-      <View style={styles.badge}>
-        <Text style={styles.badgeText}>D-{data.dday}</Text>
-      </View>
-
-      {/* 종목명 */}
-      <Text style={styles.companyName} numberOfLines={1}>
-        {data.companyName}
-      </Text>
-
-      {/* 정보 rows */}
-      <View style={styles.infoSection}>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>청약시작일</Text>
-          <Text style={styles.infoValue}>{data.startDate}</Text>
+    <TouchableOpacity onPress={onPress}>
+      <View style={styles.card}>
+        {/* D-day 뱃지 */}
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>D-{data.dday}</Text>
         </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>공모예정가</Text>
-          <Text style={styles.infoValue}>{data.priceRange}</Text>
+
+        {/* 종목명 */}
+        <Text style={styles.companyName} numberOfLines={1}>
+          {data.companyName}
+        </Text>
+
+        {/* 정보 rows */}
+        <View style={styles.infoSection}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>청약시작일</Text>
+            <Text style={styles.infoValue}>{data.startDate}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>공모예정가</Text>
+            <Text style={styles.infoValue}>{data.priceRange}</Text>
+          </View>
+        </View>
+
+        {/* 증권사 태그 */}
+        <View style={styles.brokerTag}>
+          <Text style={styles.brokerText}>{data.broker}</Text>
         </View>
       </View>
-
-      {/* 증권사 태그 */}
-      <View style={styles.brokerTag}>
-        <Text style={styles.brokerText}>{data.broker}</Text>
-      </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
