@@ -10,27 +10,20 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import SubscriptionCalendar, {
+  CalendarEvent,
+  ScheduleTag,
+  TAG_COLORS,
+} from "./_components/SubscriptionCalendar";
 
-const CHIPS = ["수요예측", "공모청약", "락업해제", "환불", "상장", "배정"];
-
-// 태그 타입
-type ScheduleTag =
-  | "수요예측"
-  | "공모청약"
-  | "락업해제"
-  | "환불"
-  | "상장"
-  | "배정";
-
-// 태그별 색상 매핑
-const TAG_COLORS: Record<ScheduleTag, string> = {
-  수요예측: colors.calender.demandBlue,
-  공모청약: colors.primary600,
-  락업해제: colors.calender.lockupPink,
-  환불: colors.calender.refundSlate,
-  상장: colors.calender.listingGreen,
-  배정: colors.calender.allocationOrange,
-};
+const CHIPS: ScheduleTag[] = [
+  "수요예측",
+  "공모청약",
+  "락업해제",
+  "환불",
+  "상장",
+  "배정",
+];
 
 // TODO: API 연동 시 교체
 type TodayScheduleItem = {
@@ -57,15 +50,58 @@ const MOCK_TODAY_SCHEDULE: TodayScheduleItem[] = [
   },
 ];
 
+// TODO: API 연동 시 교체
+const today = new Date();
+const MOCK_EVENTS: CalendarEvent[] = [
+  {
+    id: "e1",
+    date: new Date(today.getFullYear(), today.getMonth(), 1),
+    companyName: "공쫀쿠제12호",
+    tag: "수요예측",
+  },
+  {
+    id: "e2",
+    date: new Date(today.getFullYear(), today.getMonth(), 1),
+    companyName: "공쫀쿠인수목적",
+    tag: "배정",
+  },
+  {
+    id: "e3",
+    date: new Date(today.getFullYear(), today.getMonth(), 2),
+    companyName: "공쫀쿠인수목적",
+    tag: "공모청약",
+  },
+  {
+    id: "e4",
+    date: new Date(today.getFullYear(), today.getMonth(), 3),
+    companyName: "공쫀ㄹ쿠인수목적",
+    tag: "환불",
+  },
+  {
+    id: "e5",
+    date: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
+    companyName: "신한제18호",
+    tag: "배정",
+  },
+  {
+    id: "e6",
+    date: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
+    companyName: "플레드",
+    tag: "수요예측",
+  },
+];
+
 export default function SubscriptionScheduleScreen() {
   const router = useRouter();
-  const [selectedChip, setSelectedChip] = useState("수요예측");
+  const [selectedChip, setSelectedChip] = useState<ScheduleTag>("수요예측");
 
-  const currentMonth = new Date().getMonth() + 1;
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* 헤더 - 스크롤과 무관하게 상단 고정 */}
+      {/* 헤더 */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#333" />
@@ -85,29 +121,40 @@ export default function SubscriptionScheduleScreen() {
           style={styles.chipContainer}
           contentContainerStyle={styles.chipContent}
         >
-          {CHIPS.map((chip) => (
-            <TouchableOpacity
-              key={chip}
-              style={[
-                styles.chip,
-                selectedChip === chip && styles.chipSelected,
-              ]}
-              onPress={() => setSelectedChip(chip)}
-            >
-              <Text
+          {CHIPS.map((chip) => {
+            const isSelected = selectedChip === chip;
+            const chipColor = TAG_COLORS[chip];
+            return (
+              <TouchableOpacity
+                key={chip}
                 style={[
-                  styles.chipText,
-                  selectedChip === chip && styles.chipTextSelected,
+                  styles.chip,
+                  { borderColor: chipColor },
+                  isSelected && { backgroundColor: chipColor },
                 ]}
+                onPress={() => setSelectedChip(chip)}
               >
-                {chip}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.chipText,
+                    { color: chipColor },
+                    isSelected && styles.chipTextSelected,
+                  ]}
+                >
+                  {chip}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
 
-        {/* 캘린더 공백 영역 */}
-        <View style={styles.calendarPlaceholder} />
+        {/* 캘린더 */}
+        <SubscriptionCalendar
+          year={currentYear}
+          month={currentMonth}
+          events={MOCK_EVENTS}
+          selectedTag={selectedChip}
+        />
 
         {/* 오늘 주요 일정 */}
         <Text style={styles.sectionTitle}>오늘 주요 일정</Text>
@@ -173,27 +220,15 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#ddd",
-    backgroundColor: "#fff",
-  },
-  chipSelected: {
-    backgroundColor: "#7B61FF",
-    borderColor: "#7B61FF",
+    backgroundColor: colors.white,
   },
   chipText: {
     fontSize: 13,
-    color: "#666",
+    fontWeight: "500",
   },
   chipTextSelected: {
-    color: "#fff",
+    color: colors.white,
     fontWeight: "600",
-  },
-  calendarPlaceholder: {
-    marginHorizontal: 20,
-    height: 390,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 12,
-    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 18,
@@ -204,6 +239,7 @@ const styles = StyleSheet.create({
   todayScheduleList: {
     paddingHorizontal: 20,
     gap: 8,
+    marginBottom: 24,
   },
   scheduleCard: {
     flexDirection: "row",
