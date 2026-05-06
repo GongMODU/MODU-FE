@@ -3,7 +3,12 @@ import { Tabs } from "expo-router";
 
 export default function TabLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: { justifyContent: "space-around" },
+      }}
+    >
       <Tabs.Screen
         name="home"
         options={{
@@ -41,9 +46,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="schedule/index"
+        name="schedule"
         options={{
-          href: null, // 탭바에 아이콘 안 보이게
+          href: null,
           headerShown: false,
         }}
       />
