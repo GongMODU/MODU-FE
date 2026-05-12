@@ -90,7 +90,7 @@ export type CompanySummary = {
 export type DisclosureReport = {
   companySummary: CompanySummary;
   financialSummary: string;
-  /** 더보기 섹션들 */
+  financialChart: FinancialChartData;
   sections: ReportSection[];
 };
 
@@ -102,6 +102,28 @@ export type IPODetail = {
   prediction: PredictionInfo;
   companyTab: CompanyTabInfo;
   disclosure: DisclosureReport;
+};
+
+// ─── 재무제표 차트 ─────────────────────────────────────────────
+export type FinancialTerm = {
+  /** 항목명 (매출액, 자산총계, 부채총계, 당기순손실) */
+  label: string;
+  /** 항목 설명 (동적) */
+  description: string;
+};
+
+export type FinancialPeriod = {
+  /** 기수명 (제2기, 제3기, ...) */
+  periodName: string;
+  /** 원 단위 숫자. 항목 순서: [매출액, 자산총계, 부채총계, 당기순손실] */
+  values: [number, number, number, number];
+};
+
+export type FinancialChartData = {
+  /** 기수 목록 — 인덱스 순서대로 primary200, primary600 색상 매핑 */
+  periods: FinancialPeriod[];
+  /** 항목명 + 설명 목록 */
+  terms: FinancialTerm[];
 };
 
 export default {};

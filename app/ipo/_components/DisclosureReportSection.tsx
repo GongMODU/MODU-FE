@@ -1,11 +1,11 @@
-import { colors, typography } from "@/styles";
+import { colors, spacing, typography } from "@/styles";
 import { useState } from "react";
 import {
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
-    type ViewProps,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type ViewProps,
 } from "react-native";
 import FinancialChart from "./FinancialChart";
 import { type DisclosureReport, type ReportSection } from "./types";
@@ -89,7 +89,9 @@ export default function DisclosureReportSection({
         <View style={styles.summaryBox}>
           <Text style={styles.summaryText}>{data.financialSummary}</Text>
         </View>
-        <FinancialChart />
+        <View style={styles.card}>
+          <FinancialChart data={data.financialChart} />
+        </View>
       </View>
 
       {/* 더보기 섹션들 */}
@@ -113,6 +115,7 @@ export default function DisclosureReportSection({
 
 const styles = StyleSheet.create({
   container: {
+    marginHorizontal: spacing.contentArea,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.gray200,

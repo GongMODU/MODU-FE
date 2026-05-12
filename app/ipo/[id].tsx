@@ -53,6 +53,24 @@ const MOCK_IPO_DETAIL: IPODetail = {
     },
     financialSummary:
       "스팩은 영업 활동을 하지 않으므로 매출은 0원인 것이 정상이에요. 대신 투자금(자산)이 안전하게 관리되고 있는지 확인해야 해요.",
+    financialChart: {
+      periods: [
+        {
+          periodName: "제2기",
+          values: [0, 11_0000_0000, 7_2000_0000, 2144_0000],
+        },
+        {
+          periodName: "제3기",
+          values: [0, 109_4000_0000, 13_0000_0000, 2946_0000],
+        },
+      ],
+      terms: [
+        { label: "매출액", description: "영업을 하지 않는 서류상 회사" },
+        { label: "자산총계", description: "공모 자금 유입으로 크게 증가" },
+        { label: "부채총계", description: "주로 발행한 전환사채 관련 부채" },
+        { label: "당기순손실", description: "운영비 지출로 인한 장부상 손실" },
+      ],
+    },
     sections: [
       {
         title: "투자자 보호를 위한 안전장치",
