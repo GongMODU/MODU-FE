@@ -1,15 +1,253 @@
-import { StyleSheet, View, type ViewProps } from "react-native";
+import { colors, typography } from "@/styles";
+import { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  type LayoutChangeEvent,
+  type ViewProps,
+} from "react-native";
+import Svg, { Line, Rect } from "react-native-svg";
+import { type FinancialChartData } from "./types";
 
-type Props = ViewProps;
+type Props = ViewProps & {
+  /** 재무제표 차트 데이터 */
+  data: FinancialChartData;
+};
 
-export default function FinancialChart({ style, ...props }: Props) {
-  return <View style={[styles.container, style]} {...props} />;
+// ─── 상수 ──────────────────────────────────────────────────────
+const CHART_HEIGHT = 153;
+const Y_AXIS_WIDTH = 30;
+const CHART_PADDING_TOP = 8;
+const BAR_GROUP_GAP = 16;
+const BAR_GAP = 4;
+
+/** Y축 고정 눈금값 (원 단위) — 로그 스케일 기준점 */
+const Y_TICKS: { label: string; value: number }[] = [
+  { label: "100억", value: 100_0000_0000 },
+  { label: "10억", value: 10_0000_0000 },
+  { label: "억", value: 1_0000_0000 },
+  { label: "천만", value: 1000_0000 },
+  { label: "백만", value: 100_0000 },
+];
+
+/** 막대 색상 — 기수 인덱스 순서대로 매핑 */
+const BAR_COLORS = [colors.primary200, colors.primary600] as const;
+
+// ─── 로그 스케일 변환 ───────────────────────────────────────────
+const LOG_MIN = Math.log10(Y_TICKS[Y_TICKS.length - 1].value);
+const LOG_MAX = Math.log10(Y_TICKS[0].value);
+const LOG_RANGE = LOG_MAX - LOG_MIN;
+
+/**
+ * 원 단위 값을 차트 Y 좌표로 변환
+ * value가 0이거나 음수면 최하단 반환
+ */
+function valueToY(value: number, chartHeight: number): number {
+  if (value <= 0) return chartHeight;
+  const logVal = Math.log10(value);
+  const ratio = (logVal - LOG_MIN) / LOG_RANGE;
+  const clampedRatio = Math.min(Math.max(ratio, 0), 1);
+  return chartHeight - clampedRatio * (chartHeight - CHART_PADDING_TOP);
+}
+
+// ─── 재무제표 차트 ──────────────────────────────────────────────
+export default function FinancialChart({ data, style, ...props }: Props) {
+  const { periods, terms } = data;
+  const periodCount = periods.length;
+  const termCount = terms.length;
+
+  const [svgWidth, setSvgWidth] = useState(0);
+
+  function handleLayout(e: LayoutChangeEvent): void {
+    setSvgWidth(e.nativeEvent.layout.width);
+  }
+
+  const groupWidth =
+    svgWidth > 0 ? (svgWidth - BAR_GROUP_GAP * (termCount - 1)) / termCount : 0;
+  const barWidth =
+    groupWidth > 0
+      ? (groupWidth - BAR_GAP * (periodCount - 1)) / periodCount
+      : 0;
+
+  return (
+    <View style={[styles.container, style]} {...props}>
+      {/* 범례 */}
+      <View style={styles.legend}>
+        {periods.map((period, i) => (
+          <View key={period.periodName} style={styles.legendItem}>
+            <View
+              style={[
+                styles.legendDot,
+                { backgroundColor: BAR_COLORS[i % BAR_COLORS.length] },
+              ]}
+            />
+            <Text style={styles.legendText}>{period.periodName}</Text>
+          </View>
+        ))}
+      </View>
+
+      {/* 차트 영역 */}
+      <View style={styles.chartRow}>
+        {/* Y축 라벨 */}
+        <View style={[styles.yAxisLabels, { height: CHART_HEIGHT }]}>
+          {Y_TICKS.map((tick) => (
+            <Text
+              key={tick.label}
+              style={[
+                styles.yLabel,
+                { top: valueToY(tick.value, CHART_HEIGHT) - 5 },
+              ]}
+            >
+              {tick.label}
+            </Text>
+          ))}
+        </View>
+
+        {/* SVG 차트 본체 */}
+        <View style={styles.svgWrapper} onLayout={handleLayout}>
+          <Svg width={svgWidth} height={CHART_HEIGHT}>
+            {/* 수평 그리드 라인 */}
+            {Y_TICKS.map((tick) => {
+              const y = valueToY(tick.value, CHART_HEIGHT);
+              return (
+                <Line
+                  key={tick.label}
+                  x1={0}
+                  y1={y}
+                  x2={svgWidth}
+                  y2={y}
+                  stroke={colors.gray100}
+                  strokeWidth={1}
+                />
+              );
+            })}
+
+            {/* 막대 */}
+            {terms.map((_, termIdx) => {
+              const groupX = termIdx * (groupWidth + BAR_GROUP_GAP);
+              return periods.map((period, periodIdx) => {
+                const value = period.values[termIdx];
+                const barColor = BAR_COLORS[periodIdx % BAR_COLORS.length];
+                const barX = groupX + periodIdx * (barWidth + BAR_GAP);
+                const barY = valueToY(value, CHART_HEIGHT);
+                const barHeight = CHART_HEIGHT - barY;
+
+                return (
+                  <Rect
+                    key={`${termIdx}-${periodIdx}`}
+                    x={barX}
+                    y={barY}
+                    width={barWidth}
+                    height={Math.max(barHeight, 0)}
+                    fill={barColor}
+                  />
+                );
+              });
+            })}
+          </Svg>
+
+          {/* X축 라벨 */}
+          <View style={styles.xAxisLabels}>
+            {terms.map((term) => (
+              <Text key={term.label} style={styles.xLabel}>
+                {term.label}
+              </Text>
+            ))}
+          </View>
+        </View>
+      </View>
+
+      {/* 용어 설명 */}
+      <View style={styles.termList}>
+        {terms.map((term, i) => (
+          <View
+            key={term.label}
+            style={[
+              styles.termItem,
+              i < terms.length - 1 && styles.termItemGap,
+            ]}
+          >
+            <Text style={styles.termLabel}>{term.label}</Text>
+            <Text style={styles.termDescription}>{term.description}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: "100%",
-    height: 153,
-    backgroundColor: "#DDDDDD",
+    gap: 8,
+  },
+  legend: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 20,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 20,
+  },
+  legendText: {
+    ...typography.captionMedium8,
+    color: colors.gray400,
+  },
+  chartRow: {
+    flexDirection: "row",
+    gap: 4,
+  },
+  yAxisLabels: {
+    width: Y_AXIS_WIDTH,
+    position: "relative",
+  },
+  yLabel: {
+    ...typography.captionMedium8,
+    color: colors.gray400,
+    textAlign: "right",
+    width: Y_AXIS_WIDTH,
+    position: "absolute",
+  },
+  svgWrapper: {
+    flex: 1,
+    gap: 4,
+  },
+  xAxisLabels: {
+    flexDirection: "row",
+  },
+  xLabel: {
+    ...typography.captionMedium8,
+    color: colors.gray500,
+    textAlign: "center",
+    flex: 1,
+  },
+  termList: {
+    gap: 0,
+  },
+  termItem: {
+    flexDirection: "row",
+    gap: 16,
+    paddingVertical: 8,
+  },
+  termItemGap: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.gray100,
+  },
+  termLabel: {
+    ...typography.labelMedium10,
+    color: colors.gray600,
+    width: 52,
+  },
+  termDescription: {
+    ...typography.bodyRegular10,
+    color: colors.gray500,
+    flex: 1,
   },
 });
