@@ -146,10 +146,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     rowGap: 12,
-    columnGap: 48,
   },
   infoItem: {
     gap: 4,
+    width: "50%",
   },
   infoLabel: {
     ...typography.captionMedium9,
