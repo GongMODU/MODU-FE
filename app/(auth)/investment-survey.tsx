@@ -104,7 +104,9 @@ export default function InvestmentSurveyScreen() {
             styles.completeButton,
             allAnswered && styles.completeButtonActive,
           ]}
-          onPress={() => allAnswered && router.replace("/(tabs)/home")}
+          onPress={() =>
+            allAnswered && router.replace("/(auth)/investment-intro")
+          }
           disabled={!allAnswered}
         >
           <Text

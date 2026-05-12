@@ -16,7 +16,7 @@ export default function InvestmentIntroScreen() {
       <ScrollView contentContainerStyle={styles.inner}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={() => router.replace("/(tabs)/home")}
         >
           <Ionicons name="chevron-back" size={24} color={colors.gray800} />
         </TouchableOpacity>
@@ -46,7 +46,7 @@ export default function InvestmentIntroScreen() {
         {/* 시작하기 버튼 */}
         <TouchableOpacity
           style={styles.startButton}
-          onPress={() => router.push("/(auth)/investment-survey")}
+          onPress={() => router.replace("/(tabs)/home")}
         >
           <Text style={styles.startButtonText}>시작하기</Text>
         </TouchableOpacity>

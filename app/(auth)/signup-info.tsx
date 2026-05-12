@@ -111,7 +111,7 @@ export default function SignupInfoScreen() {
               isNextEnabled && styles.nextButtonActive,
             ]}
             onPress={() =>
-              isNextEnabled && router.push("/(auth)/investment-intro")
+              isNextEnabled && router.push("/(auth)/investment-survey")
             }
             disabled={!isNextEnabled}
           >
