@@ -1,7 +1,9 @@
 import { colors, spacing, typography } from "@/styles";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function ProfileCard() {
+  const router = useRouter();
   return (
     <View style={styles.profileCard}>
       <View style={styles.avatar} />
@@ -11,7 +13,10 @@ export default function ProfileCard() {
           <Text style={styles.bio}>gongjjonku@email.com</Text>
         </View>
       </View>
-      <TouchableOpacity style={styles.editButtonWrapper} onPress={() => {}}>
+      <TouchableOpacity
+        style={styles.editButtonWrapper}
+        onPress={() => router.push("/mypage/profile-edit")}
+      >
         <Text style={styles.editButton}>프로필 편집</Text>
       </TouchableOpacity>
     </View>
