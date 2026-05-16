@@ -1,12 +1,18 @@
 import { colors, spacing, typography } from "@/styles";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function InvestmentCard() {
+  const router = useRouter();
+
   return (
     <View style={styles.investmentCard}>
       <View style={styles.chartPlaceholder} />
 
-      <TouchableOpacity style={styles.retestButton} onPress={() => {}}>
+      <TouchableOpacity
+        style={styles.retestButton}
+        onPress={() => router.push("/(tabs)/mypage/investment-retest")}
+      >
         <Text style={styles.retestButtonText}>다시 검사하기</Text>
       </TouchableOpacity>
     </View>
