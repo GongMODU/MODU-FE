@@ -34,6 +34,66 @@ const questions = [
       "수요예측, 의무확약, 유통가능물량, 균등배정, 비례배정, 최소청약증거금, 기관경쟁률",
     options: ["모두 알고 있다", "4~6개 알고 있다", "1~3개 알고 있다"],
   },
+  {
+    id: 4,
+    question: "4. 공시 리포트나 투자 뉴스를 읽을 때 어떤 느낌인가요?",
+    options: [
+      "무슨 말인지 거의 모르겠다",
+      "어느 정도 읽히지만 어렵다",
+      "대부분 이해한다",
+    ],
+  },
+  {
+    id: 5,
+    question: "5. 공모주 청약에 쓸 수 있는 여유 자금 규모는 어느 정도인가요?",
+    options: ["50만 원 미만", "50~200만 원", "200~500만 원", "500만 원 이상"],
+  },
+  {
+    id: 6,
+    question: "6. 상장 후 주가가 공모가보다 10% 떨어졌다면 어떻게 하시겠어요?",
+    options: [
+      "즉시 손절한다",
+      "조금 기다려본다",
+      "물타기(추가 매수)를 고려한다",
+      "장기 보유한다",
+    ],
+  },
+  {
+    id: 7,
+    question:
+      "7. 공모주 청약에 넣는 돈이 전체 투자 자산에서 차지하는 비중이 어느 정도인가요?",
+    options: ["10% 미만", "10~30%", "30~50%", "절반 이상"],
+  },
+  {
+    id: 8,
+    question:
+      "8. 신호등이 '위험'인 공모주라도 관심이 가는 기업이라면 청약할 의향이 있나요?",
+    options: [
+      "절대 안 한다",
+      "다른 정보를 더 찾아보고 결정한다",
+      "신호등보다 내 판단을 믿는다",
+    ],
+  },
+  {
+    id: 9,
+    question: "9. 평소 투자 자산을 어떻게 운용하고 있나요?",
+    options: [
+      "예/적금만 한다",
+      "주식 일부 + 예적금 병행",
+      "주식/펀드 위주로 운용",
+      "코인/레버리지 등 고위험 자산 포함",
+    ],
+  },
+  {
+    id: 10,
+    question: "10. 공모주에서 기대하는 수익 실현 시점은 언제인가요?",
+    options: [
+      "상장 당일 팔겠다",
+      "1~3개월 내 팔겠다",
+      "6개월~1년 이상 보유하겠다",
+      "상황 봐서 / 정해두지 않겠다",
+    ],
+  },
 ];
 
 export default function InvestmentSurveyScreen() {
@@ -133,7 +193,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: spacing.contentArea,
-    paddingVertical: spacing.md,
+    paddingTop: 72,
+    paddingBottom: spacing.md,
   },
   headerTitle: {
     fontSize: 18,
@@ -143,6 +204,7 @@ const styles = StyleSheet.create({
   inner: {
     paddingHorizontal: spacing.contentArea,
     paddingBottom: spacing.xl,
+    paddingTop: 20,
     gap: spacing.xl,
   },
   questionBlock: {

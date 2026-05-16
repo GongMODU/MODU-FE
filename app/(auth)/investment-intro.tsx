@@ -66,7 +66,8 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xl,
   },
   backButton: {
-    paddingVertical: spacing.md,
+    paddingTop: 72,
+    paddingBottom: spacing.md,
     alignSelf: "flex-start",
   },
   greetingSection: {
