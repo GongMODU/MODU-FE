@@ -91,26 +91,55 @@ const MOCK_EVENTS: CalendarEvent[] = [
   },
 ];
 
+const TOOLTIP_TERMS: { key: string; description: string }[] = [
+  {
+    key: "수요예측",
+    description:
+      "IPO(기업공개) 전에 기관투자자를 대상으로 공모 주식에 대한 수요와 희망 가격을 조사해 최종 공모가를 결정하는 절차입니다. 기관들의 수요 데이터를 바탕으로 공모 가격 범위가 확정됩니다.",
+  },
+  {
+    key: "공모청약",
+    description:
+      "공모청약은 일반 투자자가 기업공개 시 공모 주식을 배정받기 위해 증권사에 청약을 신청하는 절차입니다.",
+  },
+  {
+    key: "락업",
+    description:
+      "락업(보호예수)은 상장 후 일정 기간 동안 주요 주주가 보유 주식을 매도하지 못하도록 하는 의무 보유 제도입니다.",
+  },
+  {
+    key: "상장",
+    description:
+      "상장은 기업의 주식이 증권거래소에서 공식적으로 매매될 수 있도록 등록하는 절차입니다.",
+  },
+  {
+    key: "배정",
+    description:
+      "배정은 공모청약 후 청약자들에게 실제로 주식을 나눠주는 절차입니다. 청약 경쟁률에 따라 배정 수량이 결정됩니다.",
+  },
+];
+
 export default function SubscriptionScheduleScreen() {
   const router = useRouter();
   const [selectedChip, setSelectedChip] = useState<ScheduleTag>("수요예측");
+  const [tooltipVisible, setTooltipVisible] = useState(false);
+  const [expandedTerm, setExpandedTerm] = useState<string | null>(null);
 
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
 
+  const handleTermPress = (term: string) => {
+    setExpandedTerm((prev) => (prev === term ? null : term));
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* 헤더 */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="chevron-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>청약 일정</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
-      <ScrollView showsVerticalScrollIndicator={false}>
+      {/* 스크롤 콘텐츠 — paddingTop: 72으로 다른 페이지와 동일한 상단 공백 */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* 현재 월 */}
         <Text style={styles.monthText}>{currentMonth}월</Text>
 
@@ -178,6 +207,67 @@ export default function SubscriptionScheduleScreen() {
           ))}
         </View>
       </ScrollView>
+
+      {/* 고정 헤더 — 스크롤 위에 절대 위치로 올라탐 */}
+      <View style={styles.fixedHeader} pointerEvents="box-none">
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color="#333" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>청약 일정</Text>
+        <TouchableOpacity
+          onPress={() => setTooltipVisible((v) => !v)}
+          hitSlop={8}
+        >
+          <Ionicons
+            name="information-circle-outline"
+            size={20}
+            color={colors.gray400}
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* 툴팁 오버레이 */}
+      {tooltipVisible && (
+        <>
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => setTooltipVisible(false)}
+          />
+          <View style={styles.tooltipCard}>
+            <Text style={styles.tooltipTitle}>
+              청약 일정 용어가 궁금하신가요?
+            </Text>
+            <View>
+              {TOOLTIP_TERMS.map((term) => {
+                const isExpanded = expandedTerm === term.key;
+                return (
+                  <TouchableOpacity
+                    key={term.key}
+                    style={styles.termSection}
+                    onPress={() => handleTermPress(term.key)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.termHeader}>
+                      <Text style={styles.termName}>{term.key}</Text>
+                      <Ionicons
+                        name={isExpanded ? "chevron-up" : "chevron-down"}
+                        size={14}
+                        color={colors.gray500}
+                      />
+                    </View>
+                    {isExpanded && (
+                      <Text style={styles.termDescription}>
+                        {term.description}
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        </>
+      )}
     </SafeAreaView>
   );
 }
@@ -187,12 +277,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  header: {
+  scrollContent: {
+    paddingTop: 120,
+    paddingBottom: 24,
+  },
+  // 고정 헤더: 스크롤 위에 겹쳐서 표시
+  fixedHeader: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingTop: 95,
+    paddingBottom: 4,
+    backgroundColor: colors.white,
   },
   headerTitle: {
     fontSize: 18,
@@ -202,7 +303,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     textAlign: "center",
-    marginTop: 12,
     marginBottom: 18,
   },
   chipContainer: {
@@ -272,5 +372,52 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: "500",
     paddingHorizontal: 4,
+  },
+  // 툴팁
+  tooltipCard: {
+    position: "absolute",
+    top: 100,
+    right: 16,
+    width: 280,
+    backgroundColor: colors.white,
+    borderRadius: 10,
+    paddingTop: 16,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.25,
+    shadowRadius: 2,
+    elevation: 5,
+    zIndex: 100,
+  },
+  tooltipTitle: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: colors.gray700,
+    lineHeight: 15.6,
+    marginBottom: 16,
+  },
+  termSection: {
+    borderTopWidth: 1,
+    borderTopColor: colors.gray200,
+    paddingVertical: 16,
+  },
+  termHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  termName: {
+    fontSize: 10,
+    fontWeight: "500",
+    color: colors.gray600,
+  },
+  termDescription: {
+    fontSize: 9,
+    fontWeight: "500",
+    color: colors.gray400,
+    lineHeight: 11.7,
+    marginTop: 8,
   },
 });

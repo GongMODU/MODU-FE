@@ -12,6 +12,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ProfitRateSection from "./_components/ProfitRateSection";
 import ScheduleCard, {
   type ScheduleCardData,
 } from "./_components/ScheduleCard";
@@ -207,12 +208,7 @@ export default function HomeScreen() {
         </View>
 
         {/* 나의 평균 수익률 */}
-        <View style={styles.section}>
-          <TouchableOpacity onPress={() => router.push("/history")}>
-            <Text style={styles.sectionTitle}>나의 평균 수익률</Text>
-          </TouchableOpacity>
-          {/* TODO: 수익률 컴포넌트 연동 */}
-        </View>
+        <ProfitRateSection />
       </ScrollView>
 
       {/* 바텀 시트 */}
