@@ -1,10 +1,14 @@
+import { updateNickname, updatePassword } from "@/lib/api/mypage";
+import { queryKeys } from "@/lib/queryKeys";
 import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -16,6 +20,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { z } from "zod";
+import { mypageHomeOptions } from "./_components/queries";
 
 type ProfileEditFormValues = {
   nickname: string;
@@ -60,20 +65,51 @@ export default function ProfileEditScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordConfirmVisible, setPasswordConfirmVisible] = useState(false);
 
+  const queryClient = useQueryClient();
+  const { data } = useQuery(mypageHomeOptions());
+
+  const nicknameMutation = useMutation({
+    mutationFn: (nickname: string) => updateNickname(nickname),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.mypage.home() });
+    },
+  });
+
+  const passwordMutation = useMutation({
+    mutationFn: ({
+      newPassword,
+      newPasswordConfirm,
+    }: {
+      newPassword: string;
+      newPasswordConfirm: string;
+    }) => updatePassword(newPassword, newPasswordConfirm),
+  });
+
   const {
     control,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm<ProfileEditFormValues>({
     resolver: zodResolver(profileEditSchema),
     defaultValues: {
-      nickname: "닉네임닉네임",
+      nickname: data?.nickname ?? "",
       newPassword: "",
       newPasswordConfirm: "",
     },
     mode: "onChange",
   });
+
+  useEffect(() => {
+    if (data?.nickname) {
+      reset({
+        nickname: data.nickname,
+        newPassword: "",
+        newPasswordConfirm: "",
+      });
+    }
+  }, [data?.nickname, reset]);
 
   const newPassword = watch("newPassword");
 
@@ -81,11 +117,31 @@ export default function ProfileEditScreen() {
     !!errors.nickname ||
     (!!newPassword && (!!errors.newPassword || !!errors.newPasswordConfirm));
 
-  const onSubmit: SubmitHandler<ProfileEditFormValues> = (data) => {
-    // TODO: API 연동
-    // 닉네임 변경: PATCH /api/mypage/profile/nickname
-    // 비밀번호 변경: PATCH /api/mypage/profile/password
-    router.back();
+  const onSubmit: SubmitHandler<ProfileEditFormValues> = async (data) => {
+    try {
+      const promises: Promise<unknown>[] = [];
+
+      if (
+        data.nickname !==
+        queryClient.getQueryData(mypageHomeOptions().queryKey)?.nickname
+      ) {
+        promises.push(nicknameMutation.mutateAsync(data.nickname));
+      }
+
+      if (data.newPassword) {
+        promises.push(
+          passwordMutation.mutateAsync({
+            newPassword: data.newPassword,
+            newPasswordConfirm: data.newPasswordConfirm ?? "",
+          }),
+        );
+      }
+
+      await Promise.all(promises);
+      router.back();
+    } catch {
+      Alert.alert("오류", "변경에 실패했습니다. 다시 시도해주세요.");
+    }
   };
 
   return (
