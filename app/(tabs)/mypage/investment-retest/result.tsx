@@ -1,31 +1,34 @@
 import { colors, spacing, typography } from "@/styles";
-import { type InvestmentAnalysisResult } from "@/types/investment";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { mypageHomeOptions } from "../_components/queries";
 
-// ─── 목 데이터 — API 연동 시 useQuery 결과로 교체 ──────────────
-const MOCK_RESULT: Pick<
-  InvestmentAnalysisResult,
-  "koreanName" | "keywordTags"
-> = {
-  koreanName: "데이터 기반 승부사",
-  keywordTags: ["#고급데이터", "#자체판단", "#고활용"],
+type ResultParams = {
+  koreanName: string;
+  keywordTags: string;
 };
-
-const MOCK_NICKNAME = "공쫀쿠"; // API 연동 시 GET /api/mypage/home 응답의 nickname으로 교체
 
 export default function InvestmentRetestResultScreen() {
   const router = useRouter();
-  const { koreanName, keywordTags } = MOCK_RESULT;
-  const nickname = MOCK_NICKNAME;
+  const { koreanName, keywordTags: keywordTagsJson } =
+    useLocalSearchParams<ResultParams>();
+
+  const { data } = useQuery(mypageHomeOptions());
+  const nickname = data?.nickname ?? "";
+
+  const rawKeywordTags = keywordTagsJson ? JSON.parse(keywordTagsJson) : [];
+  const keywordTags: string[] = Array.isArray(rawKeywordTags)
+    ? rawKeywordTags.map((t: string) => (t.startsWith("#") ? t : `#${t}`))
+    : [];
 
   return (
     <SafeAreaView edges={["top"]} style={styles.container}>
