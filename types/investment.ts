@@ -69,8 +69,8 @@ export type InvestmentAnalysisResult = {
   koreanName: string;
   /** 영문 유형명 */
   englishName: string;
-  /** 태그 목록 — DB JSONB 기반으로 string[] 추정, 연동 시 검증 필요 */
-  keywordTags: string[];
+  /** 태그 목록 */
+  keywordTags: string;
   /** 축 조합 요약 설명 */
   axisSummary: string;
   /** 유형 상세 설명 */

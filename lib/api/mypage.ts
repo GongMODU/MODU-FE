@@ -1,4 +1,9 @@
 import apiClient from "@/lib/axios";
+import {
+    type InvestmentAnalysisResult,
+    type InvestmentAnswersPayload,
+    type InvestmentQuestionsResponse,
+} from "@/types/investment";
 import { type MypageHomeResponse } from "@/types/mypage";
 
 export const getMypageHome = () =>
@@ -17,3 +22,14 @@ export const updatePassword = (
     newPassword,
     newPasswordConfirm,
   });
+
+export const getRetestQuestions = () =>
+  apiClient.get<InvestmentQuestionsResponse>(
+    "/api/mypage/investment-profile/questions",
+  );
+
+export const reanalyzeInvestment = (answers: InvestmentAnswersPayload) =>
+  apiClient.post<InvestmentAnalysisResult>(
+    "/api/mypage/investment-profile/reanalyze",
+    answers,
+  );
