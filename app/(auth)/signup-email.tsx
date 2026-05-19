@@ -1,8 +1,10 @@
+import { sendEmailCode, verifyEmailCode } from "@/lib/api/auth";
 import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -20,6 +22,7 @@ export default function SignupEmailScreen() {
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([
     null,
     null,
@@ -40,20 +43,38 @@ export default function SignupEmailScreen() {
     }
   };
 
-  const handleNext = () => {
-    if (step === "email" && email) {
+  const handleSendCode = async () => {
+    if (!email || isLoading) return;
+    setIsLoading(true);
+    try {
+      await sendEmailCode(email);
       setStep("verify");
-    } else if (step === "verify" && isVerified) {
-      setStep("verified");
+    } catch {
+      Alert.alert("오류", "인증코드 발송에 실패했습니다. 다시 시도해주세요.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleNext = async () => {
+    if (step === "verify" && isVerified) {
+      if (isLoading) return;
+      setIsLoading(true);
+      try {
+        await verifyEmailCode(email, code.join(""));
+        setStep("verified");
+      } catch {
+        Alert.alert("오류", "인증번호가 올바르지 않습니다. 다시 확인해주세요.");
+      } finally {
+        setIsLoading(false);
+      }
     } else if (step === "verified") {
-      router.push("/(auth)/signup-info");
+      router.push({ pathname: "/(auth)/signup-info", params: { email } });
     }
   };
 
   const isNextEnabled =
-    (step === "email" && email.length > 0) ||
-    (step === "verify" && isVerified) ||
-    step === "verified";
+    (step === "verify" && isVerified) || step === "verified";
 
   return (
     <SafeAreaView style={styles.container}>
@@ -89,7 +110,8 @@ export default function SignupEmailScreen() {
                 />
                 <TouchableOpacity
                   style={styles.verifyButton}
-                  onPress={() => step === "email" && email && setStep("verify")}
+                  onPress={handleSendCode}
+                  disabled={isLoading}
                 >
                   <Text style={styles.verifyButtonText}>인증</Text>
                 </TouchableOpacity>

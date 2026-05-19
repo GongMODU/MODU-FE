@@ -2,7 +2,6 @@ import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import {
     Dimensions,
-    KeyboardAvoidingView,
     Modal,
     Platform,
     ScrollView,
@@ -14,7 +13,8 @@ import {
 } from "react-native";
 import { DetailData } from "./HistoryCard";
 
-const SCREEN_HEIGHT = Dimensions.get("window").height;
+const { height: SCREEN_HEIGHT } = Dimensions.get("screen");
+const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
 
 type Props = {
   visible: boolean;
@@ -66,87 +66,81 @@ export default function EditModal({
           onPress={onClose}
         />
 
-        {/* 키보드 올라올 때 시트도 같이 올라옴 */}
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.keyboardView}
-        >
-          <View style={styles.sheet}>
-            {/* 핸들 + 닫기 버튼 */}
-            <View style={styles.topArea}>
-              <View style={styles.handle} />
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={onClose}
-                hitSlop={8}
-              >
-                <Ionicons name="close" size={20} color={colors.gray400} />
-              </TouchableOpacity>
-            </View>
-
-            {/* 타이틀 */}
-            <View style={styles.titleArea}>
-              <Text style={styles.title}>청약 이력 수정</Text>
-            </View>
-
-            <ScrollView
-              style={styles.scrollArea}
-              contentContainerStyle={styles.scrollContent}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-            >
-              {/* 종목명 - 수정 가능 */}
-              <View style={styles.fieldGroup}>
-                <Text style={styles.fieldLabel}>종목명</Text>
-                <View style={styles.inputBox}>
-                  <TextInput
-                    style={styles.inputText}
-                    value={name}
-                    onChangeText={onNameChange}
-                    placeholder="종목명 입력"
-                    placeholderTextColor={colors.gray300}
-                  />
-                </View>
-              </View>
-
-              {/* 2열 필드들 */}
-              {fieldRows.map((row, rowIndex) => (
-                <View key={rowIndex} style={styles.fieldRow}>
-                  {row.map((field, fieldIndex) => (
-                    <View
-                      key={field.key}
-                      style={[
-                        styles.fieldGroup,
-                        styles.fieldFlex,
-                        fieldIndex < row.length - 1 && styles.fieldRowGap,
-                      ]}
-                    >
-                      <Text style={styles.fieldLabel}>{field.label}</Text>
-                      <View style={styles.inputBox}>
-                        <TextInput
-                          style={styles.inputText}
-                          value={data[field.key]}
-                          onChangeText={(value) => onChange(field.key, value)}
-                          placeholder="-"
-                          placeholderTextColor={colors.gray300}
-                        />
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              ))}
-            </ScrollView>
-
-            {/* 수정하기 버튼 */}
+        <View style={styles.sheet}>
+          {/* 핸들 + 닫기 버튼 */}
+          <View style={styles.topArea}>
+            <View style={styles.handle} />
             <TouchableOpacity
-              style={styles.saveButton}
-              onPress={() => onSave(data)}
-              activeOpacity={0.85}
+              style={styles.closeButton}
+              onPress={onClose}
+              hitSlop={8}
             >
-              <Text style={styles.saveButtonText}>수정하기</Text>
+              <Ionicons name="close" size={20} color={colors.gray400} />
             </TouchableOpacity>
           </View>
-        </KeyboardAvoidingView>
+
+          {/* 타이틀 */}
+          <View style={styles.titleArea}>
+            <Text style={styles.title}>청약 이력 수정</Text>
+          </View>
+
+          <ScrollView
+            style={styles.scrollArea}
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {/* 종목명 - 수정 가능 */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>종목명</Text>
+              <View style={styles.inputBox}>
+                <TextInput
+                  style={styles.inputText}
+                  value={name}
+                  onChangeText={onNameChange}
+                  placeholder="종목명 입력"
+                  placeholderTextColor={colors.gray300}
+                />
+              </View>
+            </View>
+
+            {/* 2열 필드들 */}
+            {fieldRows.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.fieldRow}>
+                {row.map((field, fieldIndex) => (
+                  <View
+                    key={field.key}
+                    style={[
+                      styles.fieldGroup,
+                      styles.fieldFlex,
+                      fieldIndex < row.length - 1 && styles.fieldRowGap,
+                    ]}
+                  >
+                    <Text style={styles.fieldLabel}>{field.label}</Text>
+                    <View style={styles.inputBox}>
+                      <TextInput
+                        style={styles.inputText}
+                        value={data[field.key]}
+                        onChangeText={(value) => onChange(field.key, value)}
+                        placeholder="-"
+                        placeholderTextColor={colors.gray300}
+                      />
+                    </View>
+                  </View>
+                ))}
+              </View>
+            ))}
+          </ScrollView>
+
+          {/* 수정하기 버튼 */}
+          <TouchableOpacity
+            style={styles.saveButton}
+            onPress={() => onSave(data)}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.saveButtonText}>수정하기</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </Modal>
   );
@@ -156,14 +150,13 @@ const styles = StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",
-    justifyContent: "flex-end",
-  },
-  keyboardView: {
-    width: "100%",
-    flex: 1,
-    justifyContent: "flex-end",
   },
   sheet: {
+    position: "absolute",
+    top: SCREEN_HEIGHT - SHEET_HEIGHT,
+    left: 0,
+    right: 0,
+    height: SHEET_HEIGHT,
     backgroundColor: colors.white,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
@@ -199,7 +192,7 @@ const styles = StyleSheet.create({
     color: colors.gray600,
   },
   scrollArea: {
-    maxHeight: SCREEN_HEIGHT * 0.5,
+    flex: 1,
   },
   scrollContent: {
     paddingHorizontal: spacing.contentArea,

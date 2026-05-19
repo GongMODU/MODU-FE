@@ -1,3 +1,5 @@
+import { investmentResultStore } from "@/lib/investmentResultStore";
+import { tokenStore } from "@/lib/tokenStore";
 import { colors, spacing } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -11,6 +13,15 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function InvestmentIntroScreen() {
+  const result = investmentResultStore.get();
+  const nickname = tokenStore.getNickname() ?? "";
+  const keywordTags = result?.keywordTags
+    ? result.keywordTags
+        .split(/[,\s]+/)
+        .filter(Boolean)
+        .map((t) => (t.startsWith("#") ? t : `#${t}`))
+    : [];
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.inner}>
@@ -23,9 +34,11 @@ export default function InvestmentIntroScreen() {
 
         {/* 인사 텍스트 */}
         <View style={styles.greetingSection}>
-          <Text style={styles.greetingTitle}>데이터 기반 승부사</Text>
+          <Text style={styles.greetingTitle}>
+            {result?.koreanName ?? ""}
+          </Text>
           <Text style={styles.greetingNickname}>
-            <Text style={styles.nicknameHighlight}>공쫀쿠</Text>
+            <Text style={styles.nicknameHighlight}>{nickname}</Text>
             <Text style={styles.greetingText}> 님, 안녕하세요!</Text>
           </Text>
         </View>
@@ -36,7 +49,7 @@ export default function InvestmentIntroScreen() {
         {/* 투자 성향 키워드 */}
         <Text style={styles.keywordTitle}>투자 성향 키워드</Text>
         <View style={styles.chipRow}>
-          {["#고급데이터", "#자체판단", "#고활용"].map((tag) => (
+          {keywordTags.map((tag) => (
             <View key={tag} style={styles.chip}>
               <Text style={styles.chipText}>{tag}</Text>
             </View>

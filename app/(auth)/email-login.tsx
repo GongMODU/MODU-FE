@@ -1,3 +1,5 @@
+import { login } from "@/lib/api/auth";
+import { tokenStore } from "@/lib/tokenStore";
 import { colors, spacing } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -15,17 +17,27 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EmailLoginScreen() {
-  const [id, setId] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const isEnabled = id.length > 0 && password.length > 0;
+  const isEnabled = email.length > 0 && password.length > 0;
 
-  const handleLogin = () => {
-    // TODO: 실제 로그인 로직 연결
-    // 비밀번호 불일치 시: setPasswordError(true)
-    router.replace("/(tabs)/home");
+  const handleLogin = async () => {
+    if (!isEnabled || isLoading) return;
+    setIsLoading(true);
+    try {
+      const res = await login(email, password);
+      tokenStore.setTokens(res.data.accessToken, res.data.refreshToken);
+      tokenStore.setNickname(res.data.nickname);
+      router.replace("/(tabs)/home");
+    } catch {
+      setPasswordError(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -48,13 +60,14 @@ export default function EmailLoginScreen() {
           </View>
 
           <View style={styles.content}>
-            {/* 아이디 */}
+            {/* 이메일 */}
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>아이디</Text>
+              <Text style={styles.label}>이메일</Text>
               <TextInput
                 style={styles.inputBox}
-                value={id}
-                onChangeText={setId}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
                 autoCapitalize="none"
                 placeholderTextColor={colors.gray400}
               />
@@ -71,7 +84,7 @@ export default function EmailLoginScreen() {
                   value={password}
                   onChangeText={(t) => {
                     setPassword(t);
-                    setPasswordError(false);
+                    if (passwordError) setPasswordError(false);
                   }}
                   secureTextEntry={!passwordVisible}
                   autoCapitalize="none"
@@ -99,7 +112,7 @@ export default function EmailLoginScreen() {
           <TouchableOpacity
             style={[styles.loginButton, isEnabled && styles.loginButtonActive]}
             onPress={handleLogin}
-            disabled={!isEnabled}
+            disabled={!isEnabled || isLoading}
           >
             <Text
               style={[
