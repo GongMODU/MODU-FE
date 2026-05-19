@@ -52,6 +52,14 @@ export default function SignupInfoScreen() {
           </View>
 
           <View style={styles.content}>
+            {/* 아이디 */}
+            <View style={styles.fieldGroup}>
+              <Text style={styles.label}>아이디</Text>
+              <View style={styles.inputBox}>
+                <Text style={styles.inputText}>{email}</Text>
+              </View>
+            </View>
+
             {/* 비밀번호 */}
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>비밀번호</Text>
@@ -90,7 +98,7 @@ export default function SignupInfoScreen() {
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>닉네임</Text>
               <TextInput
-                style={styles.inputBox}
+                style={styles.nicknameInput}
                 value={nickname}
                 onChangeText={setNickname}
                 placeholderTextColor={colors.gray400}
@@ -172,6 +180,21 @@ const styles = StyleSheet.create({
     color: colors.gray700,
   },
   inputBox: {
+    width: "100%",
+    height: 46,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    backgroundColor: colors.white,
+    paddingHorizontal: spacing.md,
+    justifyContent: "center",
+  },
+  inputText: {
+    fontSize: 11,
+    fontWeight: "500",
+    color: colors.gray600,
+  },
+  nicknameInput: {
     width: "100%",
     height: 46,
     borderRadius: 10,
