@@ -2,15 +2,21 @@ import { colors, spacing, typography } from "@/styles";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export default function ProfileCard() {
+type Props = {
+  nickname: string;
+  email: string;
+};
+
+export default function ProfileCard({ nickname, email }: Props) {
   const router = useRouter();
+
   return (
     <View style={styles.profileCard}>
       <View style={styles.avatar} />
       <View style={styles.profileInfo}>
-        <Text style={styles.nickname}>사용자 닉네임</Text>
+        <Text style={styles.nickname}>{nickname}</Text>
         <View style={styles.bioBadge}>
-          <Text style={styles.bio}>gongjjonku@email.com</Text>
+          <Text style={styles.bio}>{email}</Text>
         </View>
       </View>
       <TouchableOpacity
