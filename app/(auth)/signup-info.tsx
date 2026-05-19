@@ -1,8 +1,10 @@
+import { signup } from "@/lib/api/auth";
 import { colors, spacing } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -14,17 +16,21 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,16}$/;
+const NICKNAME_REGEX = /^[가-힣a-zA-Z]{2,8}$/;
+
 export default function SignupInfoScreen() {
-  const [id, setId] = useState("");
+  const { email } = useLocalSearchParams<{ email: string }>();
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const isPasswordError =
-    passwordFocused && password.length > 0 && password.length < 8;
+    passwordFocused && password.length > 0 && !PASSWORD_REGEX.test(password);
   const isNextEnabled =
-    id.length > 0 && password.length >= 8 && nickname.length > 0;
+    PASSWORD_REGEX.test(password) && NICKNAME_REGEX.test(nickname);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -46,18 +52,6 @@ export default function SignupInfoScreen() {
           </View>
 
           <View style={styles.content}>
-            {/* 아이디 */}
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>아이디</Text>
-              <TextInput
-                style={styles.inputBox}
-                value={id}
-                onChangeText={setId}
-                autoCapitalize="none"
-                placeholderTextColor={colors.gray400}
-              />
-            </View>
-
             {/* 비밀번호 */}
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>비밀번호</Text>
@@ -110,10 +104,22 @@ export default function SignupInfoScreen() {
               styles.nextButton,
               isNextEnabled && styles.nextButtonActive,
             ]}
-            onPress={() =>
-              isNextEnabled && router.push("/(auth)/investment-survey")
-            }
-            disabled={!isNextEnabled}
+            onPress={async () => {
+              if (!isNextEnabled || isLoading) return;
+              setIsLoading(true);
+              try {
+                await signup({ email: email ?? "", password, nickname });
+                router.push("/(auth)/investment-survey");
+              } catch {
+                Alert.alert(
+                  "회원가입 실패",
+                  "입력 정보를 확인하고 다시 시도해주세요.",
+                );
+              } finally {
+                setIsLoading(false);
+              }
+            }}
+            disabled={!isNextEnabled || isLoading}
           >
             <Text
               style={[
