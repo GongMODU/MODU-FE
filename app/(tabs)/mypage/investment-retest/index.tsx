@@ -97,7 +97,9 @@ export default function InvestmentRetestScreen() {
       >
         {questions.map((q) => (
           <View key={q.questionNumber} style={styles.questionBlock}>
-            <Text style={styles.questionText}>{q.content}</Text>
+            <Text style={styles.questionText}>
+              {q.questionNumber}. {q.content}
+            </Text>
             {q.description && (
               <Text style={styles.descriptionText}>{q.description}</Text>
             )}
