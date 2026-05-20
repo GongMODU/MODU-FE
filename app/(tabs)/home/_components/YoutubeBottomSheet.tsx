@@ -1,7 +1,9 @@
 import { colors, spacing, typography } from "@/styles";
-import { type YoutubeCardData } from "@/types/youtube";
+import { type YoutubeDetailData } from "@/types/youtube";
+import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Animated,
   Dimensions,
   Linking,
@@ -15,6 +17,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { youtubeDetailOptions } from "./queries";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -26,21 +29,25 @@ const SNAP_FULL = SCREEN_HEIGHT * 0.95;
 const DRAG_THRESHOLD = 50;
 
 type YoutubeBottomSheetProps = {
-  /** 표시할 카드 데이터 */
-  data: YoutubeCardData;
+  /** 선택된 카드의 videoId */
+  videoId: string;
+  /** 채널명 (로딩 중에도 표시) */
+  channelName: string;
   /** 닫기 핸들러 */
   onClose: () => void;
 };
 
 export default function YoutubeBottomSheet({
-  data,
+  videoId,
+  channelName,
   onClose,
 }: YoutubeBottomSheetProps) {
   const translateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const [snapState, setSnapState] = useState<"partial" | "full">("partial");
   const snapRef = useRef<"partial" | "full">("partial");
-
   const insets = useSafeAreaInsets();
+
+  const { data, isPending } = useQuery(youtubeDetailOptions(videoId));
 
   const animateTo = useCallback(
     (toValue: number) => {
@@ -90,9 +97,28 @@ export default function YoutubeBottomSheet({
     }),
   ).current;
 
-  const handlePressUrl = useCallback(() => {
-    Linking.openURL(data.videoUrl);
-  }, [data.videoUrl]);
+  const handlePressUrl = useCallback((url: string) => {
+    Linking.openURL(url);
+  }, []);
+
+  const renderContent = (detail: YoutubeDetailData) => (
+    <>
+      {detail.sections.map((section, index) => (
+        <View key={index} style={styles.section}>
+          <Text style={styles.sectionTitle}>{section.title}</Text>
+          <Text style={styles.sectionBody}>{section.content}</Text>
+        </View>
+      ))}
+
+      <View style={styles.sourceArea}>
+        <Text style={styles.sourceChannel}>{detail.channelName}</Text>
+        <Text style={styles.sourceTitle}>{detail.videoTitle}</Text>
+        <TouchableOpacity onPress={() => handlePressUrl(detail.videoUrl)}>
+          <Text style={styles.sourceUrl}>{detail.videoUrl}</Text>
+        </TouchableOpacity>
+      </View>
+    </>
+  );
 
   return (
     <Modal
@@ -145,20 +171,14 @@ export default function YoutubeBottomSheet({
               scrollEventThrottle={16}
               scrollEnabled={snapState === "full"}
             >
-              {data.sections.map((section, index) => (
-                <View key={index} style={styles.section}>
-                  <Text style={styles.sectionTitle}>{section.title}</Text>
-                  <Text style={styles.sectionBody}>{section.body}</Text>
+              {isPending || data === undefined ? (
+                <View style={styles.loadingArea}>
+                  <Text style={styles.loadingChannel}>{channelName}</Text>
+                  <ActivityIndicator color={colors.primary600} />
                 </View>
-              ))}
-
-              <View style={styles.sourceArea}>
-                <Text style={styles.sourceChannel}>{data.channelName}</Text>
-                <Text style={styles.sourceTitle}>{data.videoTitle}</Text>
-                <TouchableOpacity onPress={handlePressUrl}>
-                  <Text style={styles.sourceUrl}>{data.videoUrl}</Text>
-                </TouchableOpacity>
-              </View>
+              ) : (
+                renderContent(data)
+              )}
             </ScrollView>
           </View>
         </Animated.View>
@@ -170,7 +190,7 @@ export default function YoutubeBottomSheet({
 const styles = StyleSheet.create({
   dim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: `${colors.gray500}1A`, // gray500 10%
+    backgroundColor: `${colors.gray500}1A`,
   },
   sheet: {
     position: "absolute",
@@ -246,6 +266,16 @@ const styles = StyleSheet.create({
     color: colors.gray700,
   },
   sourceUrl: {
+    ...typography.bodyRegular10,
+    color: colors.gray500,
+  },
+  loadingArea: {
+    flex: 1,
+    alignItems: "center",
+    gap: spacing.md,
+    paddingTop: spacing.xl,
+  },
+  loadingChannel: {
     ...typography.bodyRegular10,
     color: colors.gray500,
   },

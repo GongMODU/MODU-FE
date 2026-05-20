@@ -1,16 +1,16 @@
 import { colors, spacing, typography } from "@/styles";
-import { type YoutubeCardData } from "@/types/youtube";
+import { type YoutubeSummaryItem } from "@/types/youtube";
 import {
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  ViewProps,
+  type ViewProps,
 } from "react-native";
 
 type YoutubeCardProps = ViewProps & {
   /** 카드 데이터 */
-  data: YoutubeCardData;
+  data: YoutubeSummaryItem;
   /** 자세히 알아보기 버튼 핸들러 */
   onPressDetail: () => void;
 };
@@ -30,7 +30,7 @@ export default function YoutubeCard({
 
       {/* 요약 불릿 목록 */}
       <View style={styles.summaryList}>
-        {data.summaries.map((summary, index) => (
+        {data.summaryLines.map((summary, index) => (
           <View key={index} style={styles.summaryItem}>
             <Text style={styles.bullet}>•</Text>
             <Text style={styles.summaryText}>{summary}</Text>
