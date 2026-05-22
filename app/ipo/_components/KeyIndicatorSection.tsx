@@ -1,5 +1,13 @@
 import { colors, spacing, typography } from "@/styles";
-import { StyleSheet, Text, View, type ViewProps } from "react-native";
+import { useState } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type ViewProps,
+} from "react-native";
+import KeyIndicatorBottomSheet from "./KeyIndicatorBottomSheet";
 import { type KeyIndicator } from "./types";
 
 type Props = ViewProps & {
@@ -37,43 +45,58 @@ export default function KeyIndicatorSection({
   ...props
 }: Props) {
   const config = GRADE_CONFIG[keyIndicator.grade];
+  const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
 
   return (
-    <View style={[styles.container, style]} {...props}>
-      {/* 헤더 */}
-      <View style={styles.header}>
-        <Text style={styles.title}>핵심 지표 신호등</Text>
-        <Text style={styles.infoIcon}>ⓘ</Text>
-      </View>
-
-      {/* 신호등 + 텍스트 */}
-      <View style={styles.content}>
-        {/* 신호등 원 3개 */}
-        <View style={styles.trafficLight}>
-          {TRAFFIC_COLORS.map((color, index) => (
-            <View
-              key={index}
-              style={[
-                styles.circle,
-                {
-                  backgroundColor:
-                    index === config.activeIndex ? color : colors.gray200,
-                },
-              ]}
-            />
-          ))}
+    <>
+      <View style={[styles.container, style]} {...props}>
+        {/* 헤더 */}
+        <View style={styles.header}>
+          <Text style={styles.title}>핵심 지표 신호등</Text>
+          <Pressable
+            onPress={() => setIsBottomSheetVisible(true)}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.infoIcon}>ⓘ</Text>
+          </Pressable>
         </View>
 
-        {/* 등급 / 점수 / 설명 */}
-        <View style={styles.textArea}>
-          <Text style={[styles.grade, { color: config.color }]}>
-            {keyIndicator.grade}
-          </Text>
-          <Text style={styles.score}>{keyIndicator.score}점</Text>
-          <Text style={styles.description}>{config.description}</Text>
+        {/* 신호등 + 텍스트 */}
+        <View style={styles.content}>
+          {/* 신호등 원 3개 */}
+          <View style={styles.trafficLight}>
+            {TRAFFIC_COLORS.map((color, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.circle,
+                  {
+                    backgroundColor:
+                      index === config.activeIndex ? color : colors.gray200,
+                  },
+                ]}
+              />
+            ))}
+          </View>
+
+          {/* 등급 / 점수 / 설명 */}
+          <View style={styles.textArea}>
+            <Text style={[styles.grade, { color: config.color }]}>
+              {keyIndicator.grade}
+            </Text>
+            <Text style={styles.score}>{keyIndicator.score}점</Text>
+            <Text style={styles.description}>{config.description}</Text>
+          </View>
         </View>
       </View>
-    </View>
+
+      {/* 바텀시트 */}
+      {isBottomSheetVisible && (
+        <KeyIndicatorBottomSheet
+          onClose={() => setIsBottomSheetVisible(false)}
+        />
+      )}
+    </>
   );
 }
 
