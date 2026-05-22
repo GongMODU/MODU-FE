@@ -163,6 +163,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   scrollContent: {
+    paddingTop: 48,
     paddingBottom: spacing.xl,
     gap: spacing.lg,
   },
