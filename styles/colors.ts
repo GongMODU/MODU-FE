@@ -29,4 +29,9 @@ export const colors = {
   gray700: "#3F3F46",
   gray800: "#27272A",
   gray900: "#18181B",
+
+  // Traffic Light
+  trafficGreen: "#22A866",
+  trafficYellow: "#F5A623",
+  trafficRed: "#E24B4A",
 } as const;

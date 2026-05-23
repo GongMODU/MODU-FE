@@ -2,11 +2,11 @@ import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
-    type ViewProps,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type ViewProps,
 } from "react-native";
 import { type IPOItem } from "./types";
 
@@ -58,14 +58,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   backButton: {
-    marginRight: spacing.sm,
+    width: 40,
   },
   companyName: {
     flex: 1,
-    ...typography.largeTitleMedium20,
+    ...typography.subtitleMedium14,
     color: colors.gray800,
+    textAlign: "center",
   },
   favoriteButton: {
-    marginLeft: spacing.sm,
+    width: 40,
+    alignItems: "flex-end",
   },
 });
