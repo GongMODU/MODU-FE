@@ -4,7 +4,7 @@ import {
 } from "@/lib/api/investmentProfile";
 import { investmentResultStore } from "@/lib/investmentResultStore";
 import { queryKeys } from "@/lib/queryKeys";
-import { colors, spacing } from "@/styles";
+import { colors, spacing, typography } from "@/styles";
 import { useQuery } from "@tanstack/react-query";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -161,8 +161,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.md,
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
+    ...typography.subtitleMedium14,
     color: colors.gray800,
   },
   inner: {
@@ -186,8 +185,7 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
   },
   questionText: {
-    fontSize: 17,
-    fontWeight: "700",
+    ...typography.subtitleMedium14,
     color: colors.gray800,
   },
   optionsGroup: {
@@ -229,8 +227,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
   },
   optionText: {
-    fontSize: 14,
-    fontWeight: "500",
+    ...typography.bodyMedium11,
     color: colors.gray600,
     flex: 1,
   },
@@ -252,8 +249,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary600,
   },
   completeButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
+    ...typography.footerBold12,
     color: colors.primary100,
   },
   completeButtonTextActive: {
