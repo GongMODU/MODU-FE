@@ -1,4 +1,5 @@
-import { signup } from "@/lib/api/auth";
+import { login, signup } from "@/lib/api/auth";
+import { tokenStore } from "@/lib/tokenStore";
 import { colors, spacing } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
@@ -117,6 +118,9 @@ export default function SignupInfoScreen() {
               setIsLoading(true);
               try {
                 await signup({ email: email ?? "", password, nickname });
+                const loginRes = await login(email ?? "", password);
+                tokenStore.setTokens(loginRes.data.accessToken, loginRes.data.refreshToken);
+                tokenStore.setNickname(loginRes.data.nickname);
                 router.push("/(auth)/investment-survey");
               } catch {
                 Alert.alert(

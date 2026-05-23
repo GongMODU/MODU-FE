@@ -1,6 +1,6 @@
 import { investmentResultStore } from "@/lib/investmentResultStore";
 import { tokenStore } from "@/lib/tokenStore";
-import { colors, spacing } from "@/styles";
+import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
@@ -15,12 +15,24 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function InvestmentIntroScreen() {
   const result = investmentResultStore.get();
   const nickname = tokenStore.getNickname() ?? "";
-  const keywordTags = result?.keywordTags
-    ? result.keywordTags
-        .split(/[,\s]+/)
-        .filter(Boolean)
-        .map((t) => (t.startsWith("#") ? t : `#${t}`))
-    : [];
+  const keywordTags = (() => {
+    const raw = result?.keywordTags;
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        return parsed
+          .map((t: unknown) => String(t).trim())
+          .filter(Boolean)
+          .map((t) => (t.startsWith("#") ? t : `#${t}`));
+      }
+    } catch {}
+    return raw
+      .replace(/[\[\]"']/g, "")
+      .split(/[,\s]+/)
+      .filter(Boolean)
+      .map((t) => (t.startsWith("#") ? t : `#${t}`));
+  })();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -34,9 +46,7 @@ export default function InvestmentIntroScreen() {
 
         {/* 인사 텍스트 */}
         <View style={styles.greetingSection}>
-          <Text style={styles.greetingTitle}>
-            {result?.koreanName ?? ""}
-          </Text>
+          <Text style={styles.greetingTitle}>{result?.koreanName ?? ""}</Text>
           <Text style={styles.greetingNickname}>
             <Text style={styles.nicknameHighlight}>{nickname}</Text>
             <Text style={styles.greetingText}> 님, 안녕하세요!</Text>
@@ -88,22 +98,18 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   greetingTitle: {
-    fontSize: 22,
-    fontWeight: "700",
+    ...typography.largeTitleMedium20,
     color: colors.gray700,
   },
   greetingNickname: {
-    fontSize: 22,
-    fontWeight: "700",
+    ...typography.largeTitleMedium20,
   },
   nicknameHighlight: {
-    fontSize: 22,
-    fontWeight: "700",
+    ...typography.largeTitleMedium20,
     color: colors.primary600,
   },
   greetingText: {
-    fontSize: 22,
-    fontWeight: "700",
+    ...typography.largeTitleMedium20,
     color: colors.gray700,
   },
   imagePlaceholder: {
@@ -114,8 +120,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   keywordTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    ...typography.subtitleMedium14,
     color: colors.gray700,
     marginTop: spacing.md,
   },
@@ -133,8 +138,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary600,
   },
   chipText: {
-    fontSize: 13,
-    fontWeight: "500",
+    ...typography.labelMedium10,
     color: colors.primary600,
   },
   startButton: {
@@ -148,8 +152,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   startButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
+    ...typography.footerBold12,
     color: colors.white,
   },
 });
