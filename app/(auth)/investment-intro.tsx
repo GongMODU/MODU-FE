@@ -1,6 +1,6 @@
 import { investmentResultStore } from "@/lib/investmentResultStore";
 import { tokenStore } from "@/lib/tokenStore";
-import { colors, spacing } from "@/styles";
+import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
@@ -88,22 +88,18 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   greetingTitle: {
-    fontSize: 22,
-    fontWeight: "700",
+    ...typography.largeTitleMedium20,
     color: colors.gray700,
   },
   greetingNickname: {
-    fontSize: 22,
-    fontWeight: "700",
+    ...typography.largeTitleMedium20,
   },
   nicknameHighlight: {
-    fontSize: 22,
-    fontWeight: "700",
+    ...typography.largeTitleMedium20,
     color: colors.primary600,
   },
   greetingText: {
-    fontSize: 22,
-    fontWeight: "700",
+    ...typography.largeTitleMedium20,
     color: colors.gray700,
   },
   imagePlaceholder: {
@@ -114,8 +110,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   keywordTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    ...typography.subtitleMedium14,
     color: colors.gray700,
     marginTop: spacing.md,
   },
@@ -133,8 +128,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary600,
   },
   chipText: {
-    fontSize: 13,
-    fontWeight: "500",
+    ...typography.labelMedium10,
     color: colors.primary600,
   },
   startButton: {
@@ -148,8 +142,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   startButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
+    ...typography.footerBold12,
     color: colors.white,
   },
 });
