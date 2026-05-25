@@ -1,13 +1,15 @@
 import { colors, typography } from "@/styles";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
   type LayoutChangeEvent,
   type ViewProps,
 } from "react-native";
 import Svg, { Line, Rect } from "react-native-svg";
+import TooltipCard from "./TooltipCard";
 import { type FinancialChartData } from "./types";
 
 type Props = ViewProps & {
@@ -34,6 +36,33 @@ const Y_TICKS: { label: string; value: number }[] = [
 /** 막대 색상 — 기수 인덱스 순서대로 매핑 */
 const BAR_COLORS = [colors.primary200, colors.primary600] as const;
 
+const TOOLTIPS = {
+  totalAssets: {
+    title: "자산총계",
+    description:
+      "기업이 가진 모든 것의 합계예요. 현금, 건물, 장비 등을 모두 더한 값으로, 숫자가 클수록 기업이 더 많은 것을 보유하고 있어요.",
+  },
+  totalLiabilities: {
+    title: "부채총계",
+    description:
+      "기업이 갚아야 할 모든 빚의 합계예요. 자산 대비 부채가 너무 많으면 재무적으로 불안정할 수 있어요.",
+  },
+  netLoss: {
+    title: "당기순손실",
+    description:
+      "해당 기간 동안 벌어들인 돈보다 나간 돈이 더 많을 때 발생해요. 손실이 크거나 지속되면 기업의 재무 건전성을 꼼꼼히 살펴볼 필요가 있어요.",
+  },
+} as const;
+
+type TooltipKey = keyof typeof TOOLTIPS;
+
+/** 툴팁이 있는 term 인덱스 매핑 (0: 매출액 제외) */
+const TOOLTIP_TERM_MAP: Record<number, TooltipKey> = {
+  1: "totalAssets",
+  2: "totalLiabilities",
+  3: "netLoss",
+};
+
 // ─── 로그 스케일 변환 ───────────────────────────────────────────
 const LOG_MIN = Math.log10(Y_TICKS[Y_TICKS.length - 1].value);
 const LOG_MAX = Math.log10(Y_TICKS[0].value);
@@ -58,6 +87,19 @@ export default function FinancialChart({ data, style, ...props }: Props) {
   const termCount = terms.length;
 
   const [svgWidth, setSvgWidth] = useState(0);
+
+  const [activeTooltip, setActiveTooltip] = useState<TooltipKey | null>(null);
+  const [tooltipPositionY, setTooltipPositionY] = useState(0);
+  const iconRefs = useRef<Record<number, View | null>>({});
+
+  const handleTooltipToggle = (key: TooltipKey, positionY: number) => {
+    if (activeTooltip === key) {
+      setActiveTooltip(null);
+      return;
+    }
+    setTooltipPositionY(positionY);
+    setActiveTooltip(key);
+  };
 
   function handleLayout(e: LayoutChangeEvent): void {
     setSvgWidth(e.nativeEvent.layout.width);
@@ -160,19 +202,55 @@ export default function FinancialChart({ data, style, ...props }: Props) {
 
       {/* 용어 설명 */}
       <View style={styles.termList}>
-        {terms.map((term, i) => (
-          <View
-            key={term.label}
-            style={[
-              styles.termItem,
-              i < terms.length - 1 && styles.termItemGap,
-            ]}
-          >
-            <Text style={styles.termLabel}>{term.label}</Text>
-            <Text style={styles.termDescription}>{term.description}</Text>
-          </View>
-        ))}
+        {terms.map((term, i) => {
+          const tooltipKey = TOOLTIP_TERM_MAP[i];
+          return (
+            <View
+              key={term.label}
+              style={[
+                styles.termItem,
+                i < terms.length - 1 && styles.termItemGap,
+              ]}
+            >
+              <View style={styles.termLabelRow}>
+                <Text style={styles.termLabel}>{term.label}</Text>
+                {tooltipKey !== undefined && (
+                  <TouchableOpacity
+                    ref={(el) => {
+                      iconRefs.current[i] = el;
+                    }}
+                    onPress={() => {
+                      if (activeTooltip === tooltipKey) {
+                        setActiveTooltip(null);
+                        return;
+                      }
+                      iconRefs.current[i]?.measureInWindow(
+                        (_x, y, _width, height) => {
+                          handleTooltipToggle(tooltipKey, y + height + 4);
+                        },
+                      );
+                    }}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Text style={styles.infoIcon}>ⓘ</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <Text style={styles.termDescription}>{term.description}</Text>
+            </View>
+          );
+        })}
       </View>
+
+      {activeTooltip !== null && (
+        <TooltipCard
+          visible
+          title={TOOLTIPS[activeTooltip].title}
+          description={TOOLTIPS[activeTooltip].description}
+          positionY={tooltipPositionY}
+          onClose={() => setActiveTooltip(null)}
+        />
+      )}
     </View>
   );
 }
@@ -249,5 +327,15 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular10,
     color: colors.gray500,
     flex: 1,
+  },
+  termLabelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  infoIcon: {
+    fontSize: 10,
+    color: colors.gray400,
+    lineHeight: 13,
   },
 });
