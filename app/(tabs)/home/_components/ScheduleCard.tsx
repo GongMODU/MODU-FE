@@ -1,14 +1,13 @@
 import { colors, spacing, typography } from "@/styles";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-// TODO: API 연동 시 @/types/schedule 로 분리
 export type ScheduleCardData = {
   id: string;
-  dday: number; // D-11
-  companyName: string; // 종목명
+  dday: string; // "D-11"
+  companyName: string;
   startDate: string; // "04/14(화)"
   priceRange: string; // "2,000~2,000원"
-  broker: string; // "신한투자증권"
+  broker: string;
 };
 
 type Props = {
@@ -22,7 +21,7 @@ export default function ScheduleCard({ data, onPress }: Props) {
       <View style={styles.card}>
         {/* D-day 뱃지 */}
         <View style={styles.badge}>
-          <Text style={styles.badgeText}>D-{data.dday}</Text>
+          <Text style={styles.badgeText}>{data.dday}</Text>
         </View>
 
         {/* 종목명 */}

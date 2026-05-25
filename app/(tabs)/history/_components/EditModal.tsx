@@ -24,6 +24,7 @@ type Props = {
   onSave: (data: DetailData) => void;
   onChange: (field: keyof DetailData, value: string) => void;
   onNameChange: (value: string) => void;
+  mode?: "add" | "edit";
 };
 
 export default function EditModal({
@@ -34,6 +35,7 @@ export default function EditModal({
   onSave,
   onChange,
   onNameChange,
+  mode = "edit",
 }: Props) {
   const fieldRows: { label: string; key: keyof DetailData }[][] = [
     [
@@ -81,7 +83,7 @@ export default function EditModal({
 
           {/* 타이틀 */}
           <View style={styles.titleArea}>
-            <Text style={styles.title}>청약 이력 수정</Text>
+            <Text style={styles.title}>{mode === "add" ? "청약 이력 추가" : "청약 이력 수정"}</Text>
           </View>
 
           <ScrollView
@@ -132,13 +134,13 @@ export default function EditModal({
             ))}
           </ScrollView>
 
-          {/* 수정하기 버튼 */}
+          {/* 저장 버튼 */}
           <TouchableOpacity
             style={styles.saveButton}
             onPress={() => onSave(data)}
             activeOpacity={0.85}
           >
-            <Text style={styles.saveButtonText}>수정하기</Text>
+            <Text style={styles.saveButtonText}>{mode === "add" ? "추가하기" : "수정하기"}</Text>
           </TouchableOpacity>
         </View>
       </View>

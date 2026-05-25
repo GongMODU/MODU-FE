@@ -28,10 +28,12 @@ type Props = {
   favorite: boolean;
   isOpen: boolean;
   data: DetailData;
+  recordStatus?: "ONGOING" | "COMPLETED";
   onPress: () => void;
   onChange: (id: string, field: keyof DetailData, value: string) => void;
   onEditPress: (id: string) => void;
   onDeletePress: (id: string) => void;
+  onCompletePress?: (id: string) => void;
 };
 
 export default function HistoryCard({
@@ -40,10 +42,12 @@ export default function HistoryCard({
   favorite,
   isOpen,
   data,
+  recordStatus = "COMPLETED",
   onPress,
   onChange,
   onEditPress,
   onDeletePress,
+  onCompletePress,
 }: Props) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
@@ -91,7 +95,7 @@ export default function HistoryCard({
       >
         <View style={styles.itemHeader}>
           <View style={styles.itemLeft}>
-            <View style={styles.dot} />
+            <View style={[styles.dot, recordStatus === "ONGOING" && styles.dotOngoing]} />
             <Text style={styles.itemName}>{name}</Text>
             {favorite && <StarIcon width={16} height={16} />}
           </View>
@@ -158,6 +162,20 @@ export default function HistoryCard({
                 { top: menuPosition.top, right: menuPosition.right },
               ]}
             >
+              {recordStatus === "ONGOING" && (
+                <>
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      setMenuVisible(false);
+                      onCompletePress?.(id);
+                    }}
+                  >
+                    <Text style={[styles.dropdownText, styles.completeText]}>완료 처리</Text>
+                  </TouchableOpacity>
+                  <View style={styles.dropdownDivider} />
+                </>
+              )}
               <TouchableOpacity
                 style={styles.dropdownItem}
                 onPress={() => {
@@ -222,6 +240,12 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: colors.gray500,
+  },
+  dotOngoing: {
+    backgroundColor: colors.primary600,
+  },
+  completeText: {
+    color: colors.primary600,
   },
   itemName: {
     ...typography.bodyMedium11,
