@@ -1,7 +1,9 @@
 import { colors } from "@/styles";
+import type { IpoHomeItem } from "@/types/ipo";
 import { Ionicons } from "@expo/vector-icons";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -15,6 +17,11 @@ import SubscriptionCalendar, {
   ScheduleTag,
   TAG_COLORS,
 } from "./_components/SubscriptionCalendar";
+import {
+  listingScheduleOptions,
+  lockupScheduleOptions,
+  subscriptionScheduleOptions,
+} from "./_components/queries";
 
 const CHIPS: ScheduleTag[] = [
   "수요예측",
@@ -25,71 +32,11 @@ const CHIPS: ScheduleTag[] = [
   "배정",
 ];
 
-// TODO: API 연동 시 교체
 type TodayScheduleItem = {
   id: string;
   companyName: string;
   tags: ScheduleTag[];
 };
-
-const MOCK_TODAY_SCHEDULE: TodayScheduleItem[] = [
-  {
-    id: "1",
-    companyName: "신한제18호기업인수목적",
-    tags: ["배정", "환불"],
-  },
-  {
-    id: "2",
-    companyName: "플레드",
-    tags: ["수요예측"],
-  },
-  {
-    id: "3",
-    companyName: "키움히어로제2호기업인수목적",
-    tags: ["상장"],
-  },
-];
-
-// TODO: API 연동 시 교체
-const today = new Date();
-const MOCK_EVENTS: CalendarEvent[] = [
-  {
-    id: "e1",
-    date: new Date(today.getFullYear(), today.getMonth(), 1),
-    companyName: "공쫀쿠제12호",
-    tag: "수요예측",
-  },
-  {
-    id: "e2",
-    date: new Date(today.getFullYear(), today.getMonth(), 1),
-    companyName: "공쫀쿠인수목적",
-    tag: "배정",
-  },
-  {
-    id: "e3",
-    date: new Date(today.getFullYear(), today.getMonth(), 2),
-    companyName: "공쫀쿠인수목적",
-    tag: "공모청약",
-  },
-  {
-    id: "e4",
-    date: new Date(today.getFullYear(), today.getMonth(), 3),
-    companyName: "공쫀ㄹ쿠인수목적",
-    tag: "환불",
-  },
-  {
-    id: "e5",
-    date: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
-    companyName: "신한제18호",
-    tag: "배정",
-  },
-  {
-    id: "e6",
-    date: new Date(today.getFullYear(), today.getMonth(), today.getDate()),
-    companyName: "플레드",
-    tag: "수요예측",
-  },
-];
 
 const TOOLTIP_TERMS: { key: string; description: string }[] = [
   {
@@ -119,9 +66,24 @@ const TOOLTIP_TERMS: { key: string; description: string }[] = [
   },
 ];
 
+// "YYYY-MM-DD" 문자열 → 로컬 Date (타임존 오류 방지)
+function parseLocalDate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+// 오늘 날짜를 "YYYY-MM-DD" 형식으로
+function todayString(): string {
+  const t = new Date();
+  const y = t.getFullYear();
+  const m = String(t.getMonth() + 1).padStart(2, "0");
+  const d = String(t.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 export default function SubscriptionScheduleScreen() {
   const router = useRouter();
-  const [selectedChip, setSelectedChip] = useState<ScheduleTag>("수요예측");
+  const [selectedChip, setSelectedChip] = useState<ScheduleTag>("공모청약");
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [expandedTerm, setExpandedTerm] = useState<string | null>(null);
 
@@ -129,13 +91,89 @@ export default function SubscriptionScheduleScreen() {
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
 
+  const { data: subscriptionItems = [] } = useQuery(subscriptionScheduleOptions);
+  const { data: listingItems = [] } = useQuery(listingScheduleOptions);
+  const { data: lockupItems = [] } = useQuery(lockupScheduleOptions);
+
+  // 달력 이벤트 생성 (날짜 필드가 있는 3가지 타입만)
+  const calendarEvents = useMemo((): CalendarEvent[] => {
+    const events: CalendarEvent[] = [];
+
+    subscriptionItems.forEach((item: IpoHomeItem) => {
+      events.push({
+        id: `sub-${item.ipoEventId}`,
+        date: parseLocalDate(item.subscriptionStartDate),
+        companyName: item.companyName,
+        tag: "공모청약",
+      });
+    });
+
+    listingItems.forEach((item: IpoHomeItem) => {
+      events.push({
+        id: `list-${item.ipoEventId}`,
+        date: parseLocalDate(item.listingDate),
+        companyName: item.companyName,
+        tag: "상장",
+      });
+    });
+
+    lockupItems.forEach((item: IpoHomeItem) => {
+      events.push({
+        id: `lock-${item.ipoEventId}`,
+        date: parseLocalDate(item.lockupExpiryDate),
+        companyName: item.companyName,
+        tag: "락업해제",
+      });
+    });
+
+    return events;
+  }, [subscriptionItems, listingItems, lockupItems]);
+
+  // 오늘 주요 일정 (오늘 날짜와 매칭되는 항목)
+  const todaySchedule = useMemo((): TodayScheduleItem[] => {
+    const today = todayString();
+    const map = new Map<number, TodayScheduleItem>();
+
+    const addTag = (item: IpoHomeItem, tag: ScheduleTag) => {
+      const existing = map.get(item.ipoEventId);
+      if (existing) {
+        if (!existing.tags.includes(tag)) existing.tags.push(tag);
+      } else {
+        map.set(item.ipoEventId, {
+          id: String(item.ipoEventId),
+          companyName: item.companyName,
+          tags: [tag],
+        });
+      }
+    };
+
+    subscriptionItems.forEach((item) => {
+      if (item.subscriptionStartDate <= today && today <= item.subscriptionEndDate) {
+        addTag(item, "공모청약");
+      }
+    });
+
+    listingItems.forEach((item) => {
+      if (item.listingDate === today) {
+        addTag(item, "상장");
+      }
+    });
+
+    lockupItems.forEach((item) => {
+      if (item.lockupExpiryDate === today) {
+        addTag(item, "락업해제");
+      }
+    });
+
+    return Array.from(map.values());
+  }, [subscriptionItems, listingItems, lockupItems]);
+
   const handleTermPress = (term: string) => {
     setExpandedTerm((prev) => (prev === term ? null : term));
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* 스크롤 콘텐츠 — paddingTop: 72으로 다른 페이지와 동일한 상단 공백 */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -181,34 +219,40 @@ export default function SubscriptionScheduleScreen() {
         <SubscriptionCalendar
           year={currentYear}
           month={currentMonth}
-          events={MOCK_EVENTS}
+          events={calendarEvents}
           selectedTag={selectedChip}
         />
 
         {/* 오늘 주요 일정 */}
         <Text style={styles.sectionTitle}>오늘 주요 일정</Text>
         <View style={styles.todayScheduleList}>
-          {MOCK_TODAY_SCHEDULE.map((item) => (
-            <View key={item.id} style={styles.scheduleCard}>
-              <Text style={styles.scheduleCompanyName}>{item.companyName}</Text>
-              <View style={styles.tagRow}>
-                {item.tags.map((tag) => (
-                  <View
-                    key={tag}
-                    style={[styles.tag, { borderColor: TAG_COLORS[tag] }]}
-                  >
-                    <Text style={[styles.tagText, { color: TAG_COLORS[tag] }]}>
-                      {tag}
-                    </Text>
-                  </View>
-                ))}
-              </View>
+          {todaySchedule.length === 0 ? (
+            <View style={styles.emptyToday}>
+              <Text style={styles.emptyTodayText}>오늘 예정된 일정이 없어요.</Text>
             </View>
-          ))}
+          ) : (
+            todaySchedule.map((item) => (
+              <View key={item.id} style={styles.scheduleCard}>
+                <Text style={styles.scheduleCompanyName}>{item.companyName}</Text>
+                <View style={styles.tagRow}>
+                  {item.tags.map((tag) => (
+                    <View
+                      key={tag}
+                      style={[styles.tag, { borderColor: TAG_COLORS[tag] }]}
+                    >
+                      <Text style={[styles.tagText, { color: TAG_COLORS[tag] }]}>
+                        {tag}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ))
+          )}
         </View>
       </ScrollView>
 
-      {/* 고정 헤더 — 스크롤 위에 절대 위치로 올라탐 */}
+      {/* 고정 헤더 */}
       <View style={styles.fixedHeader} pointerEvents="box-none">
         <TouchableOpacity onPress={() => router.back()}>
           <Ionicons name="chevron-back" size={24} color="#333" />
@@ -281,7 +325,6 @@ const styles = StyleSheet.create({
     paddingTop: 120,
     paddingBottom: 24,
   },
-  // 고정 헤더: 스크롤 위에 겹쳐서 표시
   fixedHeader: {
     position: "absolute",
     top: 0,
@@ -341,6 +384,14 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 24,
   },
+  emptyToday: {
+    paddingVertical: 20,
+    alignItems: "center",
+  },
+  emptyTodayText: {
+    fontSize: 13,
+    color: colors.gray400,
+  },
   scheduleCard: {
     flexDirection: "row",
     alignItems: "center",
@@ -373,7 +424,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     paddingHorizontal: 4,
   },
-  // 툴팁
   tooltipCard: {
     position: "absolute",
     top: 100,

@@ -1,7 +1,24 @@
+import {
+  completeHistory,
+  createCompletedHistory,
+  deleteSubscriptionHistory,
+  getSubscriptionHistories,
+  updateSubscriptionHistory,
+} from "@/lib/api/subscriptionHistory";
+import queryClient from "@/lib/queryClient";
+import { queryKeys } from "@/lib/queryKeys";
 import { colors, spacing, typography } from "@/styles";
+import type {
+  CompleteHistoryRequest,
+  CompletedHistoryCreateRequest,
+  SubscriptionHistoryItem,
+  SubscriptionHistoryUpdateRequest,
+} from "@/types/subscriptionHistory";
 import { Ionicons } from "@expo/vector-icons";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,22 +28,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CurrentCard from "./_components/CurrentCard";
+import CompleteModal from "./_components/CompleteModal";
 import EditModal from "./_components/EditModal";
 import HistoryCard, { DetailData } from "./_components/HistoryCard";
-
-const PAST_HISTORY = [
-  { id: "1", name: "리센스메디컬", favorite: true },
-  { id: "2", name: "신한제17호기업인수목적", favorite: false },
-  { id: "3", name: "교보20호기업인수목적", favorite: true },
-  { id: "4", name: "공쫀쿠20호기업인수목적", favorite: false },
-];
-
-const CURRENT_HISTORY = [
-  { id: "c1", name: "공공" },
-  { id: "c2", name: "쫀쫀" },
-  { id: "c3", name: "쿠쿠" },
-];
 
 const INITIAL_DETAIL: DetailData = {
   증권사: "",
@@ -38,56 +42,139 @@ const INITIAL_DETAIL: DetailData = {
   매도가: "",
 };
 
-const GONGJONKU_DETAIL: DetailData = {
-  증권사: "신한투자증권",
-  매도일: "04.28",
-  청약수량: "30주",
-  수수료: "2,490원",
-  배정수량: "20주",
-  제세금: "24,900원",
-  매도가: "42,900원",
-};
+// API 응답 → UI DetailData 변환
+function toDetailData(item: SubscriptionHistoryItem): DetailData {
+  return {
+    증권사: item.securityCompany ?? "",
+    매도일: item.sellDate ?? "",
+    청약수량: item.subscribedQuantity != null ? String(item.subscribedQuantity) : "",
+    수수료: item.fee != null ? String(item.fee) : "",
+    배정수량: item.allocatedQuantity != null ? String(item.allocatedQuantity) : "",
+    제세금: item.tax != null ? String(item.tax) : "",
+    매도가: item.sellPrice != null ? String(item.sellPrice) : "",
+  };
+}
+
+// 문자열 → 숫자 파싱 (단위 제거)
+function parseNum(val: string): number | undefined {
+  const n = Number(val.replace(/[^0-9.-]/g, ""));
+  return val.trim() === "" || isNaN(n) ? undefined : n;
+}
+
+function toCreateRequest(name: string, data: DetailData): CompletedHistoryCreateRequest {
+  return {
+    inputStockName: name,
+    securityCompany: data.증권사 || undefined,
+    subscribedQuantity: parseNum(data.청약수량),
+    fee: parseNum(data.수수료),
+    allocatedQuantity: parseNum(data.배정수량),
+    tax: parseNum(data.제세금),
+    sellPrice: parseNum(data.매도가),
+    sellDate: data.매도일 || undefined,
+  };
+}
+
+function toUpdateRequest(name: string, data: DetailData): SubscriptionHistoryUpdateRequest {
+  return {
+    inputStockName: name || undefined,
+    securityCompany: data.증권사 || undefined,
+    subscribedQuantity: parseNum(data.청약수량),
+    fee: parseNum(data.수수료),
+    allocatedQuantity: parseNum(data.배정수량),
+    tax: parseNum(data.제세금),
+    sellPrice: parseNum(data.매도가),
+    sellDate: data.매도일 || undefined,
+  };
+}
+
+function getItemName(item: SubscriptionHistoryItem): string {
+  return item.inputStockName ?? item.ipoEventCompanyName ?? item.inputCompanyName ?? "";
+}
 
 export default function HistoryScreen() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [editId, setEditId] = useState<string | null>(null);
-  const [detailData, setDetailData] = useState<Record<string, DetailData>>({
-    "1": { ...INITIAL_DETAIL },
-    "2": { ...INITIAL_DETAIL },
-    "3": { ...INITIAL_DETAIL },
-    "4": { ...GONGJONKU_DETAIL },
-    c1: { ...INITIAL_DETAIL },
-    c2: { ...INITIAL_DETAIL },
-    c3: { ...INITIAL_DETAIL },
-  });
-  // 모달 임시 데이터 (수정하기 누르기 전까지 원본 유지)
+  const [completeId, setCompleteId] = useState<string | null>(null);
   const [draftData, setDraftData] = useState<DetailData | null>(null);
   const [draftName, setDraftName] = useState<string>("");
 
-  const handleChange = (id: string, field: keyof DetailData, value: string) => {
-    setDetailData((prev) => ({
-      ...prev,
-      [id]: { ...prev[id], [field]: value },
-    }));
-  };
+  const { data: completedHistories = [], isLoading: isLoadingCompleted } = useQuery({
+    queryKey: queryKeys.subscriptionHistory.list(),
+    queryFn: () => getSubscriptionHistories("COMPLETED").then((r) => r.data),
+  });
+
+  const { data: ongoingHistories = [], isLoading: isLoadingOngoing } = useQuery({
+    queryKey: queryKeys.subscriptionHistory.ongoingList(),
+    queryFn: () => getSubscriptionHistories("ONGOING").then((r) => r.data),
+  });
+
+  const isLoading = isLoadingCompleted || isLoadingOngoing;
+  const allHistories = [...ongoingHistories, ...completedHistories];
+
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: ["subscription-history"] });
+
+  const createMutation = useMutation({
+    mutationFn: (req: CompletedHistoryCreateRequest) => createCompletedHistory(req),
+    onSuccess: invalidate,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, req }: { id: number; req: SubscriptionHistoryUpdateRequest }) =>
+      updateSubscriptionHistory(id, req),
+    onSuccess: invalidate,
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteSubscriptionHistory(id),
+    onSuccess: invalidate,
+  });
+
+  const completeMutation = useMutation({
+    mutationFn: ({ id, req }: { id: number; req: CompleteHistoryRequest }) =>
+      completeHistory(id, req),
+    onSuccess: invalidate,
+  });
 
   const handleModalChange = (field: keyof DetailData, value: string) => {
     setDraftData((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
+  const handleAddPress = () => {
+    setDraftName("");
+    setDraftData({ ...INITIAL_DETAIL });
+    setEditId("__new__");
+  };
+
+  const handleCompletePress = (id: string) => {
+    setCompleteId(id);
+  };
+
+  const handleComplete = (data: CompleteHistoryRequest) => {
+    if (!completeId) return;
+    completeMutation.mutate({ id: Number(completeId), req: data });
+    setCompleteId(null);
+  };
+
   const handleEditPress = (id: string) => {
-    const item = [...PAST_HISTORY, ...CURRENT_HISTORY].find((i) => i.id === id);
-    setDraftName(item?.name ?? "");
-    setDraftData({ ...detailData[id] });
+    const item = allHistories.find((i) => String(i.id) === id);
+    setDraftName(item ? getItemName(item) : "");
+    setDraftData(item ? toDetailData(item) : { ...INITIAL_DETAIL });
     setEditId(id);
   };
 
   const handleSave = (data: DetailData) => {
-    if (editId) {
-      setDetailData((prev) => ({ ...prev, [editId]: data }));
+    if (editId === "__new__") {
+      createMutation.mutate(toCreateRequest(draftName, data));
+    } else if (editId) {
+      updateMutation.mutate({
+        id: Number(editId),
+        req: toUpdateRequest(draftName, data),
+      });
     }
     setEditId(null);
     setDraftData(null);
+    setDraftName("");
   };
 
   const handleCloseModal = () => {
@@ -97,8 +184,7 @@ export default function HistoryScreen() {
   };
 
   const handleDeletePress = (id: string) => {
-    // TODO: 삭제 확인 다이얼로그 추가 가능
-    console.log("delete", id);
+    deleteMutation.mutate(Number(id));
   };
 
   return (
@@ -109,49 +195,54 @@ export default function HistoryScreen() {
       >
         <ScrollView
           style={styles.container}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[
+            styles.scrollContent,
+            allHistories.length === 0 && styles.scrollContentEmpty,
+          ]}
           keyboardShouldPersistTaps="handled"
         >
-          {/* 페이지 타이틀 + + 버튼 */}
           <View style={styles.titleRow}>
             <Text style={styles.pageTitle}>청약 이력</Text>
-            <TouchableOpacity style={styles.addButton} hitSlop={8}>
+            <TouchableOpacity style={styles.addButton} hitSlop={8} onPress={handleAddPress}>
               <Ionicons name="add" size={20} color={colors.gray400} />
             </TouchableOpacity>
           </View>
 
-          {PAST_HISTORY.map((item) => (
-            <HistoryCard
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              favorite={item.favorite}
-              isOpen={openId === item.id}
-              data={detailData[item.id]}
-              onPress={() => setOpenId(openId === item.id ? null : item.id)}
-              onChange={handleChange}
-              onEditPress={handleEditPress}
-              onDeletePress={handleDeletePress}
-            />
-          ))}
-
-          {CURRENT_HISTORY.map((item) => (
-            <CurrentCard
-              key={item.id}
-              id={item.id}
-              name={item.name}
-              isOpen={openId === item.id}
-              data={detailData[item.id]}
-              onPress={() => setOpenId(openId === item.id ? null : item.id)}
-              onChange={handleChange}
-              onEditPress={handleEditPress}
-              onDeletePress={handleDeletePress}
-            />
-          ))}
+          {isLoading ? (
+            <View style={styles.emptyContainer}>
+              <ActivityIndicator color={colors.primary600} />
+            </View>
+          ) : allHistories.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <View style={styles.emptyImage} />
+              <View style={styles.emptyTextGroup}>
+                <Text style={styles.emptyText}>아직 청약 이력이 없어요.</Text>
+                <Text style={styles.emptyText}>버튼을 눌러 이력을 추가해보세요.</Text>
+              </View>
+            </View>
+          ) : (
+            allHistories.map((item) => (
+              <HistoryCard
+                key={item.id}
+                id={String(item.id)}
+                name={getItemName(item)}
+                favorite={false}
+                recordStatus={item.recordStatus}
+                isOpen={openId === String(item.id)}
+                data={toDetailData(item)}
+                onPress={() =>
+                  setOpenId(openId === String(item.id) ? null : String(item.id))
+                }
+                onChange={() => {}}
+                onEditPress={handleEditPress}
+                onDeletePress={handleDeletePress}
+                onCompletePress={handleCompletePress}
+              />
+            ))
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* 수정 모달 */}
       {editId && draftData && (
         <EditModal
           visible={true}
@@ -161,8 +252,15 @@ export default function HistoryScreen() {
           onSave={handleSave}
           onChange={handleModalChange}
           onNameChange={setDraftName}
+          mode={editId === "__new__" ? "add" : "edit"}
         />
       )}
+
+      <CompleteModal
+        visible={completeId !== null}
+        onClose={() => setCompleteId(null)}
+        onComplete={handleComplete}
+      />
     </SafeAreaView>
   );
 }
@@ -178,6 +276,29 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 72,
     paddingBottom: spacing.xl,
+  },
+  scrollContentEmpty: {
+    flexGrow: 1,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  emptyImage: {
+    width: 71,
+    height: 71,
+    backgroundColor: "#d9d9d9",
+  },
+  emptyTextGroup: {
+    alignItems: "center",
+    gap: 4,
+  },
+  emptyText: {
+    ...typography.bodyMedium11,
+    color: colors.gray400,
+    textAlign: "center",
   },
   titleRow: {
     flexDirection: "row",

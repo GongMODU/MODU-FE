@@ -10,4 +10,13 @@ export const queryKeys = {
   investmentProfile: {
     questions: () => ["investment-profile", "questions"] as const,
   },
+  subscriptionHistory: {
+    list: () => ["subscription-history", "list"] as const,
+    ongoingList: () => ["subscription-history", "list", "ONGOING"] as const,
+    detail: (id: number) => ["subscription-history", "detail", id] as const,
+    returnRate: (months: number) => ["subscription-history", "return-rate", months] as const,
+  },
+  ipo: {
+    home: (filter: string) => ["ipo", "home", filter] as const,
+  },
 } as const;

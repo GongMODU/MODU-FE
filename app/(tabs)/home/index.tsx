@@ -1,4 +1,5 @@
 import { colors, spacing, typography } from "@/styles";
+import type { IpoHomeItem } from "@/types/ipo";
 import { type YoutubeSummaryItem } from "@/types/youtube";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -19,35 +20,35 @@ import ScheduleCard, {
 } from "./_components/ScheduleCard";
 import YoutubeBottomSheet from "./_components/YoutubeBottomSheet";
 import YoutubeCard from "./_components/YoutubeCard";
-import { youtubeSummariesOptions } from "./_components/queries";
+import { ipoHomeOptions, youtubeSummariesOptions } from "./_components/queries";
 
-// TODO: API 연동 시 교체
-const MOCK_SCHEDULE_CARDS: ScheduleCardData[] = [
-  {
-    id: "1",
-    dday: 11,
-    companyName: "키움히어로제2호기업인수목적",
-    startDate: "04/14(화)",
-    priceRange: "2,000~2,000원",
-    broker: "신한투자증권",
-  },
-  {
-    id: "2",
-    dday: 12,
-    companyName: "채비",
-    startDate: "04/15(수)",
-    priceRange: "12,000~14,000원",
-    broker: "신한투자증권",
-  },
-  {
-    id: "3",
-    dday: 13,
-    companyName: "예시종목",
-    startDate: "04/16(목)",
-    priceRange: "5,000~6,000원",
-    broker: "미래에셋증권",
-  },
-];
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+function formatDate(dateStr: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}/${day}(${WEEKDAYS[date.getDay()]})`;
+}
+
+function formatPriceRange(item: IpoHomeItem): string {
+  if (item.offerPrice != null) {
+    return `${item.offerPrice.toLocaleString()}원`;
+  }
+  return `${item.offerPriceMin.toLocaleString()}~${item.offerPriceMax.toLocaleString()}원`;
+}
+
+function toScheduleCardData(item: IpoHomeItem): ScheduleCardData {
+  return {
+    id: String(item.ipoEventId),
+    dday: item.ddayLabel ?? "",
+    companyName: item.companyName,
+    startDate: formatDate(item.subscriptionStartDate),
+    priceRange: formatPriceRange(item),
+    broker: item.brokerNames[0] ?? "-",
+  };
+}
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -60,6 +61,7 @@ export default function HomeScreen() {
   > | null>(null);
 
   const { data: youtubeSummaries = [] } = useQuery(youtubeSummariesOptions);
+  const { data: ipoItems = [] } = useQuery(ipoHomeOptions());
 
   const handlePressDetail = (card: YoutubeSummaryItem) => {
     setSelectedCard({ videoId: card.videoId, channelName: card.channelName });
@@ -91,11 +93,11 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.scheduleScrollContent}
           >
-            {MOCK_SCHEDULE_CARDS.map((card) => (
+            {ipoItems.map((item) => (
               <ScheduleCard
-                key={card.id}
-                data={card}
-                onPress={() => router.push(`/ipo/${card.id}`)}
+                key={item.ipoEventId}
+                data={toScheduleCardData(item)}
+                onPress={() => router.push(`/ipo/${item.ipoEventId}`)}
               />
             ))}
           </ScrollView>
