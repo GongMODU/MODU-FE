@@ -1,5 +1,6 @@
 import { colors, spacing, typography } from "@/styles";
 import { type YoutubeSummaryItem } from "@/types/youtube";
+import { FontAwesome } from "@expo/vector-icons";
 import {
   StyleSheet,
   Text,
@@ -25,6 +26,7 @@ export default function YoutubeCard({
     <View style={[styles.card, style]} {...props}>
       {/* 채널명 */}
       <View style={styles.channelRow}>
+        <FontAwesome name="youtube-play" size={11} color="#FF0000" />
         <Text style={styles.channelName}>{data.channelName}</Text>
       </View>
 
@@ -56,7 +58,10 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   channelRow: {
-    alignItems: "flex-end",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 4,
   },
   channelName: {
     ...typography.captionMedium8,
@@ -66,6 +71,8 @@ const styles = StyleSheet.create({
   summaryList: {
     flexDirection: "column",
     gap: spacing.sm,
+    height: 114,
+    overflow: "hidden",
   },
   summaryItem: {
     flexDirection: "row",

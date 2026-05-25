@@ -1,5 +1,6 @@
 import { colors, spacing, typography } from "@/styles";
 import { type YoutubeDetailData } from "@/types/youtube";
+import { FontAwesome } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -111,7 +112,10 @@ export default function YoutubeBottomSheet({
       ))}
 
       <View style={styles.sourceArea}>
-        <Text style={styles.sourceChannel}>{detail.channelName}</Text>
+        <View style={styles.sourceChannelRow}>
+          <FontAwesome name="youtube-play" size={13} color="#FF0000" />
+          <Text style={styles.sourceChannel}>{detail.channelName}</Text>
+        </View>
         <Text style={styles.sourceTitle}>{detail.videoTitle}</Text>
         <TouchableOpacity onPress={() => handlePressUrl(detail.videoUrl)}>
           <Text style={styles.sourceUrl}>{detail.videoUrl}</Text>
@@ -256,6 +260,11 @@ const styles = StyleSheet.create({
   sourceArea: {
     flexDirection: "column",
     gap: 2,
+  },
+  sourceChannelRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
   },
   sourceChannel: {
     ...typography.bodyRegular10,
