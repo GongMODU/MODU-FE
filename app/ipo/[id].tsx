@@ -1,7 +1,7 @@
-import { colors, spacing } from "@/styles";
+import { colors, spacing, typography } from "@/styles";
 import { useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DetailInfoSection from "./_components/DetailInfoSection";
 import DisclosureReportSection from "./_components/DisclosureReportSection";
@@ -152,6 +152,17 @@ export default function IPODetailScreen() {
           companyTab={MOCK_IPO_DETAIL.companyTab}
         />
         <DisclosureReportSection data={MOCK_IPO_DETAIL.disclosure} />
+
+        {/* 면책 문구 */}
+        <View style={styles.disclaimer}>
+          <Text style={styles.disclaimerText}>
+            MODU는 정보 제공을 우선하며, 투자를 권유 및 유도하지 않습니다.
+          </Text>
+          <Text style={styles.disclaimerText}>
+            제공하는 정보들은 오류가 존재할 수 있으며, 투자 결과에 대한 법적인
+            책임을 지지 않습니다.
+          </Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -166,5 +177,13 @@ const styles = StyleSheet.create({
     paddingTop: 48,
     paddingBottom: spacing.xl,
     gap: spacing.lg,
+  },
+  disclaimer: {
+    paddingLeft: 32,
+    gap: 4,
+  },
+  disclaimerText: {
+    ...typography.captionMedium8,
+    color: colors.gray400,
   },
 });
