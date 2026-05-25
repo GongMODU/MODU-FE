@@ -1,4 +1,10 @@
 import {
+  NotoSans_400Regular,
+  NotoSans_500Medium,
+  NotoSans_700Bold,
+  useFonts,
+} from "@expo-google-fonts/noto-sans";
+import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
@@ -17,6 +23,15 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const [fontsLoaded] = useFonts({
+    NotoSans_400Regular,
+    NotoSans_500Medium,
+    NotoSans_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
