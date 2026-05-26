@@ -14,7 +14,11 @@ export interface IpoHomeItem {
   brokerNames: string[];
   signalLevel: "GREEN" | "YELLOW" | "RED" | null;
   riskScore: number | null;
-  signalUnavailableReason: "SPAC" | "PRE_DEMAND_FORECAST" | "INCOMPLETE_DATA" | null;
+  signalUnavailableReason:
+    | "SPAC"
+    | "PRE_DEMAND_FORECAST"
+    | "INCOMPLETE_DATA"
+    | null;
   favorited: boolean;
   ddayLabel: string | null;
 }
@@ -26,3 +30,21 @@ export type IpoHomeFilter =
   | "REFUND"
   | "LISTING"
   | "ALLOCATION";
+
+export interface FavoriteItem {
+  interestId: number;
+  ipoEventId: number;
+  companyName: string;
+  status: "UPCOMING" | "ONGOING" | "CLOSED" | "LISTED";
+  subscriptionStartDate: string;
+  subscriptionEndDate: string;
+  listingDate: string;
+  listingDateEstimated: boolean;
+  lockupExpiryDate: string;
+  lockupExpiryDateEstimated: boolean;
+  offerPriceMin: number;
+  offerPriceMax: number;
+  offerPrice: number | null;
+  brokerNames: string[];
+  interestedAt: string;
+}
