@@ -9,12 +9,9 @@ export type IPOItem = {
 };
 
 // ─── 핵심 지표 신호등 ──────────────────────────────────────────
-export type KeyIndicator = {
-  /** 신호등 점수 0~100 */
-  score: number;
-  /** 신호등 등급 */
-  grade: "양호" | "보통" | "위험";
-};
+export type KeyIndicator =
+  | { grade: "양호" | "보통" | "위험"; score: number }
+  | { grade: null; score: null };
 
 // ─── 청약 탭 ───────────────────────────────────────────────────
 export type SubscriptionInfo = {
