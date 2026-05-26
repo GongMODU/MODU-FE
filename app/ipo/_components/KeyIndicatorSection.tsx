@@ -44,8 +44,10 @@ export default function KeyIndicatorSection({
   style,
   ...props
 }: Props) {
-  const config = GRADE_CONFIG[keyIndicator.grade];
   const [isBottomSheetVisible, setIsBottomSheetVisible] = useState(false);
+
+  const isUnrated = keyIndicator.grade === null;
+  const config = isUnrated ? null : GRADE_CONFIG[keyIndicator.grade];
 
   return (
     <>
@@ -72,7 +74,9 @@ export default function KeyIndicatorSection({
                   styles.circle,
                   {
                     backgroundColor:
-                      index === config.activeIndex ? color : colors.gray200,
+                      !isUnrated && index === config!.activeIndex
+                        ? color
+                        : colors.gray200,
                   },
                 ]}
               />
@@ -81,16 +85,29 @@ export default function KeyIndicatorSection({
 
           {/* 등급 / 점수 / 설명 */}
           <View style={styles.textArea}>
-            <Text style={[styles.grade, { color: config.color }]}>
-              {keyIndicator.grade}
-            </Text>
-            <Text style={styles.score}>{keyIndicator.score}점</Text>
-            <Text style={styles.description}>{config.description}</Text>
+            {isUnrated ? (
+              <>
+                <Text style={[styles.grade, { color: colors.gray400 }]}>
+                  미산정
+                </Text>
+                <Text style={styles.score}>--점</Text>
+                <Text style={styles.description}>
+                  수요예측 전인 공모주는 지표 계산이 불가능 합니다.
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text style={[styles.grade, { color: config!.color }]}>
+                  {keyIndicator.grade}
+                </Text>
+                <Text style={styles.score}>{keyIndicator.score}점</Text>
+                <Text style={styles.description}>{config!.description}</Text>
+              </>
+            )}
           </View>
         </View>
       </View>
 
-      {/* 바텀시트 */}
       {isBottomSheetVisible && (
         <KeyIndicatorBottomSheet
           onClose={() => setIsBottomSheetVisible(false)}
