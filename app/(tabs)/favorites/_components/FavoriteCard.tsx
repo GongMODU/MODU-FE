@@ -1,14 +1,32 @@
 import { colors, spacing, typography } from "@/styles";
+import { type FavoriteItem } from "@/types/ipo";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { FavoriteItem } from "../index";
+
+// ─── 날짜 포맷 변환 ───────────────────────────────────────────
+function formatDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const days = ["일", "월", "화", "수", "목", "금", "토"];
+  const dayName = days[date.getDay()];
+  return `${String(month).padStart(2, "0")}/${String(day).padStart(2, "0")}(${dayName})`;
+}
+
+// ─── 공모가 포맷 변환 ─────────────────────────────────────────
+function formatOfferPrice(item: FavoriteItem): string {
+  if (item.offerPrice !== null) {
+    return `${item.offerPrice.toLocaleString()}원`;
+  }
+  return `${item.offerPriceMin.toLocaleString()}~${item.offerPriceMax.toLocaleString()}원`;
+}
 
 // ─── 증권사 태그 ──────────────────────────────────────────────
 const MAX_VISIBLE_BROKERS = 2;
 
-function BrokerTags({ brokers }: { brokers: string[] }) {
-  const visible = brokers.slice(0, MAX_VISIBLE_BROKERS);
-  const remaining = brokers.length - MAX_VISIBLE_BROKERS;
+function BrokerTags({ brokerNames }: { brokerNames: string[] }) {
+  const visible = brokerNames.slice(0, MAX_VISIBLE_BROKERS);
+  const remaining = brokerNames.length - MAX_VISIBLE_BROKERS;
 
   return (
     <View style={styles.brokerRow}>
@@ -30,26 +48,33 @@ function BrokerTags({ brokers }: { brokers: string[] }) {
 }
 
 // ─── 카드 ─────────────────────────────────────────────────────
-export default function FavoriteCard({ item }: { item: FavoriteItem }) {
+type Props = {
+  /** 관심 공모주 아이템 */
+  item: FavoriteItem;
+};
+
+export default function FavoriteCard({ item }: Props) {
   const router = useRouter();
 
   return (
-    <TouchableOpacity onPress={() => router.push(`/ipo/${item.id}`)}>
+    <TouchableOpacity onPress={() => router.push(`/ipo/${item.ipoEventId}`)}>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>{item.name}</Text>
+        <Text style={styles.cardTitle}>{item.companyName}</Text>
 
         <View style={styles.infoSection}>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>청약시작일</Text>
-            <Text style={styles.infoValue}>{item.subscriptionStartDate}</Text>
+            <Text style={styles.infoValue}>
+              {formatDate(item.subscriptionStartDate)}
+            </Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>공모예정가</Text>
-            <Text style={styles.infoValue}>{item.offeringPrice}</Text>
+            <Text style={styles.infoValue}>{formatOfferPrice(item)}</Text>
           </View>
         </View>
 
-        <BrokerTags brokers={item.brokers} />
+        <BrokerTags brokerNames={item.brokerNames} />
       </View>
     </TouchableOpacity>
   );
