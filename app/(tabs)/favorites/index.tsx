@@ -1,6 +1,8 @@
 import { colors, spacing, typography } from "@/styles";
+import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Modal,
   Pressable,
   ScrollView,
@@ -12,73 +14,51 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import FavoriteCard from "./_components/FavoriteCard";
 import FavoriteInfoCard from "./_components/FavoriteInfoCard";
+import { favoritesOptions } from "./_components/queries";
 
-// ─── 타입 ────────────────────────────────────────────────────
-export type FavoriteItem = {
-  id: string;
-  name: string;
-  subscriptionStartDate: string;
-  offeringPrice: string;
-  brokers: string[];
-};
-
-// ─── Mock 데이터 (나중에 API로 교체) ─────────────────────────
-const MOCK_DATA: FavoriteItem[] = [
-  {
-    id: "1",
-    name: "키움히어로제2호기업인수목적",
-    subscriptionStartDate: "04/14(화)",
-    offeringPrice: "2,000~2,000원",
-    brokers: ["신한투자증권"],
-  },
-  {
-    id: "2",
-    name: "키움히어로제2호기업인수목적",
-    subscriptionStartDate: "04/14(화)",
-    offeringPrice: "2,000~2,000원",
-    brokers: [
-      "신한투자증권",
-      "유진투자증권",
-      "NH투자증권",
-      "미래에셋",
-      "KB증권",
-    ],
-  },
-  {
-    id: "3",
-    name: "키움히어로제2호기업인수목적",
-    subscriptionStartDate: "04/14(화)",
-    offeringPrice: "2,000~2,000원",
-    brokers: ["신한투자증권"],
-  },
-  {
-    id: "4",
-    name: "키움히어로제2호기업인수목적",
-    subscriptionStartDate: "04/14(화)",
-    offeringPrice: "2,000~2,000원",
-    brokers: ["신한투자증권", "NH투자증권"],
-  },
-  {
-    id: "5",
-    name: "키움히어로제2호기업인수목적",
-    subscriptionStartDate: "04/14(화)",
-    offeringPrice: "2,000~2,000원",
-    brokers: ["신한투자증권"],
-  },
-];
-
-// ─── 메인 화면 ───────────────────────────────────────────────
 export default function FavoritesScreen() {
   const [infoVisible, setInfoVisible] = useState(false);
   const [infoCardTop, setInfoCardTop] = useState(0);
   const infoButtonRef = useRef<View>(null);
+
+  const { data: favorites, isPending, isError } = useQuery(favoritesOptions);
 
   const handleInfoPress = () => {
     infoButtonRef.current?.measure((_x, _y, _width, height, _pageX, pageY) => {
       setInfoCardTop(pageY + height - 13);
       setInfoVisible((v) => !v);
     });
-  }; // 인포 버튼 아래 어디에 인포 카드가 보여지는지
+  };
+
+  const renderContent = () => {
+    if (isPending) {
+      return (
+        <View style={styles.center}>
+          <ActivityIndicator color={colors.primary600} />
+        </View>
+      );
+    }
+
+    if (isError) {
+      return (
+        <View style={styles.center}>
+          <Text style={styles.errorText}>데이터를 불러오지 못했어요.</Text>
+        </View>
+      );
+    }
+
+    if (favorites.length === 0) {
+      return (
+        <View style={styles.center}>
+          <Text style={styles.errorText}>관심 공모주가 없어요.</Text>
+        </View>
+      );
+    }
+
+    return favorites.map((item) => (
+      <FavoriteCard key={item.interestId} item={item} />
+    ));
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
@@ -94,9 +74,7 @@ export default function FavoritesScreen() {
           </TouchableOpacity>
         </View>
 
-        {MOCK_DATA.map((item) => (
-          <FavoriteCard key={item.id} item={item} />
-        ))}
+        {renderContent()}
       </ScrollView>
 
       {/* 안내 카드 */}
@@ -144,5 +122,14 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
+  },
+  center: {
+    flex: 1,
+    alignItems: "center",
+    paddingTop: 60,
+  },
+  errorText: {
+    ...typography.bodyRegular10,
+    color: colors.gray400,
   },
 });
