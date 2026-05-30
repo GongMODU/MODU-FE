@@ -52,7 +52,7 @@ export default function EmailLoginScreen() {
         >
           {/* 헤더 */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.push("/onboarding")}>
+            <TouchableOpacity onPress={() => router.back()}>
               <Ionicons name="chevron-back" size={24} color={colors.gray800} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>로그인</Text>
@@ -80,7 +80,11 @@ export default function EmailLoginScreen() {
                 style={[styles.inputRow, passwordError && styles.inputRowError]}
               >
                 <TextInput
-                  style={styles.input}
+                  key={String(passwordVisible)}
+                  style={[
+                    styles.input,
+                    !passwordVisible && Platform.OS === "android" && { fontFamily: "Roboto", fontWeight: "400" },
+                  ]}
                   value={password}
                   onChangeText={(t) => {
                     setPassword(t);

@@ -1,9 +1,29 @@
+import { googleLogin, kakaoLogin } from "@/lib/api/auth";
+import { tokenStore } from "@/lib/tokenStore";
 import { colors, spacing } from "@/styles";
 import { router } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OnboardingScreen() {
+  const [loadingProvider, setLoadingProvider] = useState<"kakao" | "google" | null>(null);
+
+  const handleSocialLogin = async (provider: "kakao" | "google") => {
+    if (loadingProvider) return;
+    setLoadingProvider(provider);
+    try {
+      const result = provider === "kakao" ? await kakaoLogin() : await googleLogin();
+      if (result) {
+        tokenStore.setTokens(result.accessToken, result.refreshToken);
+        if (result.nickname) tokenStore.setNickname(result.nickname);
+        router.replace("/(tabs)/home");
+      }
+    } finally {
+      setLoadingProvider(null);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.inner}>
@@ -22,12 +42,28 @@ export default function OnboardingScreen() {
             <Text style={styles.loginButtonText}>이메일로 로그인</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>구글 아이디로 로그인</Text>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => handleSocialLogin("google")}
+            disabled={!!loadingProvider}
+          >
+            {loadingProvider === "google" ? (
+              <ActivityIndicator size="small" color={colors.gray700} />
+            ) : (
+              <Text style={styles.loginButtonText}>구글 아이디로 로그인</Text>
+            )}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.loginButton}>
-            <Text style={styles.loginButtonText}>카카오 아이디로 로그인</Text>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => handleSocialLogin("kakao")}
+            disabled={!!loadingProvider}
+          >
+            {loadingProvider === "kakao" ? (
+              <ActivityIndicator size="small" color={colors.gray700} />
+            ) : (
+              <Text style={styles.loginButtonText}>카카오 아이디로 로그인</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => router.push("/(auth)/signup-email")}>

@@ -5,7 +5,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -27,6 +26,8 @@ export default function SignupInfoScreen() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState(false);
+  const [nicknameError, setNicknameError] = useState(false);
 
   const isPasswordError =
     passwordFocused && password.length > 0 && !PASSWORD_REGEX.test(password);
@@ -45,7 +46,7 @@ export default function SignupInfoScreen() {
         >
           {/* 헤더 */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.push("/onboarding")}>
+            <TouchableOpacity onPress={() => router.back()}>
               <Ionicons name="chevron-back" size={24} color={colors.gray800} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>회원가입</Text>
@@ -56,9 +57,12 @@ export default function SignupInfoScreen() {
             {/* 아이디 */}
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>아이디</Text>
-              <View style={styles.inputBox}>
+              <View style={[styles.inputBox, emailError && styles.inputBoxError]}>
                 <Text style={styles.inputText}>{email}</Text>
               </View>
+              {emailError && (
+                <Text style={styles.errorText}>* 이미 사용 중인 이메일입니다.</Text>
+              )}
             </View>
 
             {/* 비밀번호 */}
@@ -71,7 +75,11 @@ export default function SignupInfoScreen() {
                 ]}
               >
                 <TextInput
-                  style={styles.input}
+                  key={String(passwordVisible)}
+                  style={[
+                    styles.input,
+                    !passwordVisible && Platform.OS === "android" && { fontFamily: "Roboto", fontWeight: "400" },
+                  ]}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!passwordVisible}
@@ -99,11 +107,17 @@ export default function SignupInfoScreen() {
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>닉네임</Text>
               <TextInput
-                style={styles.nicknameInput}
+                style={[styles.nicknameInput, nicknameError && styles.inputError]}
                 value={nickname}
-                onChangeText={setNickname}
+                onChangeText={(t) => {
+                  setNickname(t);
+                  if (nicknameError) setNicknameError(false);
+                }}
                 placeholderTextColor={colors.gray400}
               />
+              {nicknameError && (
+                <Text style={styles.errorText}>* 이미 사용 중인 닉네임입니다.</Text>
+              )}
             </View>
           </View>
 
@@ -116,17 +130,27 @@ export default function SignupInfoScreen() {
             onPress={async () => {
               if (!isNextEnabled || isLoading) return;
               setIsLoading(true);
+              setEmailError(false);
+              setNicknameError(false);
               try {
                 await signup({ email: email ?? "", password, nickname });
                 const loginRes = await login(email ?? "", password);
                 tokenStore.setTokens(loginRes.data.accessToken, loginRes.data.refreshToken);
                 tokenStore.setNickname(loginRes.data.nickname);
                 router.push("/(auth)/investment-survey");
-              } catch {
-                Alert.alert(
-                  "회원가입 실패",
-                  "입력 정보를 확인하고 다시 시도해주세요.",
-                );
+              } catch (error: unknown) {
+                const res = (error as { response?: { status?: number; data?: unknown } })?.response;
+                const data = res?.data;
+                const serverMsg =
+                  typeof data === "string"
+                    ? data
+                    : (data as { message?: string })?.message ?? "";
+                const msg = serverMsg.toLowerCase();
+                if (msg.includes("nickname") || msg.includes("닉네임")) {
+                  setNicknameError(true);
+                } else {
+                  setEmailError(true);
+                }
               } finally {
                 setIsLoading(false);
               }
@@ -192,6 +216,17 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     paddingHorizontal: spacing.md,
     justifyContent: "center",
+  },
+  inputBoxError: {
+    borderColor: colors.primary600,
+  },
+  inputError: {
+    borderColor: colors.primary600,
+  },
+  errorText: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: colors.primary600,
   },
   inputText: {
     fontSize: 11,

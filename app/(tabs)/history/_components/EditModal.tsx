@@ -1,15 +1,14 @@
 import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import {
-    Dimensions,
-    Modal,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Dimensions,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { DetailData } from "./HistoryCard";
 
@@ -83,7 +82,9 @@ export default function EditModal({
 
           {/* 타이틀 */}
           <View style={styles.titleArea}>
-            <Text style={styles.title}>{mode === "add" ? "청약 이력 추가" : "청약 이력 수정"}</Text>
+            <Text style={styles.title}>
+              {mode === "add" ? "청약 이력 추가" : "청약 이력 수정"}
+            </Text>
           </View>
 
           <ScrollView
@@ -140,7 +141,9 @@ export default function EditModal({
             onPress={() => onSave(data)}
             activeOpacity={0.85}
           >
-            <Text style={styles.saveButtonText}>{mode === "add" ? "추가하기" : "수정하기"}</Text>
+            <Text style={styles.saveButtonText}>
+              {mode === "add" ? "추가하기" : "수정하기"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -198,7 +201,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: spacing.contentArea,
-    paddingBottom: spacing.sm,
+    paddingBottom: 120,
   },
   fieldGroup: {
     marginBottom: spacing.sm,
@@ -222,7 +225,6 @@ const styles = StyleSheet.create({
     borderColor: colors.gray200,
     borderRadius: 10,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
     backgroundColor: colors.white,
     justifyContent: "center",
     height: 46,
@@ -231,11 +233,14 @@ const styles = StyleSheet.create({
     ...typography.bodyMedium11,
     color: colors.gray500,
     padding: 0,
+    flex: 1,
+    textAlignVertical: "center",
   },
   saveButton: {
-    marginHorizontal: spacing.contentArea,
-    marginTop: spacing.sm,
-    marginBottom: Platform.OS === "ios" ? 34 : 24,
+    position: "absolute",
+    bottom: 100,
+    left: spacing.contentArea,
+    right: spacing.contentArea,
     borderRadius: 10,
     backgroundColor: colors.primary600,
     paddingVertical: spacing.md,
