@@ -47,10 +47,10 @@ const TOOLTIPS = {
     description:
       "기업이 갚아야 할 모든 빚의 합계예요. 자산 대비 부채가 너무 많으면 재무적으로 불안정할 수 있어요.",
   },
-  netLoss: {
-    title: "당기순손실",
+  netIncome: {
+    title: "당기순이익 / 당기순손실",
     description:
-      "해당 기간 동안 벌어들인 돈보다 나간 돈이 더 많을 때 발생해요. 손실이 크거나 지속되면 기업의 재무 건전성을 꼼꼼히 살펴볼 필요가 있어요.",
+      "당기순이익은 해당 기간 동안 수입이 지출보다 많아 발생한 이익이에요. 당기순손실은 반대로 지출이 수입보다 많을 때 발생하며, 손실이 크거나 지속되면 기업의 재무 건전성을 꼼꼼히 살펴볼 필요가 있어요.",
   },
 } as const;
 
@@ -60,7 +60,7 @@ type TooltipKey = keyof typeof TOOLTIPS;
 const TOOLTIP_TERM_MAP: Record<number, TooltipKey> = {
   1: "totalAssets",
   2: "totalLiabilities",
-  3: "netLoss",
+  3: "netIncome",
 };
 
 // ─── 로그 스케일 변환 ───────────────────────────────────────────
