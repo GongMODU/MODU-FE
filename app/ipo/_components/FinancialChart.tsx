@@ -409,6 +409,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+    width: 68,
   },
   infoIcon: {
     fontSize: 10,
