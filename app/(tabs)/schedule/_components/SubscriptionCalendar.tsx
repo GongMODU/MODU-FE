@@ -32,7 +32,7 @@ type Props = {
   year: number;
   month: number; // 1-12
   events?: CalendarEvent[];
-  selectedTag?: ScheduleTag | null;
+  selectedTags?: ScheduleTag[] | null;
 };
 
 const WEEKDAYS = ["월", "화", "수", "목", "금"];
@@ -73,7 +73,7 @@ export default function SubscriptionCalendar({
   year,
   month,
   events = [],
-  selectedTag,
+  selectedTags,
 }: Props) {
   const weeks = useMemo(() => buildCalendarWeeks(year, month), [year, month]);
 
@@ -93,7 +93,7 @@ export default function SubscriptionCalendar({
   function getEventsForDate(date: Date): CalendarEvent[] {
     const key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     const all = eventsByDate[key] ?? [];
-    if (selectedTag) return all.filter((e) => e.tag === selectedTag);
+    if (selectedTags && selectedTags.length > 0) return all.filter((e) => selectedTags.includes(e.tag));
     return all;
   }
 

@@ -17,10 +17,9 @@ import type {
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
+import EmptyHistoryIcon from "@/assets/images/empty-history.svg";
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -188,11 +187,7 @@ export default function HistoryScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
         <ScrollView
           style={styles.container}
           contentContainerStyle={[
@@ -214,7 +209,7 @@ export default function HistoryScreen() {
             </View>
           ) : allHistories.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <View style={styles.emptyImage} />
+              <EmptyHistoryIcon width={71} height={68} />
               <View style={styles.emptyTextGroup}>
                 <Text style={styles.emptyText}>아직 청약 이력이 없어요.</Text>
                 <Text style={styles.emptyText}>버튼을 눌러 이력을 추가해보세요.</Text>
@@ -241,7 +236,6 @@ export default function HistoryScreen() {
             ))
           )}
         </ScrollView>
-      </KeyboardAvoidingView>
 
       {editId && draftData && (
         <EditModal
@@ -286,11 +280,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 8,
   },
-  emptyImage: {
-    width: 71,
-    height: 71,
-    backgroundColor: "#d9d9d9",
-  },
   emptyTextGroup: {
     alignItems: "center",
     gap: 4,
@@ -302,7 +291,7 @@ const styles = StyleSheet.create({
   },
   titleRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
     paddingHorizontal: spacing.contentArea,
     paddingBottom: spacing.lg,

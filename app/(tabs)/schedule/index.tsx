@@ -1,4 +1,4 @@
-import { colors } from "@/styles";
+import { colors, spacing, typography } from "@/styles";
 import type { IpoHomeItem } from "@/types/ipo";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
@@ -83,7 +83,7 @@ function todayString(): string {
 
 export default function SubscriptionScheduleScreen() {
   const router = useRouter();
-  const [selectedChip, setSelectedChip] = useState<ScheduleTag>("공모청약");
+  const [selectedChips, setSelectedChips] = useState<ScheduleTag[]>([]);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const [expandedTerm, setExpandedTerm] = useState<string | null>(null);
 
@@ -168,6 +168,12 @@ export default function SubscriptionScheduleScreen() {
     return Array.from(map.values());
   }, [subscriptionItems, listingItems, lockupItems]);
 
+  const toggleChip = (chip: ScheduleTag) => {
+    setSelectedChips((prev) =>
+      prev.includes(chip) ? prev.filter((c) => c !== chip) : [...prev, chip]
+    );
+  };
+
   const handleTermPress = (term: string) => {
     setExpandedTerm((prev) => (prev === term ? null : term));
   };
@@ -182,30 +188,23 @@ export default function SubscriptionScheduleScreen() {
         <Text style={styles.monthText}>{currentMonth}월</Text>
 
         {/* 칩 목록 */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.chipContainer}
-          contentContainerStyle={styles.chipContent}
-        >
+        <View style={styles.chipRow}>
           {CHIPS.map((chip) => {
-            const isSelected = selectedChip === chip;
+            const isSelected = selectedChips.includes(chip);
             const chipColor = TAG_COLORS[chip];
             return (
               <TouchableOpacity
                 key={chip}
                 style={[
                   styles.chip,
-                  { borderColor: chipColor },
-                  isSelected && { backgroundColor: chipColor },
+                  { backgroundColor: isSelected ? chipColor : colors.gray100 },
                 ]}
-                onPress={() => setSelectedChip(chip)}
+                onPress={() => toggleChip(chip)}
               >
                 <Text
                   style={[
                     styles.chipText,
-                    { color: chipColor },
-                    isSelected && styles.chipTextSelected,
+                    { color: isSelected ? colors.gray50 : colors.gray500 },
                   ]}
                 >
                   {chip}
@@ -213,14 +212,14 @@ export default function SubscriptionScheduleScreen() {
               </TouchableOpacity>
             );
           })}
-        </ScrollView>
+        </View>
 
         {/* 캘린더 */}
         <SubscriptionCalendar
           year={currentYear}
           month={currentMonth}
           events={calendarEvents}
-          selectedTag={selectedChip}
+          selectedTags={selectedChips}
         />
 
         {/* 오늘 주요 일정 */}
@@ -348,30 +347,20 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 18,
   },
-  chipContainer: {
-    flexGrow: 0,
+  chipRow: {
+    flexDirection: "row",
+    gap: 8,
+    paddingHorizontal: spacing.contentArea,
     marginBottom: 16,
   },
-  chipContent: {
-    paddingHorizontal: 16,
-    gap: 8,
-    justifyContent: "center",
-    flexGrow: 1,
-  },
   chip: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
-    backgroundColor: colors.white,
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 4,
+    borderRadius: 16,
   },
   chipText: {
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  chipTextSelected: {
-    color: colors.white,
-    fontWeight: "600",
+    ...typography.labelMedium10,
   },
   sectionTitle: {
     fontSize: 18,

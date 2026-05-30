@@ -23,6 +23,7 @@ export default function SignupEmailScreen() {
   const [email, setEmail] = useState("");
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const inputRefs = useRef<(TextInput | null)[]>([
     null,
     null,
@@ -46,11 +47,17 @@ export default function SignupEmailScreen() {
   const handleSendCode = async () => {
     if (!email || isLoading) return;
     setIsLoading(true);
+    setEmailError(null);
     try {
       await sendEmailCode(email);
       setStep("verify");
-    } catch {
-      Alert.alert("오류", "인증코드 발송에 실패했습니다. 다시 시도해주세요.");
+    } catch (error: unknown) {
+      const data = (error as { response?: { data?: unknown } })?.response?.data;
+      const serverMsg =
+        typeof data === "string"
+          ? data
+          : (data as { message?: string })?.message ?? null;
+      setEmailError(serverMsg ?? "인증코드 발송에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +95,7 @@ export default function SignupEmailScreen() {
         >
           {/* 헤더 */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.push("/onboarding")}>
+            <TouchableOpacity onPress={() => router.back()}>
               <Ionicons name="chevron-back" size={24} color={colors.gray800} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>회원가입</Text>
@@ -99,11 +106,14 @@ export default function SignupEmailScreen() {
             {/* 이메일 */}
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>이메일</Text>
-              <View style={styles.inputRow}>
+              <View style={[styles.inputRow, emailError ? styles.inputRowError : null]}>
                 <TextInput
                   style={styles.input}
                   value={email}
-                  onChangeText={setEmail}
+                  onChangeText={(t) => {
+                    setEmail(t);
+                    if (emailError) setEmailError(null);
+                  }}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   placeholderTextColor={colors.gray400}
@@ -116,6 +126,9 @@ export default function SignupEmailScreen() {
                   <Text style={styles.verifyButtonText}>인증</Text>
                 </TouchableOpacity>
               </View>
+              {emailError && (
+                <Text style={styles.errorText}>* {emailError}</Text>
+              )}
             </View>
 
             {/* 인증번호 */}
@@ -224,6 +237,14 @@ const styles = StyleSheet.create({
     borderColor: colors.gray200,
     backgroundColor: colors.white,
     paddingHorizontal: spacing.md,
+  },
+  inputRowError: {
+    borderColor: colors.primary600,
+  },
+  errorText: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: colors.primary600,
   },
   input: {
     flex: 1,
