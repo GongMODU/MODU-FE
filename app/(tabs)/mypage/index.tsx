@@ -44,7 +44,11 @@ export default function MypageScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.sectionTitle}>내 프로필</Text>
-        <ProfileCard nickname={data.nickname} email={data.email} />
+        <ProfileCard
+          nickname={data.nickname}
+          email={data.email}
+          personaCode={data.investmentProfile.personaCode}
+        />
 
         <Text style={styles.investmentTitle}>나의 투자 성향</Text>
         <InvestmentCard />
