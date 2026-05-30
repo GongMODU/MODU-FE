@@ -89,9 +89,11 @@ export default function DisclosureReportSection({
         <View style={styles.summaryBox}>
           <Text style={styles.summaryText}>{data.financialSummary}</Text>
         </View>
-        <View style={styles.card}>
-          <FinancialChart data={data.financialChart} />
-        </View>
+        {data.financialChart.periods.length > 0 && (
+          <View style={styles.card}>
+            <FinancialChart data={data.financialChart} />
+          </View>
+        )}
       </View>
 
       {/* 더보기 섹션들 */}

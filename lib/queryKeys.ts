@@ -19,6 +19,11 @@ export const queryKeys = {
   },
   ipo: {
     home: (filter: string) => ["ipo", "home", filter] as const,
+    detail: (ipoEventId: number) => ["ipo", "detail", ipoEventId] as const,
+    disclosure: (ipoEventId: number) =>
+      ["ipo", "disclosure", ipoEventId] as const,
+    financials: (ipoEventId: number) =>
+      ["ipo", "financials", ipoEventId] as const,
   },
   favorites: {
     list: () => ["favorites", "list"] as const,

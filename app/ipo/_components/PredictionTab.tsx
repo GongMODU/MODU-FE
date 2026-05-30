@@ -110,7 +110,9 @@ export default function PredictionTab({ data, style, ...props }: Props) {
         <View style={styles.cellFull}>
           <Text style={styles.cellLabel}>확정공모가</Text>
           <Text style={styles.offeringPrice}>
-            {data.offeringPrice.toLocaleString()}원
+            {data.offeringPrice === null
+              ? "-"
+              : `${data.offeringPrice.toLocaleString()}원`}
           </Text>
         </View>
 

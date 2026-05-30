@@ -16,21 +16,27 @@ type Props = ViewProps & {
 };
 
 const GRADE_CONFIG = {
-  양호: {
+  GREEN: {
     color: colors.trafficGreen,
     description: "투자 안전도가 높은 수준 입니다.",
     activeIndex: 2,
   },
-  보통: {
+  YELLOW: {
     color: colors.trafficYellow,
     description: "투자 안전도가 보통 수준 입니다.",
     activeIndex: 1,
   },
-  위험: {
+  RED: {
     color: colors.trafficRed,
     description: "투자 안전도가 낮은 수준 입니다.",
     activeIndex: 0,
   },
+} as const;
+
+const GRADE_LABEL = {
+  GREEN: "양호",
+  YELLOW: "보통",
+  RED: "위험",
 } as const;
 
 const TRAFFIC_COLORS = [
@@ -98,7 +104,7 @@ export default function KeyIndicatorSection({
             ) : (
               <>
                 <Text style={[styles.grade, { color: config!.color }]}>
-                  {keyIndicator.grade}
+                  {GRADE_LABEL[keyIndicator.grade]}
                 </Text>
                 <Text style={styles.score}>{keyIndicator.score}점</Text>
                 <Text style={styles.description}>{config!.description}</Text>
