@@ -1,20 +1,20 @@
 import type {
-    CompanyDetail,
-    FinancialYear,
-    ForecastDetail,
-    IpoDisclosureResponse,
-    IpoFinancialsResponse,
-    SignalLevel,
-    SubscriptionDetail,
+  CompanyDetail,
+  FinancialYear,
+  ForecastDetail,
+  IpoDisclosureResponse,
+  IpoFinancialsResponse,
+  SignalLevel,
+  SubscriptionDetail,
 } from "@/types/ipo";
 import type {
-    CompanyTabInfo,
-    DisclosureReport,
-    FinancialChartData,
-    KeyIndicator,
-    PredictionInfo,
-    ReportSection,
-    SubscriptionInfo,
+  CompanyTabInfo,
+  DisclosureReport,
+  FinancialChartData,
+  KeyIndicator,
+  PredictionInfo,
+  ReportSection,
+  SubscriptionInfo,
 } from "./types";
 
 // ─── 날짜 포맷 유틸 ───────────────────────────────────────────
@@ -188,7 +188,7 @@ const SPAC_FINANCIAL_TERMS = [
   { label: "매출액", description: "영업을 하지 않는 서류상 회사" },
   { label: "자산총계", description: "공모 자금 유입으로 크게 증가" },
   { label: "부채총계", description: "주로 발행한 전환사채 관련 부채" },
-  { label: "당기순손실", description: "운영비 지출로 인한 장부상 손실" },
+  { label: "당기순손익", description: "운영비 지출로 인한 장부상 손실" },
 ] as const;
 
 const GENERAL_FINANCIAL_TERMS = [
@@ -199,7 +199,7 @@ const GENERAL_FINANCIAL_TERMS = [
   { label: "자산총계", description: "기업이 보유한 모든 자산의 합계예요." },
   { label: "부채총계", description: "기업이 갚아야 할 모든 부채의 합계예요." },
   {
-    label: "당기순손실",
+    label: "당기순손익",
     description: "해당 기간 동안 발생한 최종 손익이에요.",
   },
 ] as const;
@@ -212,15 +212,24 @@ export const toFinancialChartData = (
 
   const terms = isSpac ? SPAC_FINANCIAL_TERMS : GENERAL_FINANCIAL_TERMS;
 
-  // netIncome이 하나라도 음수면 "당기순손실", 아니면 "당기순이익"
-  const hasNetLoss = data.financials.some(
-    (f) => f.netIncome !== null && f.netIncome < 0,
+  const allPositive = data.financials.every(
+    (f) => f.netIncome === null || f.netIncome >= 0,
   );
-  const netIncomeLabel = hasNetLoss ? "당기순손실" : "당기순이익";
+  const allNegative = data.financials.every(
+    (f) => f.netIncome === null || f.netIncome < 0,
+  );
 
-  const netIncomeDescription = hasNetLoss
-    ? "해당 기간 동안 지출이 수입보다 많아 발생한 손실이에요."
-    : "해당 기간 동안 수입이 지출보다 많아 발생한 이익이에요.";
+  const netIncomeLabel = allPositive
+    ? "당기순이익"
+    : allNegative
+      ? "당기순손실"
+      : "당기순손익";
+
+  const netIncomeDescription = allPositive
+    ? "해당 기간 동안 수입이 지출보다 많아 발생한 이익이에요."
+    : allNegative
+      ? "해당 기간 동안 지출이 수입보다 많아 발생한 손실이에요."
+      : "당기순이익은 수입이 지출보다 많을 때, 당기순손실은 지출이 수입보다 많을 때 발생해요.";
 
   const dynamicTerms = terms.map((t, i) =>
     i === 3
