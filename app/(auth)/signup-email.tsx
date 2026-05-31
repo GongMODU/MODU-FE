@@ -95,7 +95,14 @@ export default function SignupEmailScreen() {
         >
           {/* 헤더 */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => {
+                if (step === "email") {
+                  router.replace("/onboarding");
+                } else {
+                  setStep("email");
+                  setCode(["", "", "", "", "", ""]);
+                }
+              }}>
               <Ionicons name="chevron-back" size={24} color={colors.gray800} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>회원가입</Text>

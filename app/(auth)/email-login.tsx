@@ -52,7 +52,7 @@ export default function EmailLoginScreen() {
         >
           {/* 헤더 */}
           <View style={styles.header}>
-            <TouchableOpacity onPress={() => router.back()}>
+            <TouchableOpacity onPress={() => router.replace("/onboarding")}>
               <Ionicons name="chevron-back" size={24} color={colors.gray800} />
             </TouchableOpacity>
             <Text style={styles.headerTitle}>로그인</Text>
