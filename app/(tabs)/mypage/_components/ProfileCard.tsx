@@ -1,18 +1,39 @@
+import { getPersonaImage } from "@/lib/personaImage";
 import { colors, spacing, typography } from "@/styles";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  type ViewProps,
+} from "react-native";
 
-type Props = {
+type Props = ViewProps & {
   nickname: string;
   email: string;
+  /** 페르소나 코드 (K1R1 ~ K4R4) */
+  personaCode: string;
 };
 
-export default function ProfileCard({ nickname, email }: Props) {
+export default function ProfileCard({
+  nickname,
+  email,
+  personaCode,
+  style,
+  ...props
+}: Props) {
   const router = useRouter();
+  const image = getPersonaImage(personaCode);
 
   return (
-    <View style={styles.profileCard}>
-      <View style={styles.avatar} />
+    <View style={[styles.profileCard, style]} {...props}>
+      {image != null ? (
+        <Image source={image} style={styles.avatar} resizeMode="cover" />
+      ) : (
+        <View style={styles.avatar} />
+      )}
       <View style={styles.profileInfo}>
         <Text style={styles.nickname}>{nickname}</Text>
         <View style={styles.bioBadge}>
