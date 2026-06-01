@@ -101,27 +101,23 @@ export default function CompanyTab({ data, style, ...props }: Props) {
   return (
     <View style={[styles.container, style]} {...props}>
       <View style={styles.grid}>
-        <InfoCell label="매출액" value={data.revenue} />
+        <View style={[styles.cellFull, styles.cellFullCentered]}>
+          <Text style={styles.cellLabel}>매출액</Text>
+          <Text style={styles.revenue}>{data.revenue}</Text>
+        </View>
+
         <InfoCell label="순이익" value={data.netIncome} />
         <InfoCell label="공모주식수" value={data.offeringShares} />
-        <InfoCell label="상장주식수" value={data.listedShares} />
-        {/* 보호예수는 두 셀 모두 동일한 툴팁 사용 */}
-        <InfoCellWithTooltip
-          label="보호예수"
-          value={data.lockupShares[0]}
-          tooltipKey="lockupShares"
-          activeTooltip={activeTooltip}
-          onTooltipToggle={handleTooltipToggle}
-        />
-        <InfoCellWithTooltip
-          label="보호예수"
-          value={data.lockupShares[1]}
-          tooltipKey="lockupShares"
-          activeTooltip={activeTooltip}
-          onTooltipToggle={handleTooltipToggle}
-        />
 
-        {/* 청약 증권사 - 2열 전체 너비 */}
+        <InfoCellWithTooltip
+          label="보호예수"
+          value={data.lockupShares}
+          tooltipKey="lockupShares"
+          activeTooltip={activeTooltip}
+          onTooltipToggle={handleTooltipToggle}
+        />
+        <InfoCell label="상장주식수" value={data.listedShares} />
+
         <View style={styles.cellFull}>
           <Text style={styles.cellLabel}>청약 증권사</Text>
           <View style={styles.brokerRow}>
@@ -179,6 +175,10 @@ const styles = StyleSheet.create({
     borderColor: colors.gray50,
     backgroundColor: colors.white,
   },
+  cellFullCentered: {
+    alignItems: "center",
+    gap: 4,
+  },
   labelRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -187,6 +187,10 @@ const styles = StyleSheet.create({
   cellLabel: {
     ...typography.bodyRegular10,
     color: colors.gray500,
+  },
+  revenue: {
+    ...typography.subtitleMedium14,
+    color: colors.gray800,
   },
   cellValue: {
     ...typography.labelMedium10,

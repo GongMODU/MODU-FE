@@ -30,7 +30,7 @@ export type CompanyTabInfo = {
   netIncome: string;
   offeringShares: string;
   listedShares: string;
-  lockupShares: [string, string];
+  lockupShares: string;
   brokers: string[];
 };
 

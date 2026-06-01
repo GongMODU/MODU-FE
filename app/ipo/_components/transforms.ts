@@ -116,17 +116,14 @@ export const toPredictionInfo = (data: ForecastDetail): PredictionInfo => ({
 });
 
 // ─── CompanyTabInfo 변환 ──────────────────────────────────────
-export const toCompanyTabInfo = (data: CompanyDetail): CompanyTabInfo => {
-  const custodyValue = formatRatio(data.protectiveCustodyRatio);
-  return {
-    revenue: formatAmount(data.revenue),
-    netIncome: formatAmount(data.netIncome),
-    offeringShares: formatShares(data.shareCount),
-    listedShares: formatShares(data.totalListedShares),
-    lockupShares: [custodyValue, custodyValue],
-    brokers: data.brokerNames,
-  };
-};
+export const toCompanyTabInfo = (data: CompanyDetail): CompanyTabInfo => ({
+  revenue: formatAmount(data.revenue),
+  netIncome: formatAmount(data.netIncome),
+  offeringShares: formatShares(data.shareCount),
+  listedShares: formatShares(data.totalListedShares),
+  lockupShares: formatRatio(data.protectiveCustodyRatio),
+  brokers: data.brokerNames,
+});
 
 // ─── DisclosureReport 변환 ────────────────────────────────────
 const SPAC_PURPOSE = "다른 기업과 합병하여 성장";
