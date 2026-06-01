@@ -1,13 +1,27 @@
+import { getPersonaMypageImage } from "@/lib/personaImage";
 import { colors, spacing, typography } from "@/styles";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export default function InvestmentCard() {
+type InvestmentCardProps = {
+  personaCode: string;
+};
+
+export default function InvestmentCard({ personaCode }: InvestmentCardProps) {
   const router = useRouter();
+  const personaImage = getPersonaMypageImage(personaCode);
 
   return (
     <View style={styles.investmentCard}>
-      <View style={styles.chartPlaceholder} />
+      {personaImage != null ? (
+        <Image
+          source={personaImage}
+          style={styles.personaImage}
+          resizeMode="cover"
+        />
+      ) : (
+        <View style={styles.personaImage} />
+      )}
 
       <TouchableOpacity
         style={styles.retestButton}
@@ -27,11 +41,11 @@ const styles = StyleSheet.create({
     borderColor: colors.gray200,
     marginBottom: 20,
   },
-  chartPlaceholder: {
+  personaImage: {
     width: "100%",
     height: 260,
+    borderRadius: 8,
     backgroundColor: colors.gray200,
-    borderRadius: 4,
     marginBottom: 7,
   },
   retestButton: {

@@ -51,7 +51,7 @@ export default function MypageScreen() {
         />
 
         <Text style={styles.investmentTitle}>나의 투자 성향</Text>
-        <InvestmentCard />
+        <InvestmentCard personaCode={data.investmentProfile.personaCode} />
 
         <MenuList />
       </ScrollView>

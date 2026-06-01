@@ -1,8 +1,10 @@
+import { getPersonaResultImage } from "@/lib/personaImage";
 import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,12 +17,16 @@ import { mypageHomeOptions } from "../_components/queries";
 type ResultParams = {
   koreanName: string;
   keywordTags: string;
+  personaCode: string;
 };
 
 export default function InvestmentRetestResultScreen() {
   const router = useRouter();
-  const { koreanName, keywordTags: keywordTagsJson } =
-    useLocalSearchParams<ResultParams>();
+  const {
+    koreanName,
+    keywordTags: keywordTagsJson,
+    personaCode,
+  } = useLocalSearchParams<ResultParams>();
 
   const { data } = useQuery(mypageHomeOptions());
   const nickname = data?.nickname ?? "";
@@ -29,6 +35,8 @@ export default function InvestmentRetestResultScreen() {
   const keywordTags: string[] = Array.isArray(rawKeywordTags)
     ? rawKeywordTags.map((t: string) => (t.startsWith("#") ? t : `#${t}`))
     : [];
+
+  const personaImage = getPersonaResultImage(personaCode ?? "");
 
   return (
     <SafeAreaView edges={["top"]} style={styles.container}>
@@ -49,8 +57,15 @@ export default function InvestmentRetestResultScreen() {
           </Text>
         </View>
 
-        {/* 이미지 플레이스홀더 */}
-        <View style={styles.imagePlaceholder} />
+        {personaImage != null ? (
+          <Image
+            source={personaImage}
+            style={styles.personaImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.personaImage} />
+        )}
 
         {/* 투자 성향 키워드 */}
         <Text style={styles.keywordTitle}>투자 성향 키워드</Text>
@@ -108,10 +123,10 @@ const styles = StyleSheet.create({
     ...typography.largeTitleMedium20,
     color: colors.gray700,
   },
-  imagePlaceholder: {
+  personaImage: {
     width: "100%",
     height: 322,
-    backgroundColor: "#D9D9D9",
+    borderRadius: 10,
     marginTop: spacing.lg,
     alignSelf: "center",
   },

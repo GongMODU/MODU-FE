@@ -1,9 +1,11 @@
 import { investmentResultStore } from "@/lib/investmentResultStore";
+import { getPersonaResultImage } from "@/lib/personaImage";
 import { tokenStore } from "@/lib/tokenStore";
 import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function InvestmentIntroScreen() {
   const result = investmentResultStore.get();
   const nickname = tokenStore.getNickname() ?? "";
+  const personaImage = getPersonaResultImage(result?.personaCode ?? "");
   const keywordTags = (() => {
     const raw = result?.keywordTags;
     if (!raw) return [];
@@ -53,8 +56,15 @@ export default function InvestmentIntroScreen() {
           </Text>
         </View>
 
-        {/* 이미지 플레이스홀더 */}
-        <View style={styles.imagePlaceholder} />
+        {personaImage != null ? (
+          <Image
+            source={personaImage}
+            style={styles.personaImage}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={styles.personaImage} />
+        )}
 
         {/* 투자 성향 키워드 */}
         <Text style={styles.keywordTitle}>투자 성향 키워드</Text>
@@ -112,10 +122,10 @@ const styles = StyleSheet.create({
     ...typography.largeTitleMedium20,
     color: colors.gray700,
   },
-  imagePlaceholder: {
+  personaImage: {
     width: "100%",
     height: 322,
-    backgroundColor: "#D9D9D9",
+    borderRadius: 10,
     marginTop: spacing.lg,
     alignSelf: "center",
   },
