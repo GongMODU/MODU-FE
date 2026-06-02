@@ -23,7 +23,6 @@ import {
 import {
   toCompanyTabInfo,
   toDisclosureReport,
-  toFinancialChartData,
   toKeyIndicator,
   toPredictionInfo,
   toSubscriptionInfo,
@@ -91,7 +90,13 @@ export default function IPODetailScreen() {
     );
   }
 
-  if (isDetailError || isDisclosureError || !detail || !disclosure) {
+  if (
+    isDetailError ||
+    isDisclosureError ||
+    !detail ||
+    !disclosure ||
+    !financials
+  ) {
     return (
       <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
         <View style={styles.center}>
@@ -105,16 +110,7 @@ export default function IPODetailScreen() {
   const subscription = toSubscriptionInfo(detail.subscription);
   const prediction = toPredictionInfo(detail.forecast);
   const companyTab = toCompanyTabInfo(detail.company);
-  const disclosureReport = toDisclosureReport(disclosure);
-  const financialChartData = financials
-    ? toFinancialChartData(financials, disclosure.isSpac)
-    : null;
-
-  // financialChart를 disclosureReport에 주입
-  const disclosureWithChart = {
-    ...disclosureReport,
-    financialChart: financialChartData ?? { periods: [], terms: [] },
-  };
+  const disclosureReport = toDisclosureReport(disclosure, financials);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
@@ -136,7 +132,7 @@ export default function IPODetailScreen() {
           prediction={prediction}
           companyTab={companyTab}
         />
-        <DisclosureReportSection data={disclosureWithChart} />
+        <DisclosureReportSection data={disclosureReport} />
 
         {/* 면책 문구 */}
         <View style={styles.disclaimer}>
