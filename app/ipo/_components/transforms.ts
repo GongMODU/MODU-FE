@@ -11,6 +11,7 @@ import type {
   CompanyTabInfo,
   DisclosureReport,
   FinancialChartData,
+  FinancialStatus,
   KeyIndicator,
   PredictionInfo,
   ReportSection,
@@ -134,6 +135,7 @@ const GENERAL_PURPOSE = "사업 영위 및 성장";
 
 export const toDisclosureReport = (
   data: IpoDisclosureResponse,
+  financialsData: IpoFinancialsResponse,
 ): DisclosureReport => {
   const sections: ReportSection[] = [];
 
@@ -169,6 +171,18 @@ export const toDisclosureReport = (
     });
   }
 
+  let financial: FinancialStatus;
+  if (!financialsData.available) {
+    financial = data.isSpac ? { kind: "spac" } : { kind: "no-data" };
+  } else {
+    const chartData = toFinancialChartData(financialsData, data.isSpac);
+    financial = {
+      kind: "available",
+      summary: data.financialSummary?.join(" ") ?? "",
+      chart: chartData ?? { periods: [], terms: [] },
+    };
+  }
+
   return {
     companySummary: {
       companyName: data.companyName,
@@ -177,8 +191,7 @@ export const toDisclosureReport = (
       establishedDate: formatFullDate(data.establishedAt),
       listingDate: formatFullDate(data.listingDate),
     },
-    financialSummary: data.financialSummary?.join(" ") ?? "",
-    financialChart: { periods: [], terms: [] },
+    financial,
     sections,
   };
 };

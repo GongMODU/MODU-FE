@@ -86,13 +86,31 @@ export default function DisclosureReportSection({
       {/* 재무제표 요약 */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>재무제표 요약</Text>
-        <View style={styles.summaryBox}>
-          <Text style={styles.summaryText}>{data.financialSummary}</Text>
-        </View>
-        {data.financialChart.periods.length > 0 && (
-          <View style={styles.card}>
-            <FinancialChart data={data.financialChart} />
+        {data.financial.kind === "spac" ? (
+          <View style={styles.summaryBox}>
+            <Text style={styles.summaryText}>
+              SPAC은 일반 사업을 하지 않고 공모로 모은 자금을 예치하여 보관하는
+              구조입니다. 따라서 매출이나 영업이익 같은 일반 기업의 재무지표는
+              발생하지 않아요.
+            </Text>
           </View>
+        ) : data.financial.kind === "no-data" ? (
+          <View style={styles.summaryBox}>
+            <Text style={styles.summaryText}>
+              제공된 재무 데이터가 없어 재무 상태를 파악하기 어렵습니다.
+            </Text>
+          </View>
+        ) : (
+          <>
+            <View style={styles.summaryBox}>
+              <Text style={styles.summaryText}>{data.financial.summary}</Text>
+            </View>
+            {data.financial.chart.periods.length > 0 && (
+              <View style={styles.card}>
+                <FinancialChart data={data.financial.chart} />
+              </View>
+            )}
+          </>
         )}
       </View>
 

@@ -54,10 +54,15 @@ export type CompanySummary = {
   listingDate: string;
 };
 
+// 재무제표 섹션 상태
+export type FinancialStatus =
+  | { kind: "available"; summary: string; chart: FinancialChartData }
+  | { kind: "no-data" }
+  | { kind: "spac" };
+
 export type DisclosureReport = {
   companySummary: CompanySummary;
-  financialSummary: string;
-  financialChart: FinancialChartData;
+  financial: FinancialStatus;
   sections: ReportSection[];
 };
 
