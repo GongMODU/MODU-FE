@@ -119,11 +119,7 @@ export default function IPODetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         <IPODetailHeader
-          item={{
-            id: String(detail.ipoEventId),
-            companyName: detail.companyName,
-            isFavorite: detail.favorited,
-          }}
+          item={detail}
           onToggleFavorite={() => toggleFavorite(detail.favorited)}
         />
         <KeyIndicatorSection keyIndicator={keyIndicator} />
