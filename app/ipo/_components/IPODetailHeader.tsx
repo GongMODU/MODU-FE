@@ -1,4 +1,5 @@
 import { colors, spacing, typography } from "@/styles";
+import { type IpoDetailResponse } from "@/types/ipo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
@@ -8,11 +9,11 @@ import {
   View,
   type ViewProps,
 } from "react-native";
-import { type IPOItem } from "./types";
+import FavoriteIcon from "./FavoriteIcon";
 
 type Props = ViewProps & {
   /** 공모주 기본 정보 */
-  item: IPOItem;
+  item: IpoDetailResponse;
   /** 찜 버튼 핸들러 */
   onToggleFavorite: () => void;
 };
@@ -39,11 +40,7 @@ export default function IPODetailHeader({
 
       {/* 찜 버튼 */}
       <Pressable onPress={onToggleFavorite} style={styles.favoriteButton}>
-        <Ionicons
-          name={item.isFavorite ? "star" : "star-outline"}
-          size={24}
-          color={item.isFavorite ? colors.primary600 : colors.gray400}
-        />
+        <FavoriteIcon isFavorite={item.favorited} />
       </Pressable>
     </View>
   );
