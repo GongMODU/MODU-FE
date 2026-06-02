@@ -35,6 +35,7 @@ export default function InvestmentRetestScreen() {
         params: {
           koreanName: result.koreanName,
           keywordTags: result.keywordTags,
+          personaCode: result.personaCode,
         },
       });
     },
