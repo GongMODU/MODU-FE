@@ -24,6 +24,7 @@ export interface CompletedHistoryCreateRequest {
   securityCompany?: string;
   subscribedQuantity?: number;
   allocatedQuantity?: number;
+  offerPrice?: number;
   sellPrice?: number;
   fee?: number;
   tax?: number;
@@ -35,6 +36,7 @@ export interface SubscriptionHistoryUpdateRequest {
   securityCompany?: string;
   subscribedQuantity?: number;
   allocatedQuantity?: number;
+  offerPrice?: number;
   sellPrice?: number;
   fee?: number;
   tax?: number;
@@ -67,7 +69,7 @@ export interface MonthlyReturnRate {
 export interface ReturnRateSummaryResponse {
   months: number;
   monthlyReturnRates: MonthlyReturnRate[];
-  currentMonthReturnRate: number;
-  lastMonthReturnRate: number;
+  currentMonthReturnRate: number | null;
+  lastMonthReturnRate: number | null;
   trend: "INCREASED" | "DECREASED" | "UNCHANGED" | "NO_DATA";
 }
