@@ -74,7 +74,7 @@ export default function FavoritesScreen() {
           </TouchableOpacity>
         </View>
 
-        {renderContent()}
+        <View style={styles.cardList}>{renderContent()}</View>
       </ScrollView>
 
       {/* 안내 카드 */}
@@ -105,12 +105,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.contentArea,
     paddingTop: 72,
     paddingBottom: 60,
-    gap: 12,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: spacing.md, // 16
+  },
+  cardList: {
+    gap: 12,
   },
   headerTitle: {
     ...typography.largeTitleMedium20,

@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     gap: spacing.xl,
   },
   section: {
-    gap: spacing.sm,
+    gap: spacing.md,
   },
   sectionHeader: {
     flexDirection: "row",
