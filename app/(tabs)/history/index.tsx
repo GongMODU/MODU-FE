@@ -38,6 +38,7 @@ const INITIAL_DETAIL: DetailData = {
   수수료: "",
   배정수량: "",
   제세금: "",
+  공모가: "",
   매도가: "",
 };
 
@@ -50,6 +51,7 @@ function toDetailData(item: SubscriptionHistoryItem): DetailData {
     수수료: item.fee != null ? String(item.fee) : "",
     배정수량: item.allocatedQuantity != null ? String(item.allocatedQuantity) : "",
     제세금: item.tax != null ? String(item.tax) : "",
+    공모가: item.offerPrice != null ? String(item.offerPrice) : "",
     매도가: item.sellPrice != null ? String(item.sellPrice) : "",
   };
 }
@@ -60,6 +62,34 @@ function parseNum(val: string): number | undefined {
   return val.trim() === "" || isNaN(n) ? undefined : n;
 }
 
+// 문자열 → YYYY-MM-DD 파싱 ("5.2", "2026.5.2", "5/2" 등 지원)
+function parseDate(val: string): string | undefined {
+  if (!val.trim()) return undefined;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+
+  const parts = val.replace(/[./]/g, "-").split("-").map((p) => p.trim());
+  let year: number, month: number, day: number;
+
+  if (parts.length === 3) {
+    if (parts[0].length === 4) {
+      [year, month, day] = parts.map(Number);
+    } else {
+      year = 2000 + Number(parts[0]);
+      [, month, day] = parts.map(Number);
+    }
+  } else if (parts.length === 2) {
+    year = new Date().getFullYear();
+    [month, day] = parts.map(Number);
+  } else {
+    return undefined;
+  }
+
+  if (isNaN(year) || isNaN(month) || isNaN(day)) return undefined;
+  if (month < 1 || month > 12 || day < 1 || day > 31) return undefined;
+
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
 function toCreateRequest(name: string, data: DetailData): CompletedHistoryCreateRequest {
   return {
     inputStockName: name,
@@ -68,8 +98,9 @@ function toCreateRequest(name: string, data: DetailData): CompletedHistoryCreate
     fee: parseNum(data.수수료),
     allocatedQuantity: parseNum(data.배정수량),
     tax: parseNum(data.제세금),
+    offerPrice: parseNum(data.공모가),
     sellPrice: parseNum(data.매도가),
-    sellDate: data.매도일 || undefined,
+    sellDate: parseDate(data.매도일),
   };
 }
 
@@ -81,8 +112,9 @@ function toUpdateRequest(name: string, data: DetailData): SubscriptionHistoryUpd
     fee: parseNum(data.수수료),
     allocatedQuantity: parseNum(data.배정수량),
     tax: parseNum(data.제세금),
+    offerPrice: parseNum(data.공모가),
     sellPrice: parseNum(data.매도가),
-    sellDate: data.매도일 || undefined,
+    sellDate: parseDate(data.매도일),
   };
 }
 

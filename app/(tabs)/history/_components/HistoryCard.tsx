@@ -12,6 +12,22 @@ import {
   View,
 } from "react-native";
 
+function formatDisplayValue(key: keyof DetailData, value: string): string {
+  if (!value.trim()) return "-";
+  if (key === "증권사") {
+    return value.endsWith("증권") ? value : `${value}증권`;
+  }
+  const num = Number(value.replace(/[^0-9.-]/g, ""));
+  if (isNaN(num)) return value;
+  if (key === "청약수량" || key === "배정수량") {
+    return `${num.toLocaleString()}주`;
+  }
+  if (key === "수수료" || key === "제세금" || key === "매도가") {
+    return `${num.toLocaleString()}원`;
+  }
+  return value;
+}
+
 export type DetailData = {
   증권사: string;
   매도일: string;
@@ -19,6 +35,7 @@ export type DetailData = {
   수수료: string;
   배정수량: string;
   제세금: string;
+  공모가: string;
   매도가: string;
 };
 
@@ -134,7 +151,7 @@ export default function HistoryCard({
                     <Text style={styles.detailLabel}>{field.label}</Text>
                     <TextInput
                       style={styles.detailValue}
-                      value={data[field.key]}
+                      value={formatDisplayValue(field.key, data[field.key])}
                       editable={false}
                       placeholder="-"
                       placeholderTextColor={colors.gray300}

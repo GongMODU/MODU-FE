@@ -33,12 +33,36 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
     return val.trim() === "" || isNaN(n) ? undefined : n;
   };
 
+  const parseDate = (val: string): string | undefined => {
+    if (!val.trim()) return undefined;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+    const parts = val.replace(/[./]/g, "-").split("-").map((p) => p.trim());
+    let year: number, month: number, day: number;
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        [year, month, day] = parts.map(Number);
+      } else {
+        year = 2000 + Number(parts[0]);
+        [, month, day] = parts.map(Number);
+      }
+    } else if (parts.length === 2) {
+      year = new Date().getFullYear();
+      [month, day] = parts.map(Number);
+    } else {
+      return undefined;
+    }
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return undefined;
+    if (month < 1 || month > 12 || day < 1 || day > 31) return undefined;
+    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  };
+
   const handleComplete = () => {
     const price = parseNum(sellPrice);
-    if (!price || !sellDate.trim()) return;
+    const date = parseDate(sellDate);
+    if (!price || !date) return;
     onComplete({
       sellPrice: price,
-      sellDate: sellDate.trim(),
+      sellDate: date,
       fee: parseNum(fee),
       tax: parseNum(tax),
     });

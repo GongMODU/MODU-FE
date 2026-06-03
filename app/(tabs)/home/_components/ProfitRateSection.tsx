@@ -15,22 +15,39 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import Svg, { Circle, G, Line, Polyline, Text as SvgText } from "react-native-svg";
+import Svg, {
+  Circle,
+  G,
+  Line,
+  Polyline,
+  Text as SvgText,
+} from "react-native-svg";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_WIDTH = SCREEN_WIDTH - spacing.lg * 2;
-const CARD_HEIGHT = 196;
-const CARD_PADDING = 16;
+const CARD_HEIGHT = 220;
 
-const SVG_W = CARD_WIDTH - CARD_PADDING * 2;
-const SVG_H = CARD_HEIGHT - CARD_PADDING * 2;
+const SVG_W = CARD_WIDTH;
+const SVG_H = CARD_HEIGHT;
 
-const CHART_LEFT = 28;
-const CHART_RIGHT = 12;
-const CHART_TOP = 28;
-const CHART_BOTTOM = 28;
-const CHART_W = SVG_W - CHART_LEFT - CHART_RIGHT;
-const CHART_H = SVG_H - CHART_TOP - CHART_BOTTOM;
+const FIGMA_CARD_W = 312;
+const S = CARD_WIDTH / FIGMA_CARD_W;
+
+const GRID_X1 = 24 * S;
+const GRID_X2 = SVG_W;
+const GRID_Y1 = 0;
+const GRID_Y2 = SVG_H - 28;
+const GRID_W = GRID_X2 - GRID_X1;
+const GRID_H = GRID_Y2 - GRID_Y1;
+
+// X레이블: 하단선 바로 아래 6px
+const X_LABEL_Y = GRID_Y2 + 14;
+
+// → 첫 점은 Y축에서 한 칸 띄고, 마지막 점도 한 칸 여백, 항상 범위 안에 유지
+function getXPositions(n: number): number[] {
+  const step = GRID_W / (n + 1);
+  return Array.from({ length: n }, (_, i) => GRID_X1 + step * (i + 1));
+}
 
 const TREND_CAPTIONS: Record<string, string> = {
   INCREASED: "저번달에 비해 이번달 평균 수익률이 증가했어요!",
@@ -39,46 +56,134 @@ const TREND_CAPTIONS: Record<string, string> = {
   NO_DATA: "아직 수익률 데이터가 없어요.",
 };
 
-const BAR_MAX_H = 90;
-
 function ProfitBarChart({
   current,
   last,
   trend,
 }: {
-  current: number;
-  last: number;
+  current: number | null;
+  last: number | null;
   trend: string;
 }) {
-  const maxAbs = Math.max(Math.abs(current), Math.abs(last), 1);
-  const barData = [
-    { label: "저번달", value: last, color: colors.primary200 },
-    { label: "이번달", value: current, color: colors.primary600 },
+  const cur = current ?? 0;
+  const prv = last ?? 0;
+  const maxAbs = Math.max(Math.abs(cur), Math.abs(prv), 1);
+
+  // 피그마 기준 312w × 200h
+  const SX = CARD_WIDTH / 312;
+  const SY = CARD_HEIGHT / 200;
+
+  const gridH = Math.round(130 * SY); // 격자 영역 높이
+  const barW = Math.round(64 * SX); // 막대 너비
+  const hpad = Math.round(45.5 * SX); // 양쪽 수평 여백
+  const maxBarH = Math.round(100 * SY); // 최대 막대 높이 (하단선까지)
+
+  const vLines = [78, 156, 234].map((x) => Math.round(x * SX));
+
+  const barItems = [
+    {
+      value: prv,
+      h: Math.max(Math.round((Math.abs(prv) / maxAbs) * maxBarH), 1),
+      color: colors.primary200,
+      label: "저번달",
+      textColor: colors.primary200,
+    },
+    {
+      value: cur,
+      h: Math.max(Math.round((Math.abs(cur) / maxAbs) * maxBarH), 1),
+      color: colors.primary600,
+      label: "이번달",
+      textColor: colors.primary600,
+    },
   ];
 
   return (
-    <View style={styles.card}>
-      <View style={styles.barChartInner}>
-        {barData.map((item) => (
-          <View key={item.label} style={styles.barColumn}>
-            <Text style={styles.barValueLabel}>
+    <View style={styles.cardNopad}>
+      {/* 격자 SVG */}
+      <Svg
+        width={CARD_WIDTH}
+        height={gridH}
+        style={{ position: "absolute", top: 0, left: 0 }}
+      >
+        {vLines.map((x, i) => (
+          <Line
+            key={i}
+            x1={x}
+            y1={0}
+            x2={x}
+            y2={gridH}
+            stroke={colors.gray100}
+            strokeWidth={1}
+          />
+        ))}
+        <Line
+          x1={0}
+          y1={gridH}
+          x2={CARD_WIDTH}
+          y2={gridH}
+          stroke={colors.gray200}
+          strokeWidth={1}
+        />
+      </Svg>
+
+      {/* 막대 + % 레이블 */}
+      <View
+        style={{
+          height: gridH,
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          paddingHorizontal: hpad,
+          paddingBottom: 0,
+        }}
+      >
+        {barItems.map((item) => (
+          <View
+            key={item.label}
+            style={{ width: barW, alignItems: "center", gap: 4 }}
+          >
+            <Text style={[styles.barValueLabel, { color: item.textColor }]}>
               {item.value >= 0 ? "+" : ""}
               {item.value.toFixed(1)}%
             </Text>
             <View
-              style={[
-                styles.bar,
-                {
-                  height: (Math.abs(item.value) / maxAbs) * BAR_MAX_H,
-                  backgroundColor: item.color,
-                },
-              ]}
+              style={{
+                width: barW,
+                height: item.h,
+                backgroundColor: item.color,
+                borderTopLeftRadius: 10,
+                borderTopRightRadius: 10,
+              }}
             />
-            <Text style={styles.barXLabel}>{item.label}</Text>
           </View>
         ))}
       </View>
-      <Text style={styles.barCaption}>{TREND_CAPTIONS[trend] ?? ""}</Text>
+
+      {/* 월 레이블 */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          paddingHorizontal: hpad,
+          paddingTop: 4,
+        }}
+      >
+        {barItems.map((item) => (
+          <Text
+            key={item.label}
+            style={[styles.barXLabel, { width: barW, textAlign: "center" }]}
+          >
+            {item.label}
+          </Text>
+        ))}
+      </View>
+
+      {/* 코멘트 */}
+      <Text
+        style={[styles.barCaption, { paddingHorizontal: 16, paddingTop: 18 }]}
+      >
+        {TREND_CAPTIONS[trend] ?? ""}
+      </Text>
     </View>
   );
 }
@@ -92,49 +197,135 @@ function ProfitLineChart({ data }: { data: MonthlyReturnRate[] }) {
     );
   }
 
-  const values = data.map((d) => d.averageReturnRate);
-  const MAX_VAL = Math.max(...values);
-  const MIN_VAL = Math.min(...values);
-  const VALUE_RANGE = MAX_VAL === MIN_VAL ? 1 : MAX_VAL - MIN_VAL;
+  const xPositions = getXPositions(data.length);
 
-  const toY = (v: number) => CHART_TOP + ((MAX_VAL - v) / VALUE_RANGE) * CHART_H;
-  const toX = (i: number) => CHART_LEFT + (i / (data.length - 1)) * CHART_W;
-  const ZERO_Y = toY(0);
-  const points = data.map((d, i) => `${toX(i)},${toY(d.averageReturnRate)}`).join(" ");
+  const values = data.map((d) => d.averageReturnRate);
+  const effMax = Math.max(...values, 0);
+  const effMin = Math.min(...values, 0);
+
+  const LABEL_PAD = 14;
+  const dynamicZeroY = GRID_Y1 + GRID_H / 2;
+  const HALF = GRID_H / 2 - LABEL_PAD;
+
+  const MIN_SCALE = 50;
+  const maxAbs = Math.max(Math.abs(effMax), Math.abs(effMin), 1);
+  const SCALE_MAX = Math.max(maxAbs * 1.2, MIN_SCALE);
+
+  const toY = (v: number) => dynamicZeroY - (v / SCALE_MAX) * HALF;
+
+  const points = data
+    .map((d, i) => `${xPositions[i]},${toY(d.averageReturnRate)}`)
+    .join(" ");
 
   return (
-    <View style={styles.card}>
+    <View style={styles.cardNopad}>
       <Svg width={SVG_W} height={SVG_H}>
+        {/* Y축 왼쪽 세로선 */}
         <Line
-          x1={CHART_LEFT} y1={ZERO_Y}
-          x2={CHART_LEFT + CHART_W} y2={ZERO_Y}
-          stroke={colors.gray200} strokeWidth={1} strokeDasharray="4,4"
+          x1={GRID_X1}
+          y1={GRID_Y1}
+          x2={GRID_X1}
+          y2={GRID_Y2}
+          stroke={colors.gray200}
+          strokeWidth={1}
         />
-        <Polyline points={points} fill="none" stroke={colors.primary200} strokeWidth={1.5} />
+
+        {/* 수직 격자선 */}
+        {xPositions.map((x, i) => (
+          <Line
+            key={`vg-${i}`}
+            x1={x}
+            y1={GRID_Y1}
+            x2={x}
+            y2={GRID_Y2}
+            stroke={colors.gray100}
+            strokeWidth={1}
+          />
+        ))}
+
+        {/* 0 기준선: GRID_X1에서 시작 */}
+        <Line
+          x1={GRID_X1}
+          y1={dynamicZeroY}
+          x2={GRID_X2}
+          y2={dynamicZeroY}
+          stroke={colors.gray200}
+          strokeWidth={1}
+        />
+
+        {/* 하단 경계선: Y축 세로선 꼭짓점부터 */}
+        <Line
+          x1={GRID_X1}
+          y1={GRID_Y2}
+          x2={GRID_X2}
+          y2={GRID_Y2}
+          stroke={colors.gray200}
+          strokeWidth={1}
+        />
+
+        {/* 꺾은선 */}
+        <Polyline
+          points={points}
+          fill="none"
+          stroke={colors.primary200}
+          strokeWidth={1.5}
+        />
+
+        {/* 포인트 + 레이블 */}
         {data.map((d, i) => {
-          const cx = toX(i);
+          const cx = xPositions[i];
           const cy = toY(d.averageReturnRate);
           const isLast = i === data.length - 1;
-          const label = `${d.averageReturnRate >= 0 ? "+" : ""}${d.averageReturnRate.toFixed(1)}%`;
-          const labelY = cy < ZERO_Y ? cy - 8 : cy + 14;
+          const label = `${d.averageReturnRate >= 0 ? "+" : ""}${Math.round(d.averageReturnRate)}%`;
+          const labelY = cy <= dynamicZeroY ? cy - 7 : cy + 12;
           return (
             <G key={i}>
-              <Circle cx={cx} cy={cy} r={3} fill={isLast ? colors.primary600 : colors.primary200} />
-              <SvgText x={cx} y={labelY} textAnchor="middle" fontSize={8} fontWeight="500"
-                fill={isLast ? colors.primary600 : colors.gray400}>
+              <Circle
+                cx={cx}
+                cy={cy}
+                r={5}
+                fill={isLast ? colors.primary600 : colors.white}
+                stroke={isLast ? colors.white : colors.primary200}
+                strokeWidth={2.5}
+              />
+              <SvgText
+                x={cx}
+                y={labelY}
+                textAnchor="middle"
+                fontSize={9}
+                fontWeight="500"
+                fill={isLast ? colors.primary600 : colors.primary200}
+              >
                 {label}
               </SvgText>
             </G>
           );
         })}
+
+        {/* X축 레이블 */}
         {data.map((d, i) => (
-          <SvgText key={`xl-${i}`} x={toX(i)} y={SVG_H - 4} textAnchor="middle"
-            fontSize={8} fontWeight="500" fill={colors.gray400}>
+          <SvgText
+            key={`xl-${i}`}
+            x={xPositions[i]}
+            y={X_LABEL_Y}
+            textAnchor="middle"
+            fontSize={8}
+            fontWeight="500"
+            fill={colors.gray400}
+          >
             {d.month}월
           </SvgText>
         ))}
-        <SvgText x={CHART_LEFT - 4} y={ZERO_Y + 3} textAnchor="end"
-          fontSize={8} fontWeight="500" fill={colors.gray400}>
+
+        {/* Y축 "0" */}
+        <SvgText
+          x={GRID_X1 - 4}
+          y={dynamicZeroY + 4}
+          textAnchor="end"
+          fontSize={8}
+          fontWeight="500"
+          fill={colors.gray400}
+        >
           0
         </SvgText>
       </Svg>
@@ -151,6 +342,9 @@ export default function ProfitRateSection() {
     queryFn: () => getReturnRate(6).then((r) => r.data),
   });
 
+  const hasCurrentMonth =
+    returnRate != null && returnRate.currentMonthReturnRate != null;
+
   return (
     <View style={styles.section}>
       <TouchableOpacity
@@ -165,18 +359,22 @@ export default function ProfitRateSection() {
         <View style={[styles.card, styles.emptyCard]}>
           <ActivityIndicator color={colors.primary600} />
         </View>
-      ) : !returnRate || returnRate.trend === "NO_DATA" ? (
+      ) : !returnRate ||
+        (returnRate.trend === "NO_DATA" &&
+          returnRate.monthlyReturnRates.length === 0) ? (
         <View style={[styles.card, styles.emptyCard]}>
           <Text style={styles.emptyText}>아직 수익률 데이터가 없어요.</Text>
         </View>
-      ) : (
+      ) : hasCurrentMonth ? (
         <>
           <ScrollView
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             onMomentumScrollEnd={(e) => {
-              const index = Math.round(e.nativeEvent.contentOffset.x / CARD_WIDTH);
+              const index = Math.round(
+                e.nativeEvent.contentOffset.x / CARD_WIDTH,
+              );
               setActiveIndex(index);
             }}
           >
@@ -191,7 +389,6 @@ export default function ProfitRateSection() {
               <ProfitLineChart data={returnRate.monthlyReturnRates} />
             </View>
           </ScrollView>
-
           <View style={styles.pagination}>
             {[0, 1].map((i) => (
               <View
@@ -202,6 +399,13 @@ export default function ProfitRateSection() {
                 ]}
               />
             ))}
+          </View>
+        </>
+      ) : (
+        <>
+          <ProfitLineChart data={returnRate.monthlyReturnRates} />
+          <View style={styles.pagination}>
+            <View style={[styles.paginationDot, styles.dotActive]} />
           </View>
         </>
       )}
@@ -229,7 +433,17 @@ const styles = StyleSheet.create({
     borderColor: colors.gray200,
     borderRadius: 10,
     backgroundColor: colors.white,
-    padding: CARD_PADDING,
+    padding: 16,
+    overflow: "hidden",
+    position: "relative",
+  },
+  cardNopad: {
+    width: CARD_WIDTH,
+    height: CARD_HEIGHT,
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    borderRadius: 10,
+    backgroundColor: colors.white,
     overflow: "hidden",
   },
   emptyCard: {
@@ -240,25 +454,8 @@ const styles = StyleSheet.create({
     ...typography.bodyRegular10,
     color: colors.gray400,
   },
-  barChartInner: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "center",
-    gap: 32,
-  },
-  barColumn: {
-    alignItems: "center",
-    gap: 6,
-  },
   barValueLabel: {
-    ...typography.captionMedium9,
-    color: colors.gray600,
-  },
-  bar: {
-    width: 44,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    ...typography.labelMedium10,
   },
   barXLabel: {
     ...typography.captionMedium8,

@@ -42,14 +42,15 @@ export default function EditModal({
       { label: "매도일", key: "매도일" },
     ],
     [
-      { label: "청약 수량", key: "청약수량" },
-      { label: "수수료", key: "수수료" },
-    ],
-    [
       { label: "배정 수량", key: "배정수량" },
+      { label: "청약 수량", key: "청약수량" },
+    ],
+    [{ label: "공모가", key: "공모가" }],
+    [{ label: "매도가", key: "매도가" }],
+    [
+      { label: "수수료", key: "수수료" },
       { label: "제세금", key: "제세금" },
     ],
-    [{ label: "매도가", key: "매도가" }],
   ];
 
   return (
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
   closeButton: {
     position: "absolute",
     right: spacing.contentArea,
-    top: 8,
+    top: 22,
   },
   titleArea: {
     paddingHorizontal: spacing.contentArea,
