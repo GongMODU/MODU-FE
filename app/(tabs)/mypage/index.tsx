@@ -32,7 +32,23 @@ export default function MypageScreen() {
       setWithdrawPassword("");
       setWithdrawModalVisible(true);
     } else {
-      Alert.alert("알림", "소셜 로그인 계정 탈퇴는 준비 중입니다.");
+      Alert.alert("회원탈퇴", "정말 탈퇴하시겠어요?", [
+        { text: "취소", style: "cancel" },
+        {
+          text: "탈퇴",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await withdraw("");
+            } catch {
+              Alert.alert("오류", "탈퇴 처리 중 문제가 발생했습니다.");
+              return;
+            }
+            tokenStore.clear();
+            router.replace("/onboarding");
+          },
+        },
+      ]);
     }
   };
 
