@@ -14,9 +14,6 @@ import {
 
 function formatDisplayValue(key: keyof DetailData, value: string): string {
   if (!value.trim()) return "-";
-  if (key === "증권사") {
-    return value.endsWith("증권") ? value : `${value}증권`;
-  }
   const num = Number(value.replace(/[^0-9.-]/g, ""));
   if (isNaN(num)) return value;
   if (key === "청약수량" || key === "배정수량") {

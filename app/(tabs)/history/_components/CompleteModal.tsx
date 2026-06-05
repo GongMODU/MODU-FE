@@ -160,7 +160,7 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
                     style={styles.inputText}
                     value={fee}
                     onChangeText={setFee}
-                    placeholder="-"
+                    placeholder="수수료 입력"
                     placeholderTextColor={colors.gray300}
                     keyboardType="numeric"
                   />
@@ -173,7 +173,7 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
                     style={styles.inputText}
                     value={tax}
                     onChangeText={setTax}
-                    placeholder="-"
+                    placeholder="제세금 입력"
                     placeholderTextColor={colors.gray300}
                     keyboardType="numeric"
                   />
