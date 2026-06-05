@@ -39,21 +39,34 @@ export default function EditModal({
   onNameChange,
   mode = "edit",
 }: Props) {
-  const fieldRows: { label: string; key: keyof DetailData }[][] = [
+  const fieldRows: {
+    label: string;
+    key: keyof DetailData;
+    placeholder: string;
+  }[][] = [
     [
-      { label: "증권사", key: "증권사" },
-      { label: "매도일", key: "매도일" },
+      { label: "증권사", key: "증권사", placeholder: "증권사 입력" },
+      { label: "매도일", key: "매도일", placeholder: "YYYY-MM-DD" },
     ],
     [
-      { label: "배정 수량", key: "배정수량" },
-      { label: "청약 수량", key: "청약수량" },
+      { label: "배정 수량", key: "배정수량", placeholder: "배정 수량 입력" },
+      { label: "청약 수량", key: "청약수량", placeholder: "청약 수량 입력" },
     ],
-    [{ label: "공모가", key: "공모가" }],
-    [{ label: "매도가", key: "매도가" }],
+    [{ label: "공모가", key: "공모가", placeholder: "공모가 입력" }],
+    [{ label: "매도가", key: "매도가", placeholder: "매도 단가 입력" }],
     [
-      { label: "수수료", key: "수수료" },
-      { label: "제세금", key: "제세금" },
+      { label: "수수료", key: "수수료", placeholder: "수수료 입력" },
+      { label: "제세금", key: "제세금", placeholder: "제세금 입력" },
     ],
+  ];
+
+  const numericFields: (keyof DetailData)[] = [
+    "배정수량",
+    "청약수량",
+    "공모가",
+    "매도가",
+    "수수료",
+    "제세금",
   ];
 
   const [searchResults, setSearchResults] = useState<IpoSearchItem[]>([]);
@@ -64,16 +77,22 @@ export default function EditModal({
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isOngoing = selectedIpoEventId !== undefined;
 
-  const ongoingFieldKeys: (keyof DetailData)[] = [
-    "증권사",
-    "청약수량",
-    "공모가",
-  ];
-
-  const filteredFieldRows = isOngoing
-    ? fieldRows
-        .map((row) => row.filter((f) => ongoingFieldKeys.includes(f.key)))
-        .filter((row) => row.length > 0)
+  const filteredFieldRows: {
+    label: string;
+    key: keyof DetailData;
+    placeholder: string;
+  }[][] = isOngoing
+    ? [
+        [{ label: "증권사", key: "증권사", placeholder: "증권사 입력" }],
+        [
+          {
+            label: "청약 수량",
+            key: "청약수량",
+            placeholder: "청약 수량 입력",
+          },
+          { label: "공모가", key: "공모가", placeholder: "공모가 입력" },
+        ],
+      ]
     : fieldRows;
 
   useEffect(() => {
@@ -201,8 +220,13 @@ export default function EditModal({
                         style={styles.inputText}
                         value={data[field.key]}
                         onChangeText={(value) => onChange(field.key, value)}
-                        placeholder="-"
+                        placeholder={field.placeholder}
                         placeholderTextColor={colors.gray300}
+                        keyboardType={
+                          numericFields.includes(field.key)
+                            ? "numeric"
+                            : "default"
+                        }
                       />
                     </View>
                   </View>
