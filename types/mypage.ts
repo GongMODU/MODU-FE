@@ -1,6 +1,8 @@
+export type Provider = "LOCAL" | "KAKAO" | "GOOGLE";
+
 export interface MypageHomeResponse {
   nickname: string;
-  provider: string;
+  provider: Provider;
   email: string;
   investmentProfile: InvestmentProfile;
 }

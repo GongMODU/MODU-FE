@@ -101,6 +101,8 @@ export default function ProfileEditScreen() {
     mode: "onChange",
   });
 
+  const isLocalUser = data?.provider === "LOCAL";
+
   useEffect(() => {
     if (data?.nickname) {
       reset({
@@ -115,7 +117,9 @@ export default function ProfileEditScreen() {
 
   const isSubmitDisabled =
     !!errors.nickname ||
-    (!!newPassword && (!!errors.newPassword || !!errors.newPasswordConfirm));
+    (isLocalUser &&
+      !!newPassword &&
+      (!!errors.newPassword || !!errors.newPasswordConfirm));
 
   const onSubmit: SubmitHandler<ProfileEditFormValues> = async (data) => {
     try {
@@ -189,93 +193,97 @@ export default function ProfileEditScreen() {
               )}
             </View>
 
-            {/* 새 비밀번호 */}
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>새 비밀번호</Text>
-              <Controller
-                control={control}
-                name="newPassword"
-                render={({ field: { value, onBlur, onChange } }) => (
-                  <View
-                    style={[
-                      styles.inputRow,
-                      !!errors.newPassword && styles.inputRowError,
-                    ]}
-                  >
-                    <TextInput
-                      style={styles.input}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      secureTextEntry={!passwordVisible}
-                      autoCapitalize="none"
-                      placeholderTextColor={colors.gray400}
-                    />
-                    <TouchableOpacity
-                      onPress={() => setPasswordVisible(!passwordVisible)}
-                    >
-                      <Ionicons
-                        name={passwordVisible ? "eye" : "eye-off"}
-                        size={18}
-                        color={colors.gray600}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                )}
-              />
-              {errors.newPassword ? (
-                <Text style={styles.errorText}>
-                  {errors.newPassword.message}
-                </Text>
-              ) : !newPassword ? (
-                <Text style={styles.hintText}>
-                  * 8-16자 이내, 영어 대소문자와 특수문자를 포함해주세요.
-                </Text>
-              ) : null}
-            </View>
+            {isLocalUser && (
+              <>
+                {/* 새 비밀번호 */}
+                <View style={styles.fieldGroup}>
+                  <Text style={styles.label}>새 비밀번호</Text>
+                  <Controller
+                    control={control}
+                    name="newPassword"
+                    render={({ field: { value, onBlur, onChange } }) => (
+                      <View
+                        style={[
+                          styles.inputRow,
+                          !!errors.newPassword && styles.inputRowError,
+                        ]}
+                      >
+                        <TextInput
+                          style={styles.input}
+                          value={value}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          secureTextEntry={!passwordVisible}
+                          autoCapitalize="none"
+                          placeholderTextColor={colors.gray400}
+                        />
+                        <TouchableOpacity
+                          onPress={() => setPasswordVisible(!passwordVisible)}
+                        >
+                          <Ionicons
+                            name={passwordVisible ? "eye" : "eye-off"}
+                            size={18}
+                            color={colors.gray600}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  />
+                  {errors.newPassword ? (
+                    <Text style={styles.errorText}>
+                      {errors.newPassword.message}
+                    </Text>
+                  ) : !newPassword ? (
+                    <Text style={styles.hintText}>
+                      * 8-16자 이내, 영어 대소문자와 특수문자를 포함해주세요.
+                    </Text>
+                  ) : null}
+                </View>
 
-            {/* 새 비밀번호 확인 */}
-            <View style={styles.fieldGroup}>
-              <Text style={styles.label}>새 비밀번호 확인</Text>
-              <Controller
-                control={control}
-                name="newPasswordConfirm"
-                render={({ field: { value, onBlur, onChange } }) => (
-                  <View
-                    style={[
-                      styles.inputRow,
-                      !!errors.newPasswordConfirm && styles.inputRowError,
-                    ]}
-                  >
-                    <TextInput
-                      style={styles.input}
-                      value={value}
-                      onChangeText={onChange}
-                      onBlur={onBlur}
-                      secureTextEntry={!passwordConfirmVisible}
-                      autoCapitalize="none"
-                      placeholderTextColor={colors.gray400}
-                    />
-                    <TouchableOpacity
-                      onPress={() =>
-                        setPasswordConfirmVisible(!passwordConfirmVisible)
-                      }
-                    >
-                      <Ionicons
-                        name={passwordConfirmVisible ? "eye" : "eye-off"}
-                        size={18}
-                        color={colors.gray600}
-                      />
-                    </TouchableOpacity>
-                  </View>
-                )}
-              />
-              {errors.newPasswordConfirm && (
-                <Text style={styles.errorText}>
-                  {errors.newPasswordConfirm.message}
-                </Text>
-              )}
-            </View>
+                {/* 새 비밀번호 확인 */}
+                <View style={styles.fieldGroup}>
+                  <Text style={styles.label}>새 비밀번호 확인</Text>
+                  <Controller
+                    control={control}
+                    name="newPasswordConfirm"
+                    render={({ field: { value, onBlur, onChange } }) => (
+                      <View
+                        style={[
+                          styles.inputRow,
+                          !!errors.newPasswordConfirm && styles.inputRowError,
+                        ]}
+                      >
+                        <TextInput
+                          style={styles.input}
+                          value={value}
+                          onChangeText={onChange}
+                          onBlur={onBlur}
+                          secureTextEntry={!passwordConfirmVisible}
+                          autoCapitalize="none"
+                          placeholderTextColor={colors.gray400}
+                        />
+                        <TouchableOpacity
+                          onPress={() =>
+                            setPasswordConfirmVisible(!passwordConfirmVisible)
+                          }
+                        >
+                          <Ionicons
+                            name={passwordConfirmVisible ? "eye" : "eye-off"}
+                            size={18}
+                            color={colors.gray600}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  />
+                  {errors.newPasswordConfirm && (
+                    <Text style={styles.errorText}>
+                      {errors.newPasswordConfirm.message}
+                    </Text>
+                  )}
+                </View>
+              </>
+            )}
           </View>
         </ScrollView>
 
