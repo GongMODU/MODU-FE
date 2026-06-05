@@ -27,6 +27,7 @@ type Props = {
   onChange: (field: keyof DetailData, value: string) => void;
   onNameChange: (value: string) => void;
   mode?: "add" | "edit";
+  recordStatus?: "ONGOING" | "COMPLETED";
 };
 
 export default function EditModal({
@@ -38,6 +39,7 @@ export default function EditModal({
   onChange,
   onNameChange,
   mode = "edit",
+  recordStatus,
 }: Props) {
   const fieldRows: {
     label: string;
@@ -75,7 +77,8 @@ export default function EditModal({
     number | undefined
   >(undefined);
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isOngoing = selectedIpoEventId !== undefined;
+  const isOngoing =
+    recordStatus === "ONGOING" || selectedIpoEventId !== undefined;
 
   const filteredFieldRows: {
     label: string;
