@@ -6,10 +6,14 @@ import type {
   IpoFinancialsResponse,
   IpoHomeFilter,
   IpoHomeItem,
+  IpoSearchItem,
 } from "@/types/ipo";
 
 export const getIpoHome = (filter: IpoHomeFilter = "SUBSCRIPTION") =>
   apiClient.get<IpoHomeItem[]>("/api/ipo/home", { params: { filter } });
+
+export const searchIpo = (keyword: string) =>
+  apiClient.get<IpoSearchItem[]>("/api/ipo/search", { params: { keyword } });
 
 export const getFavorites = () =>
   apiClient.get<FavoriteItem[]>("/api/interest-ipos");

@@ -1,5 +1,8 @@
+import { searchIpo } from "@/lib/api/ipo";
 import { colors, spacing, typography } from "@/styles";
+import type { IpoSearchItem } from "@/types/ipo";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Modal,
@@ -20,7 +23,7 @@ type Props = {
   name: string;
   data: DetailData;
   onClose: () => void;
-  onSave: (data: DetailData) => void;
+  onSave: (data: DetailData, ipoEventId?: number) => void;
   onChange: (field: keyof DetailData, value: string) => void;
   onNameChange: (value: string) => void;
   mode?: "add" | "edit";
@@ -52,6 +55,34 @@ export default function EditModal({
       { label: "제세금", key: "제세금" },
     ],
   ];
+
+  const [searchResults, setSearchResults] = useState<IpoSearchItem[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedIpoEventId, setSelectedIpoEventId] = useState<
+    number | undefined
+  >(undefined);
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isOngoing = selectedIpoEventId !== undefined;
+
+  const ongoingFieldKeys: (keyof DetailData)[] = [
+    "증권사",
+    "청약수량",
+    "공모가",
+  ];
+
+  const filteredFieldRows = isOngoing
+    ? fieldRows
+        .map((row) => row.filter((f) => ongoingFieldKeys.includes(f.key)))
+        .filter((row) => row.length > 0)
+    : fieldRows;
+
+  useEffect(() => {
+    if (!visible) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      setSelectedIpoEventId(undefined);
+    }
+  }, [visible]);
 
   return (
     <Modal
@@ -101,15 +132,59 @@ export default function EditModal({
                 <TextInput
                   style={styles.inputText}
                   value={name}
-                  onChangeText={onNameChange}
+                  onChangeText={(text) => {
+                    onNameChange(text);
+                    setSelectedIpoEventId(undefined);
+                    if (debounceTimer.current)
+                      clearTimeout(debounceTimer.current);
+                    if (text.trim().length === 0) {
+                      setSearchResults([]);
+                      setShowDropdown(false);
+                      return;
+                    }
+                    debounceTimer.current = setTimeout(async () => {
+                      try {
+                        const res = await searchIpo(text.trim());
+                        setSearchResults(res.data);
+                        setShowDropdown(res.data.length > 0);
+                      } catch {
+                        setSearchResults([]);
+                        setShowDropdown(false);
+                      }
+                    }, 300);
+                  }}
                   placeholder="종목명 입력"
                   placeholderTextColor={colors.gray300}
                 />
               </View>
+              {showDropdown && (
+                <View style={styles.dropdown}>
+                  {searchResults.map((item) => (
+                    <TouchableOpacity
+                      key={item.ipoEventId}
+                      style={styles.dropdownItem}
+                      onPress={() => {
+                        onNameChange(item.companyName);
+                        setSelectedIpoEventId(item.ipoEventId);
+                        setShowDropdown(false);
+                        setSearchResults([]);
+                      }}
+                    >
+                      <Text style={styles.dropdownText}>
+                        {item.companyName}
+                      </Text>
+                      <Text style={styles.dropdownSub}>
+                        {item.subscriptionStartDate} ~{" "}
+                        {item.subscriptionEndDate}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </View>
 
             {/* 2열 필드들 */}
-            {fieldRows.map((row, rowIndex) => (
+            {filteredFieldRows.map((row, rowIndex) => (
               <View key={rowIndex} style={styles.fieldRow}>
                 {row.map((field, fieldIndex) => (
                   <View
@@ -138,9 +213,13 @@ export default function EditModal({
 
           {/* 저장 버튼 */}
           <TouchableOpacity
-            style={styles.saveButton}
-            onPress={() => onSave(data)}
+            style={[
+              styles.saveButton,
+              mode === "add" && !name.trim() && styles.saveButtonDisabled,
+            ]}
+            onPress={() => onSave(data, selectedIpoEventId)}
             activeOpacity={0.85}
+            disabled={mode === "add" && !name.trim()}
           >
             <Text style={styles.saveButtonText}>
               {mode === "add" ? "추가하기" : "수정하기"}
@@ -251,5 +330,36 @@ const styles = StyleSheet.create({
   saveButtonText: {
     ...typography.footerBold12,
     color: colors.primary50,
+  },
+  dropdown: {
+    borderWidth: 1,
+    borderColor: colors.gray200,
+    borderRadius: 10,
+    backgroundColor: colors.white,
+    marginTop: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 100,
+  },
+  dropdownItem: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray100,
+    gap: 2,
+  },
+  dropdownText: {
+    ...typography.bodyMedium11,
+    color: colors.gray700,
+  },
+  dropdownSub: {
+    ...typography.captionRegular9,
+    color: colors.gray400,
+  },
+  saveButtonDisabled: {
+    backgroundColor: colors.gray300,
   },
 });

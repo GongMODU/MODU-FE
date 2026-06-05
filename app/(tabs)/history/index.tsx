@@ -1,6 +1,9 @@
+import EmptyHistoryIcon from "@/assets/images/empty-history.svg";
+import { getFavorites } from "@/lib/api/ipo";
 import {
   completeHistory,
   createCompletedHistory,
+  createOngoingHistory,
   deleteSubscriptionHistory,
   getSubscriptionHistories,
   updateSubscriptionHistory,
@@ -11,13 +14,13 @@ import { colors, spacing, typography } from "@/styles";
 import type {
   CompleteHistoryRequest,
   CompletedHistoryCreateRequest,
+  OngoingHistoryCreateRequest,
   SubscriptionHistoryItem,
   SubscriptionHistoryUpdateRequest,
 } from "@/types/subscriptionHistory";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import EmptyHistoryIcon from "@/assets/images/empty-history.svg";
 import {
   ActivityIndicator,
   ScrollView,
@@ -47,9 +50,11 @@ function toDetailData(item: SubscriptionHistoryItem): DetailData {
   return {
     증권사: item.securityCompany ?? "",
     매도일: item.sellDate ?? "",
-    청약수량: item.subscribedQuantity != null ? String(item.subscribedQuantity) : "",
+    청약수량:
+      item.subscribedQuantity != null ? String(item.subscribedQuantity) : "",
     수수료: item.fee != null ? String(item.fee) : "",
-    배정수량: item.allocatedQuantity != null ? String(item.allocatedQuantity) : "",
+    배정수량:
+      item.allocatedQuantity != null ? String(item.allocatedQuantity) : "",
     제세금: item.tax != null ? String(item.tax) : "",
     공모가: item.offerPrice != null ? String(item.offerPrice) : "",
     매도가: item.sellPrice != null ? String(item.sellPrice) : "",
@@ -67,7 +72,10 @@ function parseDate(val: string): string | undefined {
   if (!val.trim()) return undefined;
   if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
 
-  const parts = val.replace(/[./]/g, "-").split("-").map((p) => p.trim());
+  const parts = val
+    .replace(/[./]/g, "-")
+    .split("-")
+    .map((p) => p.trim());
   let year: number, month: number, day: number;
 
   if (parts.length === 3) {
@@ -90,7 +98,10 @@ function parseDate(val: string): string | undefined {
   return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-function toCreateRequest(name: string, data: DetailData): CompletedHistoryCreateRequest {
+function toCreateRequest(
+  name: string,
+  data: DetailData,
+): CompletedHistoryCreateRequest {
   return {
     inputStockName: name,
     securityCompany: data.증권사 || undefined,
@@ -104,7 +115,10 @@ function toCreateRequest(name: string, data: DetailData): CompletedHistoryCreate
   };
 }
 
-function toUpdateRequest(name: string, data: DetailData): SubscriptionHistoryUpdateRequest {
+function toUpdateRequest(
+  name: string,
+  data: DetailData,
+): SubscriptionHistoryUpdateRequest {
   return {
     inputStockName: name || undefined,
     securityCompany: data.증권사 || undefined,
@@ -119,7 +133,12 @@ function toUpdateRequest(name: string, data: DetailData): SubscriptionHistoryUpd
 }
 
 function getItemName(item: SubscriptionHistoryItem): string {
-  return item.inputStockName ?? item.ipoEventCompanyName ?? item.inputCompanyName ?? "";
+  return (
+    item.inputStockName ??
+    item.ipoEventCompanyName ??
+    item.inputCompanyName ??
+    ""
+  );
 }
 
 export default function HistoryScreen() {
@@ -129,15 +148,18 @@ export default function HistoryScreen() {
   const [draftData, setDraftData] = useState<DetailData | null>(null);
   const [draftName, setDraftName] = useState<string>("");
 
-  const { data: completedHistories = [], isLoading: isLoadingCompleted } = useQuery({
-    queryKey: queryKeys.subscriptionHistory.list(),
-    queryFn: () => getSubscriptionHistories("COMPLETED").then((r) => r.data),
-  });
+  const { data: completedHistories = [], isLoading: isLoadingCompleted } =
+    useQuery({
+      queryKey: queryKeys.subscriptionHistory.list(),
+      queryFn: () => getSubscriptionHistories("COMPLETED").then((r) => r.data),
+    });
 
-  const { data: ongoingHistories = [], isLoading: isLoadingOngoing } = useQuery({
-    queryKey: queryKeys.subscriptionHistory.ongoingList(),
-    queryFn: () => getSubscriptionHistories("ONGOING").then((r) => r.data),
-  });
+  const { data: ongoingHistories = [], isLoading: isLoadingOngoing } = useQuery(
+    {
+      queryKey: queryKeys.subscriptionHistory.ongoingList(),
+      queryFn: () => getSubscriptionHistories("ONGOING").then((r) => r.data),
+    },
+  );
 
   const isLoading = isLoadingCompleted || isLoadingOngoing;
   const allHistories = [...ongoingHistories, ...completedHistories];
@@ -146,13 +168,19 @@ export default function HistoryScreen() {
     queryClient.invalidateQueries({ queryKey: ["subscription-history"] });
 
   const createMutation = useMutation({
-    mutationFn: (req: CompletedHistoryCreateRequest) => createCompletedHistory(req),
+    mutationFn: (req: CompletedHistoryCreateRequest) =>
+      createCompletedHistory(req),
     onSuccess: invalidate,
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, req }: { id: number; req: SubscriptionHistoryUpdateRequest }) =>
-      updateSubscriptionHistory(id, req),
+    mutationFn: ({
+      id,
+      req,
+    }: {
+      id: number;
+      req: SubscriptionHistoryUpdateRequest;
+    }) => updateSubscriptionHistory(id, req),
     onSuccess: invalidate,
   });
 
@@ -194,9 +222,32 @@ export default function HistoryScreen() {
     setEditId(id);
   };
 
-  const handleSave = (data: DetailData) => {
+  const createOngoingMutation = useMutation({
+    mutationFn: (req: OngoingHistoryCreateRequest) => createOngoingHistory(req),
+    onSuccess: invalidate,
+  });
+
+  const { data: favorites = [] } = useQuery({
+    queryKey: queryKeys.favorites.list(),
+    queryFn: () => getFavorites().then((r) => r.data),
+  });
+
+  const favoriteIpoIds = new Set(favorites.map((f) => f.ipoEventId));
+
+  const handleSave = (data: DetailData, ipoEventId?: number) => {
     if (editId === "__new__") {
-      createMutation.mutate(toCreateRequest(draftName, data));
+      if (ipoEventId) {
+        createOngoingMutation.mutate({
+          ipoEventId,
+          securityCompany: data.증권사 || undefined,
+          subscribedQuantity: parseNum(data.청약수량),
+          offerPrice: parseNum(data.공모가),
+          subscriptionAmount: undefined,
+          memo: undefined,
+        });
+      } else {
+        createMutation.mutate(toCreateRequest(draftName, data));
+      }
     } else if (editId) {
       updateMutation.mutate({
         id: Number(editId),
@@ -220,54 +271,62 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
-        <ScrollView
-          style={styles.container}
-          contentContainerStyle={[
-            styles.scrollContent,
-            allHistories.length === 0 && styles.scrollContentEmpty,
-          ]}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.titleRow}>
-            <Text style={styles.pageTitle}>청약 이력</Text>
-            <TouchableOpacity style={styles.addButton} hitSlop={8} onPress={handleAddPress}>
-              <Ionicons name="add" size={20} color={colors.gray400} />
-            </TouchableOpacity>
-          </View>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={[
+          styles.scrollContent,
+          allHistories.length === 0 && styles.scrollContentEmpty,
+        ]}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.titleRow}>
+          <Text style={styles.pageTitle}>청약 이력</Text>
+          <TouchableOpacity
+            style={styles.addButton}
+            hitSlop={8}
+            onPress={handleAddPress}
+          >
+            <Ionicons name="add" size={20} color={colors.gray400} />
+          </TouchableOpacity>
+        </View>
 
-          {isLoading ? (
-            <View style={styles.emptyContainer}>
-              <ActivityIndicator color={colors.primary600} />
+        {isLoading ? (
+          <View style={styles.emptyContainer}>
+            <ActivityIndicator color={colors.primary600} />
+          </View>
+        ) : allHistories.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <EmptyHistoryIcon width={71} height={68} />
+            <View style={styles.emptyTextGroup}>
+              <Text style={styles.emptyText}>아직 청약 이력이 없어요.</Text>
+              <Text style={styles.emptyText}>
+                버튼을 눌러 이력을 추가해보세요.
+              </Text>
             </View>
-          ) : allHistories.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <EmptyHistoryIcon width={71} height={68} />
-              <View style={styles.emptyTextGroup}>
-                <Text style={styles.emptyText}>아직 청약 이력이 없어요.</Text>
-                <Text style={styles.emptyText}>버튼을 눌러 이력을 추가해보세요.</Text>
-              </View>
-            </View>
-          ) : (
-            allHistories.map((item) => (
-              <HistoryCard
-                key={item.id}
-                id={String(item.id)}
-                name={getItemName(item)}
-                favorite={false}
-                recordStatus={item.recordStatus}
-                isOpen={openId === String(item.id)}
-                data={toDetailData(item)}
-                onPress={() =>
-                  setOpenId(openId === String(item.id) ? null : String(item.id))
-                }
-                onChange={() => {}}
-                onEditPress={handleEditPress}
-                onDeletePress={handleDeletePress}
-                onCompletePress={handleCompletePress}
-              />
-            ))
-          )}
-        </ScrollView>
+          </View>
+        ) : (
+          allHistories.map((item) => (
+            <HistoryCard
+              key={item.id}
+              id={String(item.id)}
+              name={getItemName(item)}
+              favorite={
+                item.ipoEventId != null && favoriteIpoIds.has(item.ipoEventId)
+              }
+              recordStatus={item.recordStatus}
+              isOpen={openId === String(item.id)}
+              data={toDetailData(item)}
+              onPress={() =>
+                setOpenId(openId === String(item.id) ? null : String(item.id))
+              }
+              onChange={() => {}}
+              onEditPress={handleEditPress}
+              onDeletePress={handleDeletePress}
+              onCompletePress={handleCompletePress}
+            />
+          ))
+        )}
+      </ScrollView>
 
       {editId && draftData && (
         <EditModal
