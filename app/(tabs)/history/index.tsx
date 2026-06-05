@@ -338,6 +338,11 @@ export default function HistoryScreen() {
           onChange={handleModalChange}
           onNameChange={setDraftName}
           mode={editId === "__new__" ? "add" : "edit"}
+          recordStatus={
+            editId === "__new__"
+              ? undefined
+              : allHistories.find((i) => String(i.id) === editId)?.recordStatus
+          }
         />
       )}
 
