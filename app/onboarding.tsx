@@ -1,19 +1,29 @@
+import LogoSvg from "@/assets/images/logo.svg";
 import { googleLogin, kakaoLogin } from "@/lib/api/auth";
 import { tokenStore } from "@/lib/tokenStore";
 import { colors, spacing } from "@/styles";
 import { router } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OnboardingScreen() {
-  const [loadingProvider, setLoadingProvider] = useState<"kakao" | "google" | null>(null);
+  const [loadingProvider, setLoadingProvider] = useState<
+    "kakao" | "google" | null
+  >(null);
 
   const handleSocialLogin = async (provider: "kakao" | "google") => {
     if (loadingProvider) return;
     setLoadingProvider(provider);
     try {
-      const result = provider === "kakao" ? await kakaoLogin() : await googleLogin();
+      const result =
+        provider === "kakao" ? await kakaoLogin() : await googleLogin();
       if (result) {
         tokenStore.setTokens(result.accessToken, result.refreshToken);
         if (result.nickname) tokenStore.setNickname(result.nickname);
@@ -29,7 +39,7 @@ export default function OnboardingScreen() {
       <View style={styles.inner}>
         {/* 로고 영역 */}
         <View style={styles.logoSection}>
-          <View style={styles.logoPlaceholder} />
+          <LogoSvg width={100} height={100} />
           <Text style={styles.logoText}>모두를 위한 공모주</Text>
         </View>
 
@@ -95,11 +105,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: spacing.sm,
     marginTop: 60,
-  },
-  logoPlaceholder: {
-    width: 100,
-    height: 100,
-    backgroundColor: "#D9D9D9",
   },
   logoText: {
     fontSize: 14,
