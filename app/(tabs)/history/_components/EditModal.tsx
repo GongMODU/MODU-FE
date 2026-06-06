@@ -36,6 +36,17 @@ export default function EditModal({
   onNameChange,
   mode = "edit",
 }: Props) {
+  const placeholders: Partial<Record<keyof DetailData, string>> = {
+    증권사: "-증권",
+    매도일: "YYYY-MM-DD",
+    배정수량: "-주",
+    청약수량: "-주",
+    공모가: "-원",
+    매도가: "-원",
+    수수료: "-원",
+    제세금: "-원",
+  };
+
   const fieldRows: { label: string; key: keyof DetailData }[][] = [
     [
       { label: "증권사", key: "증권사" },
@@ -126,7 +137,7 @@ export default function EditModal({
                         style={styles.inputText}
                         value={data[field.key]}
                         onChangeText={(value) => onChange(field.key, value)}
-                        placeholder="-"
+                        placeholder={placeholders[field.key] ?? "-"}
                         placeholderTextColor={colors.gray300}
                       />
                     </View>

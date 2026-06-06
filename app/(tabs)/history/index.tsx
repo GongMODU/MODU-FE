@@ -5,6 +5,7 @@ import {
   getSubscriptionHistories,
   updateSubscriptionHistory,
 } from "@/lib/api/subscriptionHistory";
+import { getFavorites } from "@/lib/api/ipo";
 import queryClient from "@/lib/queryClient";
 import { queryKeys } from "@/lib/queryKeys";
 import { colors, spacing, typography } from "@/styles";
@@ -47,12 +48,12 @@ function toDetailData(item: SubscriptionHistoryItem): DetailData {
   return {
     증권사: item.securityCompany ?? "",
     매도일: item.sellDate ?? "",
-    청약수량: item.subscribedQuantity != null ? String(item.subscribedQuantity) : "",
-    수수료: item.fee != null ? String(item.fee) : "",
-    배정수량: item.allocatedQuantity != null ? String(item.allocatedQuantity) : "",
-    제세금: item.tax != null ? String(item.tax) : "",
-    공모가: item.offerPrice != null ? String(item.offerPrice) : "",
-    매도가: item.sellPrice != null ? String(item.sellPrice) : "",
+    청약수량: item.subscribedQuantity != null ? `${item.subscribedQuantity}주` : "",
+    배정수량: item.allocatedQuantity != null ? `${item.allocatedQuantity}주` : "",
+    수수료: item.fee != null ? `${item.fee}원` : "",
+    제세금: item.tax != null ? `${item.tax}원` : "",
+    공모가: item.offerPrice != null ? `${item.offerPrice}원` : "",
+    매도가: item.sellPrice != null ? `${item.sellPrice}원` : "",
   };
 }
 
@@ -128,6 +129,12 @@ export default function HistoryScreen() {
   const [completeId, setCompleteId] = useState<string | null>(null);
   const [draftData, setDraftData] = useState<DetailData | null>(null);
   const [draftName, setDraftName] = useState<string>("");
+
+  const { data: favorites = [] } = useQuery({
+    queryKey: queryKeys.favorites.list(),
+    queryFn: () => getFavorites().then((r) => r.data),
+  });
+  const favoriteIpoIds = new Set(favorites.map((f) => f.ipoEventId));
 
   const { data: completedHistories = [], isLoading: isLoadingCompleted } = useQuery({
     queryKey: queryKeys.subscriptionHistory.list(),
@@ -253,7 +260,7 @@ export default function HistoryScreen() {
                 key={item.id}
                 id={String(item.id)}
                 name={getItemName(item)}
-                favorite={false}
+                favorite={item.ipoEventId != null && favoriteIpoIds.has(item.ipoEventId)}
                 recordStatus={item.recordStatus}
                 isOpen={openId === String(item.id)}
                 data={toDetailData(item)}

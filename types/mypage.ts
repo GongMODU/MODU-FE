@@ -4,7 +4,7 @@ export interface MypageHomeResponse {
   nickname: string;
   provider: Provider;
   email: string;
-  investmentProfile: InvestmentProfile;
+  investmentProfile: InvestmentProfile | null;
 }
 
 export interface InvestmentProfile {
