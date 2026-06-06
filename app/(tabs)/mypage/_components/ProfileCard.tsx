@@ -1,5 +1,6 @@
 import { getPersonaImage } from "@/lib/personaImage";
 import { colors, spacing, typography } from "@/styles";
+import { type Provider } from "@/types/mypage";
 import { useRouter } from "expo-router";
 import {
   Image,
@@ -13,6 +14,7 @@ import {
 type Props = ViewProps & {
   nickname: string;
   email: string;
+  provider: Provider;
   /** 페르소나 코드 (K1R1 ~ K4R4) */
   personaCode: string;
 };
@@ -20,6 +22,7 @@ type Props = ViewProps & {
 export default function ProfileCard({
   nickname,
   email,
+  provider,
   personaCode,
   style,
   ...props
@@ -37,7 +40,13 @@ export default function ProfileCard({
       <View style={styles.profileInfo}>
         <Text style={styles.nickname}>{nickname}</Text>
         <View style={styles.bioBadge}>
-          <Text style={styles.bio}>{email}</Text>
+          <Text style={styles.bio}>
+            {provider === "LOCAL"
+              ? email
+              : provider === "KAKAO"
+                ? "Kakao"
+                : "Google"}
+          </Text>
         </View>
       </View>
       <TouchableOpacity
