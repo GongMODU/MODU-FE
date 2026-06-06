@@ -25,7 +25,7 @@ export default function MenuList() {
             // 서버 오류여도 로컬 상태는 정리하고 로그인 화면으로 이동
           } finally {
             tokenStore.clear();
-            router.replace("/(auth)/email-login");
+            router.replace("/onboarding");
           }
         },
       },

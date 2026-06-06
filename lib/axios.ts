@@ -47,7 +47,10 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
     };
 
-    if (error.response?.status !== 401 || originalRequest._retry) {
+    const url = originalRequest.url ?? "";
+    const isAuthEndpoint = url.includes("/api/auth/login") || url.includes("/api/auth/signup");
+
+    if (error.response?.status !== 401 || originalRequest._retry || isAuthEndpoint) {
       return Promise.reject(error);
     }
 

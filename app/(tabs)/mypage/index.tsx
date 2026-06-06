@@ -96,11 +96,11 @@ export default function MypageScreen() {
           nickname={data.nickname}
           email={data.email}
           provider={data.provider}
-          personaCode={data.investmentProfile.personaCode}
+          personaCode={data.investmentProfile?.personaCode ?? ""}
         />
 
         <Text style={styles.investmentTitle}>나의 투자 성향</Text>
-        <InvestmentCard personaCode={data.investmentProfile.personaCode} />
+        <InvestmentCard personaCode={data.investmentProfile?.personaCode ?? ""} />
 
         <MenuList />
         <TouchableOpacity
