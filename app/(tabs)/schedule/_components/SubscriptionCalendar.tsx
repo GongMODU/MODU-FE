@@ -1,6 +1,6 @@
 import { colors } from "@/styles";
 import React, { useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // 태그 타입
 export type ScheduleTag =
@@ -23,6 +23,7 @@ export const TAG_COLORS: Record<ScheduleTag, string> = {
 
 export type CalendarEvent = {
   id: string;
+  ipoId: number;
   date: Date; // 이벤트 날짜
   companyName: string;
   tag: ScheduleTag;
@@ -33,6 +34,7 @@ type Props = {
   month: number; // 1-12
   events?: CalendarEvent[];
   selectedTags?: ScheduleTag[] | null;
+  onEventPress?: (ipoId: number) => void;
 };
 
 const WEEKDAYS = ["월", "화", "수", "목", "금"];
@@ -74,6 +76,7 @@ export default function SubscriptionCalendar({
   month,
   events = [],
   selectedTags,
+  onEventPress,
 }: Props) {
   const weeks = useMemo(() => buildCalendarWeeks(year, month), [year, month]);
 
@@ -93,7 +96,8 @@ export default function SubscriptionCalendar({
   function getEventsForDate(date: Date): CalendarEvent[] {
     const key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     const all = eventsByDate[key] ?? [];
-    if (selectedTags && selectedTags.length > 0) return all.filter((e) => selectedTags.includes(e.tag));
+    if (selectedTags && selectedTags.length > 0)
+      return all.filter((e) => selectedTags.includes(e.tag));
     return all;
   }
 
@@ -158,17 +162,19 @@ export default function SubscriptionCalendar({
                 {/* 이벤트 뱃지 */}
                 <View style={styles.eventList}>
                   {visibleEvents.map((ev) => (
-                    <View
+                    <TouchableOpacity
                       key={ev.id}
                       style={[
                         styles.eventBadge,
                         { backgroundColor: TAG_COLORS[ev.tag] },
                       ]}
+                      onPress={() => onEventPress?.(ev.ipoId)}
+                      activeOpacity={0.7}
                     >
                       <Text style={styles.eventText} numberOfLines={1}>
                         {ev.companyName}
                       </Text>
-                    </View>
+                    </TouchableOpacity>
                   ))}
                   {hiddenCount > 0 && (
                     <View style={[styles.eventBadge, styles.eventBadgeGray]}>
