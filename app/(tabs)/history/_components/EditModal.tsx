@@ -2,7 +2,7 @@ import { searchIpo } from "@/lib/api/ipo";
 import { colors, spacing, typography } from "@/styles";
 import type { IpoSearchItem } from "@/types/ipo";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Dimensions,
   Modal,
@@ -106,6 +106,33 @@ export default function EditModal({
     }
   }, [visible]);
 
+  const handleNameChange = useCallback(
+    (text: string) => {
+      onNameChange(text);
+      setSelectedIpoEventId(undefined);
+
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+
+      if (text.trim().length === 0) {
+        setSearchResults([]);
+        setShowDropdown(false);
+        return;
+      }
+
+      debounceTimer.current = setTimeout(async () => {
+        try {
+          const res = await searchIpo(text.trim());
+          setSearchResults(res.data);
+          setShowDropdown(res.data.length > 0);
+        } catch {
+          setSearchResults([]);
+          setShowDropdown(false);
+        }
+      }, 300);
+    },
+    [onNameChange],
+  );
+
   return (
     <Modal
       visible={visible}
@@ -154,27 +181,7 @@ export default function EditModal({
                 <TextInput
                   style={styles.inputText}
                   value={name}
-                  onChangeText={(text) => {
-                    onNameChange(text);
-                    setSelectedIpoEventId(undefined);
-                    if (debounceTimer.current)
-                      clearTimeout(debounceTimer.current);
-                    if (text.trim().length === 0) {
-                      setSearchResults([]);
-                      setShowDropdown(false);
-                      return;
-                    }
-                    debounceTimer.current = setTimeout(async () => {
-                      try {
-                        const res = await searchIpo(text.trim());
-                        setSearchResults(res.data);
-                        setShowDropdown(res.data.length > 0);
-                      } catch {
-                        setSearchResults([]);
-                        setShowDropdown(false);
-                      }
-                    }, 300);
-                  }}
+                  onChangeText={handleNameChange}
                   placeholder="종목명 입력"
                   placeholderTextColor={colors.gray300}
                 />
