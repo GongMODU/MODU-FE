@@ -24,6 +24,26 @@ import { ipoHomeOptions, youtubeSummariesOptions } from "./_components/queries";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
+function getThisWeekRange(): { start: Date; end: Date } {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const day = today.getDay(); // 0=일, 1=월 ... 6=토
+  const diffToMonday = day === 0 ? -6 : 1 - day;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + diffToMonday);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  sunday.setHours(23, 59, 59, 999);
+  return { start: monday, end: sunday };
+}
+
+function isThisWeek(item: IpoHomeItem): boolean {
+  const { start, end } = getThisWeekRange();
+  const [y, m, d] = item.subscriptionStartDate.split("-").map(Number);
+  const itemStart = new Date(y, m - 1, d);
+  return itemStart >= start && itemStart <= end;
+}
+
 function formatDate(dateStr: string): string {
   const [y, m, d] = dateStr.split("-").map(Number);
   const date = new Date(y, m - 1, d);
@@ -61,7 +81,8 @@ export default function HomeScreen() {
   > | null>(null);
 
   const { data: youtubeSummaries = [] } = useQuery(youtubeSummariesOptions);
-  const { data: ipoItems = [] } = useQuery(ipoHomeOptions());
+  const { data: ipoItemsAll = [] } = useQuery(ipoHomeOptions());
+  const ipoItems = ipoItemsAll.filter(isThisWeek);
 
   const handlePressDetail = (card: YoutubeSummaryItem) => {
     setSelectedCard({ videoId: card.videoId, channelName: card.channelName });
@@ -88,19 +109,23 @@ export default function HomeScreen() {
             <Ionicons name="chevron-forward" size={24} color={colors.gray400} />
           </TouchableOpacity>
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.scheduleScrollContent}
-          >
-            {ipoItems.map((item) => (
-              <ScheduleCard
-                key={item.ipoEventId}
-                data={toScheduleCardData(item)}
-                onPress={() => router.push(`/ipo/${item.ipoEventId}`)}
-              />
-            ))}
-          </ScrollView>
+          {ipoItems.length === 0 ? (
+            <Text style={styles.emptyScheduleText}>이번주 청약 일정이 없어요.</Text>
+          ) : (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.scheduleScrollContent}
+            >
+              {ipoItems.map((item) => (
+                <ScheduleCard
+                  key={item.ipoEventId}
+                  data={toScheduleCardData(item)}
+                  onPress={() => router.push(`/ipo/${item.ipoEventId}`)}
+                />
+              ))}
+            </ScrollView>
+          )}
         </View>
 
         {/* 오늘의 유튜브 핵심 요약 */}
@@ -187,6 +212,13 @@ const styles = StyleSheet.create({
   },
   scheduleScrollContent: {
     gap: spacing.sm,
+  },
+  emptyScheduleText: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: colors.gray400,
+    textAlign: "center",
+    paddingVertical: spacing.lg,
   },
   cardWrapper: {
     width: SCREEN_WIDTH - spacing.lg * 2,

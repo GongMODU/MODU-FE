@@ -21,6 +21,8 @@ export default function EmailLoginScreen() {
   const [password, setPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const isEnabled = email.length > 0 && password.length > 0;
@@ -62,14 +64,16 @@ export default function EmailLoginScreen() {
           <View style={styles.content}>
             {/* 이메일 */}
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>이메일</Text>
+              <Text style={styles.label}>아이디</Text>
               <TextInput
-                style={styles.inputBox}
+                style={[styles.inputBox, emailFocused && styles.inputBoxFocused]}
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 placeholderTextColor={colors.gray400}
+                onFocus={() => setEmailFocused(true)}
+                onBlur={() => setEmailFocused(false)}
               />
             </View>
 
@@ -77,7 +81,7 @@ export default function EmailLoginScreen() {
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>비밀번호</Text>
               <View
-                style={[styles.inputRow, passwordError && styles.inputRowError]}
+                style={[styles.inputRow, passwordFocused && styles.inputRowFocused, passwordError && styles.inputRowError]}
               >
                 <TextInput
                   key={String(passwordVisible)}
@@ -93,6 +97,8 @@ export default function EmailLoginScreen() {
                   secureTextEntry={!passwordVisible}
                   autoCapitalize="none"
                   placeholderTextColor={colors.gray400}
+                  onFocus={() => setPasswordFocused(true)}
+                  onBlur={() => setPasswordFocused(false)}
                 />
                 <TouchableOpacity
                   onPress={() => setPasswordVisible(!passwordVisible)}
@@ -106,7 +112,7 @@ export default function EmailLoginScreen() {
               </View>
               {passwordError && (
                 <Text style={styles.errorText}>
-                  * 비밀번호가 일치하지 않습니다.
+                  * 아이디 또는 비밀번호가 일치하지 않습니다.
                 </Text>
               )}
             </View>
@@ -180,6 +186,9 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: colors.gray600,
   },
+  inputBoxFocused: {
+    borderColor: colors.primary600,
+  },
   inputRow: {
     width: "100%",
     height: 46,
@@ -190,6 +199,9 @@ const styles = StyleSheet.create({
     borderColor: colors.gray200,
     backgroundColor: colors.white,
     paddingHorizontal: spacing.md,
+  },
+  inputRowFocused: {
+    borderColor: colors.primary600,
   },
   inputRowError: {
     borderColor: colors.primary600,

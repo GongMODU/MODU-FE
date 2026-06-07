@@ -5,11 +5,11 @@ import { router } from "expo-router";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const MENU_ITEMS = [
-  { label: "도움말 및 FAQ" },
-  { label: "서비스 이용약관" },
-  { label: "개인정보 처리방침" },
-  { label: "로그아웃" },
-];
+  { label: "도움말 및 FAQ", href: "/mypage/faq" as const },
+  { label: "서비스 이용약관", href: "/mypage/terms" as const },
+  { label: "개인정보 처리방침", href: "/mypage/privacy" as const },
+  { label: "로그아웃", href: null },
+] satisfies { label: string; href: string | null }[];
 
 export default function MenuList() {
   const handleLogout = async () => {
@@ -25,15 +25,17 @@ export default function MenuList() {
             // 서버 오류여도 로컬 상태는 정리하고 로그인 화면으로 이동
           } finally {
             tokenStore.clear();
-            router.replace("/(auth)/email-login");
+            router.replace("/onboarding");
           }
         },
       },
     ]);
   };
 
-  const handlePress = (label: string) => {
-    if (label === "로그아웃") {
+  const handlePress = (item: (typeof MENU_ITEMS)[number]) => {
+    if (item.href) {
+      router.push(item.href);
+    } else {
       handleLogout();
     }
   };
@@ -47,7 +49,7 @@ export default function MenuList() {
             styles.menuItem,
             index === MENU_ITEMS.length - 1 && styles.menuItemLast,
           ]}
-          onPress={() => handlePress(item.label)}
+          onPress={() => handlePress(item)}
         >
           <Text style={styles.menuItemText}>{item.label}</Text>
           <Text style={styles.menuItemChevron}>›</Text>

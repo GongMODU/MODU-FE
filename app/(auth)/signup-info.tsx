@@ -25,12 +25,14 @@ export default function SignupInfoScreen() {
   const [nickname, setNickname] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [nicknameFocused, setNicknameFocused] = useState(false);
+  const [passwordTouched, setPasswordTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [nicknameError, setNicknameError] = useState(false);
 
   const isPasswordError =
-    passwordFocused && password.length > 0 && !PASSWORD_REGEX.test(password);
+    (passwordFocused || passwordTouched) && password.length > 0 && !PASSWORD_REGEX.test(password);
   const isNextEnabled =
     PASSWORD_REGEX.test(password) && NICKNAME_REGEX.test(nickname);
 
@@ -86,7 +88,7 @@ export default function SignupInfoScreen() {
                   autoCapitalize="none"
                   placeholderTextColor={colors.gray400}
                   onFocus={() => setPasswordFocused(true)}
-                  onBlur={() => setPasswordFocused(false)}
+                  onBlur={() => { setPasswordFocused(false); setPasswordTouched(true); }}
                 />
                 <TouchableOpacity
                   onPress={() => setPasswordVisible(!passwordVisible)}
@@ -107,12 +109,18 @@ export default function SignupInfoScreen() {
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>닉네임</Text>
               <TextInput
-                style={[styles.nicknameInput, nicknameError && styles.inputError]}
+                style={[
+                  styles.nicknameInput,
+                  nicknameFocused && styles.inputFocused,
+                  nicknameError && styles.inputError,
+                ]}
                 value={nickname}
                 onChangeText={(t) => {
                   setNickname(t);
                   if (nicknameError) setNicknameError(false);
                 }}
+                onFocus={() => setNicknameFocused(true)}
+                onBlur={() => setNicknameFocused(false)}
                 placeholderTextColor={colors.gray400}
               />
               {nicknameError && (
@@ -129,6 +137,13 @@ export default function SignupInfoScreen() {
             ]}
             onPress={async () => {
               if (!isNextEnabled || isLoading) return;
+
+              // 이미 로그인 상태면 설문으로 바로 이동 (설문 화면에서 뒤로 온 경우)
+              if (tokenStore.getAccessToken()) {
+                router.push("/(auth)/investment-survey");
+                return;
+              }
+
               setIsLoading(true);
               setEmailError(false);
               setNicknameError(false);
@@ -221,6 +236,9 @@ const styles = StyleSheet.create({
     borderColor: colors.primary600,
   },
   inputError: {
+    borderColor: colors.primary600,
+  },
+  inputFocused: {
     borderColor: colors.primary600,
   },
   errorText: {

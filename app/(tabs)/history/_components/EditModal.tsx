@@ -41,11 +41,13 @@ export default function EditModal({
   mode = "edit",
   recordStatus,
 }: Props) {
+
   const fieldRows: {
     label: string;
     key: keyof DetailData;
     placeholder: string;
   }[][] = [
+
     [
       { label: "증권사", key: "증권사", placeholder: "증권사 입력" },
       { label: "매도일", key: "매도일", placeholder: "YYYY-MM-DD" },
@@ -235,7 +237,9 @@ export default function EditModal({
                         style={styles.inputText}
                         value={data[field.key]}
                         onChangeText={(value) => onChange(field.key, value)}
+
                         placeholder={field.placeholder}
+
                         placeholderTextColor={colors.gray300}
                         keyboardType={
                           numericFields.includes(field.key)

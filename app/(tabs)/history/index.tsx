@@ -7,6 +7,7 @@ import {
   getSubscriptionHistories,
   updateSubscriptionHistory,
 } from "@/lib/api/subscriptionHistory";
+import { getFavorites } from "@/lib/api/ipo";
 import queryClient from "@/lib/queryClient";
 import { queryKeys } from "@/lib/queryKeys";
 import { colors, spacing, typography } from "@/styles";
@@ -49,6 +50,7 @@ function toDetailData(item: SubscriptionHistoryItem): DetailData {
   return {
     증권사: item.securityCompany ?? "",
     매도일: item.sellDate ?? "",
+
     청약수량:
       item.subscribedQuantity != null ? String(item.subscribedQuantity) : "",
     수수료: item.fee != null ? String(item.fee) : "",

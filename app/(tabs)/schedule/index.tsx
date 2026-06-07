@@ -34,6 +34,7 @@ const CHIPS: ScheduleTag[] = [
 
 type TodayScheduleItem = {
   id: string;
+  ipoId: number;
   companyName: string;
   tags: ScheduleTag[];
 };
@@ -91,7 +92,9 @@ export default function SubscriptionScheduleScreen() {
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
 
-  const { data: subscriptionItems = [] } = useQuery(subscriptionScheduleOptions);
+  const { data: subscriptionItems = [] } = useQuery(
+    subscriptionScheduleOptions,
+  );
   const { data: listingItems = [] } = useQuery(listingScheduleOptions);
   const { data: lockupItems = [] } = useQuery(lockupScheduleOptions);
 
@@ -102,6 +105,7 @@ export default function SubscriptionScheduleScreen() {
     subscriptionItems.forEach((item: IpoHomeItem) => {
       events.push({
         id: `sub-${item.ipoEventId}`,
+        ipoId: item.ipoEventId,
         date: parseLocalDate(item.subscriptionStartDate),
         companyName: item.companyName,
         tag: "공모청약",
@@ -111,6 +115,7 @@ export default function SubscriptionScheduleScreen() {
     listingItems.forEach((item: IpoHomeItem) => {
       events.push({
         id: `list-${item.ipoEventId}`,
+        ipoId: item.ipoEventId,
         date: parseLocalDate(item.listingDate),
         companyName: item.companyName,
         tag: "상장",
@@ -120,6 +125,7 @@ export default function SubscriptionScheduleScreen() {
     lockupItems.forEach((item: IpoHomeItem) => {
       events.push({
         id: `lock-${item.ipoEventId}`,
+        ipoId: item.ipoEventId,
         date: parseLocalDate(item.lockupExpiryDate),
         companyName: item.companyName,
         tag: "락업해제",
@@ -141,6 +147,7 @@ export default function SubscriptionScheduleScreen() {
       } else {
         map.set(item.ipoEventId, {
           id: String(item.ipoEventId),
+          ipoId: item.ipoEventId,
           companyName: item.companyName,
           tags: [tag],
         });
@@ -148,7 +155,10 @@ export default function SubscriptionScheduleScreen() {
     };
 
     subscriptionItems.forEach((item) => {
-      if (item.subscriptionStartDate <= today && today <= item.subscriptionEndDate) {
+      if (
+        item.subscriptionStartDate <= today &&
+        today <= item.subscriptionEndDate
+      ) {
         addTag(item, "공모청약");
       }
     });
@@ -170,7 +180,7 @@ export default function SubscriptionScheduleScreen() {
 
   const toggleChip = (chip: ScheduleTag) => {
     setSelectedChips((prev) =>
-      prev.includes(chip) ? prev.filter((c) => c !== chip) : [...prev, chip]
+      prev.includes(chip) ? prev.filter((c) => c !== chip) : [...prev, chip],
     );
   };
 
@@ -220,6 +230,7 @@ export default function SubscriptionScheduleScreen() {
           month={currentMonth}
           events={calendarEvents}
           selectedTags={selectedChips}
+          onEventPress={(ipoId) => router.push(`/ipo/${ipoId}`)}
         />
 
         {/* 오늘 주요 일정 */}
@@ -227,25 +238,36 @@ export default function SubscriptionScheduleScreen() {
         <View style={styles.todayScheduleList}>
           {todaySchedule.length === 0 ? (
             <View style={styles.emptyToday}>
-              <Text style={styles.emptyTodayText}>오늘 예정된 일정이 없어요.</Text>
+              <Text style={styles.emptyTodayText}>
+                오늘 예정된 일정이 없어요.
+              </Text>
             </View>
           ) : (
             todaySchedule.map((item) => (
-              <View key={item.id} style={styles.scheduleCard}>
-                <Text style={styles.scheduleCompanyName}>{item.companyName}</Text>
+              <TouchableOpacity
+                key={item.id}
+                style={styles.scheduleCard}
+                onPress={() => router.push(`/ipo/${item.ipoId}`)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.scheduleCompanyName}>
+                  {item.companyName}
+                </Text>
                 <View style={styles.tagRow}>
                   {item.tags.map((tag) => (
                     <View
                       key={tag}
                       style={[styles.tag, { borderColor: TAG_COLORS[tag] }]}
                     >
-                      <Text style={[styles.tagText, { color: TAG_COLORS[tag] }]}>
+                      <Text
+                        style={[styles.tagText, { color: TAG_COLORS[tag] }]}
+                      >
                         {tag}
                       </Text>
                     </View>
                   ))}
                 </View>
-              </View>
+              </TouchableOpacity>
             ))
           )}
         </View>

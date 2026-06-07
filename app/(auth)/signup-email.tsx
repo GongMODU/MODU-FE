@@ -4,7 +4,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useRef, useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -24,6 +23,8 @@ export default function SignupEmailScreen() {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [codeError, setCodeError] = useState(false);
+  const [emailFocused, setEmailFocused] = useState(false);
   const inputRefs = useRef<(TextInput | null)[]>([
     null,
     null,
@@ -50,6 +51,7 @@ export default function SignupEmailScreen() {
     setEmailError(null);
     try {
       await sendEmailCode(email);
+      setCode(["", "", "", "", "", ""]);
       setStep("verify");
     } catch (error: unknown) {
       const data = (error as { response?: { data?: unknown } })?.response?.data;
@@ -71,7 +73,7 @@ export default function SignupEmailScreen() {
         await verifyEmailCode(email, code.join(""));
         setStep("verified");
       } catch {
-        Alert.alert("오류", "인증번호가 올바르지 않습니다. 다시 확인해주세요.");
+        setCodeError(true);
       } finally {
         setIsLoading(false);
       }
@@ -113,7 +115,7 @@ export default function SignupEmailScreen() {
             {/* 이메일 */}
             <View style={styles.fieldGroup}>
               <Text style={styles.label}>이메일</Text>
-              <View style={[styles.inputRow, emailError ? styles.inputRowError : null]}>
+              <View style={[styles.inputRow, emailFocused && styles.inputRowFocused, emailError ? styles.inputRowError : null]}>
                 <TextInput
                   style={styles.input}
                   value={email}
@@ -124,6 +126,8 @@ export default function SignupEmailScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                   placeholderTextColor={colors.gray400}
+                  onFocus={() => setEmailFocused(true)}
+                  onBlur={() => setEmailFocused(false)}
                 />
                 <TouchableOpacity
                   style={styles.verifyButton}
@@ -158,18 +162,24 @@ export default function SignupEmailScreen() {
                           digit !== "" && styles.codeBoxFilled,
                         ]}
                         value={digit}
-                        onChangeText={(t) =>
+                        onChangeText={(t) => {
+                          if (codeError) setCodeError(false);
                           handleCodeChange(
                             t.replace(/[^0-9]/g, "").slice(-1),
                             i,
-                          )
-                        }
+                          );
+                        }}
                         keyboardType="number-pad"
                         maxLength={1}
                         textAlign="center"
                       />
                     ))}
                   </View>
+                  {codeError && (
+                    <Text style={styles.errorText}>
+                      * 인증번호가 올바르지 않습니다.
+                    </Text>
+                  )}
                 </View>
               </>
             )}
@@ -244,6 +254,9 @@ const styles = StyleSheet.create({
     borderColor: colors.gray200,
     backgroundColor: colors.white,
     paddingHorizontal: spacing.md,
+  },
+  inputRowFocused: {
+    borderColor: colors.primary600,
   },
   inputRowError: {
     borderColor: colors.primary600,
