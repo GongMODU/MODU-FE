@@ -71,7 +71,7 @@ export default function SignupEmailScreen() {
       setIsLoading(true);
       try {
         await verifyEmailCode(email, code.join(""));
-        setStep("verified");
+        router.push({ pathname: "/(auth)/signup-info", params: { email } });
       } catch {
         setCodeError(true);
       } finally {
