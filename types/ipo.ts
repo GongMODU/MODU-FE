@@ -31,6 +31,16 @@ export type IpoHomeFilter =
   | "LISTING"
   | "ALLOCATION";
 
+export interface IpoSearchItem {
+  ipoEventId: number;
+  companyName: string;
+  marketType: string;
+  status: "UPCOMING" | "ONGOING" | "CLOSED" | "LISTED";
+  subscriptionStartDate: string;
+  subscriptionEndDate: string;
+  listingDate: string;
+}
+
 export interface FavoriteItem {
   interestId: number;
   ipoEventId: number;

@@ -15,6 +15,7 @@ export interface SubscriptionHistoryItem {
   tax: number | null;
   sellDate: string | null;
   memo: string | null;
+  favorited: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -57,6 +58,7 @@ export interface CompleteHistoryRequest {
   sellDate: string;
   fee?: number;
   tax?: number;
+  allocatedQuantity?: number;
 }
 
 export interface MonthlyReturnRate {

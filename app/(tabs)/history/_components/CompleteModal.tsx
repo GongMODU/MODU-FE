@@ -1,4 +1,5 @@
 import { colors, spacing, typography } from "@/styles";
+import type { CompleteHistoryRequest } from "@/types/subscriptionHistory";
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
@@ -11,10 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import type { CompleteHistoryRequest } from "@/types/subscriptionHistory";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("screen");
-const SHEET_HEIGHT = SCREEN_HEIGHT * 0.55;
+const SHEET_HEIGHT = SCREEN_HEIGHT * 0.9;
 
 type Props = {
   visible: boolean;
@@ -27,6 +27,7 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
   const [sellDate, setSellDate] = useState("");
   const [fee, setFee] = useState("");
   const [tax, setTax] = useState("");
+  const [allocatedQuantity, setAllocatedQuantity] = useState("");
 
   const parseNum = (val: string): number | undefined => {
     const n = Number(val.replace(/[^0-9.-]/g, ""));
@@ -36,7 +37,10 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
   const parseDate = (val: string): string | undefined => {
     if (!val.trim()) return undefined;
     if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
-    const parts = val.replace(/[./]/g, "-").split("-").map((p) => p.trim());
+    const parts = val
+      .replace(/[./]/g, "-")
+      .split("-")
+      .map((p) => p.trim());
     let year: number, month: number, day: number;
     if (parts.length === 3) {
       if (parts[0].length === 4) {
@@ -65,11 +69,13 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
       sellDate: date,
       fee: parseNum(fee),
       tax: parseNum(tax),
+      allocatedQuantity: parseNum(allocatedQuantity),
     });
     setSellPrice("");
     setSellDate("");
     setFee("");
     setTax("");
+    setAllocatedQuantity("");
   };
 
   const handleClose = () => {
@@ -77,13 +83,19 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
     setSellDate("");
     setFee("");
     setTax("");
+    setAllocatedQuantity("");
     onClose();
   };
 
   const isValid = sellPrice.trim() !== "" && sellDate.trim() !== "";
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={handleClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={handleClose}
+    >
       <View style={styles.overlay}>
         <TouchableOpacity
           style={StyleSheet.absoluteFill}
@@ -93,7 +105,11 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
         <View style={styles.sheet}>
           <View style={styles.topArea}>
             <View style={styles.handle} />
-            <TouchableOpacity style={styles.closeButton} onPress={handleClose} hitSlop={8}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={handleClose}
+              hitSlop={8}
+            >
               <Ionicons name="close" size={20} color={colors.gray400} />
             </TouchableOpacity>
           </View>
@@ -134,15 +150,37 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
               </View>
             </View>
 
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>
+                배정 수량 <Text style={styles.required}>*</Text>
+              </Text>
+              <View style={styles.inputBox}>
+                <TextInput
+                  style={styles.inputText}
+                  value={allocatedQuantity}
+                  onChangeText={setAllocatedQuantity}
+                  placeholder="배정 수량 입력"
+                  placeholderTextColor={colors.gray300}
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+
             <View style={styles.fieldRow}>
-              <View style={[styles.fieldGroup, styles.fieldFlex, { marginRight: spacing.sm }]}>
+              <View
+                style={[
+                  styles.fieldGroup,
+                  styles.fieldFlex,
+                  { marginRight: spacing.sm },
+                ]}
+              >
                 <Text style={styles.fieldLabel}>수수료</Text>
                 <View style={styles.inputBox}>
                   <TextInput
                     style={styles.inputText}
                     value={fee}
                     onChangeText={setFee}
-                    placeholder="-"
+                    placeholder="수수료 입력"
                     placeholderTextColor={colors.gray300}
                     keyboardType="numeric"
                   />
@@ -155,7 +193,7 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
                     style={styles.inputText}
                     value={tax}
                     onChangeText={setTax}
-                    placeholder="-"
+                    placeholder="제세금 입력"
                     placeholderTextColor={colors.gray300}
                     keyboardType="numeric"
                   />
@@ -165,7 +203,10 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
           </View>
 
           <TouchableOpacity
-            style={[styles.completeButton, !isValid && styles.completeButtonDisabled]}
+            style={[
+              styles.completeButton,
+              !isValid && styles.completeButtonDisabled,
+            ]}
             onPress={handleComplete}
             activeOpacity={0.85}
             disabled={!isValid}
@@ -224,7 +265,6 @@ const styles = StyleSheet.create({
     color: colors.gray600,
   },
   content: {
-    flex: 1,
     paddingHorizontal: spacing.contentArea,
   },
   fieldGroup: {

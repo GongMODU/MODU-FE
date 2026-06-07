@@ -14,15 +14,17 @@ import {
 
 function formatDisplayValue(key: keyof DetailData, value: string): string {
   if (!value.trim()) return "-";
-  if (key === "증권사") {
-    return value.endsWith("증권") ? value : `${value}증권`;
-  }
   const num = Number(value.replace(/[^0-9.-]/g, ""));
   if (isNaN(num)) return value;
   if (key === "청약수량" || key === "배정수량") {
     return `${num.toLocaleString()}주`;
   }
-  if (key === "수수료" || key === "제세금" || key === "매도가") {
+  if (
+    key === "수수료" ||
+    key === "제세금" ||
+    key === "매도가" ||
+    key === "공모가"
+  ) {
     return `${num.toLocaleString()}원`;
   }
   return value;
@@ -68,24 +70,36 @@ export default function HistoryCard({
 }: Props) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, right: 0 });
-   
+
   const menuButtonRef = useRef<any>(null);
 
-  const fieldRows: { label: string; key: keyof DetailData }[][] = [
-    [
-      { label: "증권사", key: "증권사" },
-      { label: "매도일", key: "매도일" },
-    ],
-    [
-      { label: "청약 수량", key: "청약수량" },
-      { label: "수수료", key: "수수료" },
-    ],
-    [
-      { label: "배정 수량", key: "배정수량" },
-      { label: "제세금", key: "제세금" },
-    ],
-    [{ label: "매도가", key: "매도가" }],
-  ];
+  const fieldRows: { label: string; key: keyof DetailData }[][] =
+    recordStatus === "ONGOING"
+      ? [
+          [{ label: "증권사", key: "증권사" }],
+          [
+            { label: "청약 수량", key: "청약수량" },
+            { label: "공모가", key: "공모가" },
+          ],
+        ]
+      : [
+          [
+            { label: "증권사", key: "증권사" },
+            { label: "매도일", key: "매도일" },
+          ],
+          [
+            { label: "청약 수량", key: "청약수량" },
+            { label: "수수료", key: "수수료" },
+          ],
+          [
+            { label: "배정 수량", key: "배정수량" },
+            { label: "제세금", key: "제세금" },
+          ],
+          [
+            { label: "공모가", key: "공모가" },
+            { label: "매도가", key: "매도가" },
+          ],
+        ];
 
   const handleMenuPress = () => {
     menuButtonRef.current?.measure(
@@ -106,13 +120,22 @@ export default function HistoryCard({
   return (
     <>
       <TouchableOpacity
-        style={[styles.card, isOpen && styles.cardOpen]}
+        style={[
+          styles.card,
+          isOpen && styles.cardOpen,
+          recordStatus === "COMPLETED" && styles.cardCompleted,
+        ]}
         onPress={onPress}
         activeOpacity={0.8}
       >
         <View style={styles.itemHeader}>
           <View style={styles.itemLeft}>
-            <View style={[styles.dot, recordStatus === "ONGOING" && styles.dotOngoing]} />
+            <View
+              style={[
+                styles.dot,
+                recordStatus === "ONGOING" && styles.dotOngoing,
+              ]}
+            />
             <Text style={styles.itemName}>{name}</Text>
             {favorite && <StarIcon width={16} height={16} />}
           </View>
@@ -188,7 +211,9 @@ export default function HistoryCard({
                       onCompletePress?.(id);
                     }}
                   >
-                    <Text style={[styles.dropdownText, styles.completeText]}>완료 처리</Text>
+                    <Text style={[styles.dropdownText, styles.completeText]}>
+                      완료 처리
+                    </Text>
                   </TouchableOpacity>
                   <View style={styles.dropdownDivider} />
                 </>
@@ -336,5 +361,8 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     color: "#EF4444",
+  },
+  cardCompleted: {
+    backgroundColor: colors.gray100,
   },
 });
