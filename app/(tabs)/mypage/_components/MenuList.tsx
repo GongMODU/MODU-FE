@@ -1,4 +1,5 @@
 import { logout } from "@/lib/api/mypage";
+import queryClient from "@/lib/queryClient";
 import { tokenStore } from "@/lib/tokenStore";
 import { colors, spacing, typography } from "@/styles";
 import { router } from "expo-router";
@@ -25,6 +26,7 @@ export default function MenuList() {
             // 서버 오류여도 로컬 상태는 정리하고 로그인 화면으로 이동
           } finally {
             tokenStore.clear();
+            queryClient.clear();
             router.replace("/onboarding");
           }
         },
