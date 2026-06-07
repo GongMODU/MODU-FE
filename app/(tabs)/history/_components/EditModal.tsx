@@ -103,22 +103,27 @@ export default function EditModal({
       setSearchResults([]);
       setShowDropdown(false);
       setSelectedIpoEventId(undefined);
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
     }
   }, [visible]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, []);
 
   const handleNameChange = useCallback(
     (text: string) => {
       onNameChange(text);
+      if (mode !== "add") return;
       setSelectedIpoEventId(undefined);
-
       if (debounceTimer.current) clearTimeout(debounceTimer.current);
-
       if (text.trim().length === 0) {
         setSearchResults([]);
         setShowDropdown(false);
         return;
       }
-
       debounceTimer.current = setTimeout(async () => {
         try {
           const res = await searchIpo(text.trim());
@@ -130,7 +135,7 @@ export default function EditModal({
         }
       }, 300);
     },
-    [onNameChange],
+    [onNameChange, mode],
   );
 
   return (
@@ -186,7 +191,7 @@ export default function EditModal({
                   placeholderTextColor={colors.gray300}
                 />
               </View>
-              {showDropdown && (
+              {mode === "add" && showDropdown && (
                 <View style={styles.dropdown}>
                   {searchResults.map((item) => (
                     <TouchableOpacity
