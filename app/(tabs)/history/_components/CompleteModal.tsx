@@ -151,7 +151,9 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
             </View>
 
             <View style={styles.fieldGroup}>
-              <Text style={styles.fieldLabel}>배정 수량</Text>
+              <Text style={styles.fieldLabel}>
+                배정 수량 <Text style={styles.required}>*</Text>
+              </Text>
               <View style={styles.inputBox}>
                 <TextInput
                   style={styles.inputText}
