@@ -1,5 +1,4 @@
 import EmptyHistoryIcon from "@/assets/images/empty-history.svg";
-import { getFavorites } from "@/lib/api/ipo";
 import {
   completeHistory,
   createCompletedHistory,
@@ -227,13 +226,6 @@ export default function HistoryScreen() {
     onSuccess: invalidate,
   });
 
-  const { data: favorites = [] } = useQuery({
-    queryKey: queryKeys.favorites.list(),
-    queryFn: () => getFavorites().then((r) => r.data),
-  });
-
-  const favoriteIpoIds = new Set(favorites.map((f) => f.ipoEventId));
-
   const handleSave = (data: DetailData, ipoEventId?: number) => {
     if (editId === "__new__") {
       if (ipoEventId) {
@@ -310,9 +302,7 @@ export default function HistoryScreen() {
               key={item.id}
               id={String(item.id)}
               name={getItemName(item)}
-              favorite={
-                item.ipoEventId != null && favoriteIpoIds.has(item.ipoEventId)
-              }
+              favorite={item.favorited}
               recordStatus={item.recordStatus}
               isOpen={openId === String(item.id)}
               data={toDetailData(item)}

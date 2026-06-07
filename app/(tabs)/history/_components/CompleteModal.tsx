@@ -27,6 +27,7 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
   const [sellDate, setSellDate] = useState("");
   const [fee, setFee] = useState("");
   const [tax, setTax] = useState("");
+  const [allocatedQuantity, setAllocatedQuantity] = useState("");
 
   const parseNum = (val: string): number | undefined => {
     const n = Number(val.replace(/[^0-9.-]/g, ""));
@@ -68,11 +69,13 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
       sellDate: date,
       fee: parseNum(fee),
       tax: parseNum(tax),
+      allocatedQuantity: parseNum(allocatedQuantity),
     });
     setSellPrice("");
     setSellDate("");
     setFee("");
     setTax("");
+    setAllocatedQuantity("");
   };
 
   const handleClose = () => {
@@ -80,6 +83,7 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
     setSellDate("");
     setFee("");
     setTax("");
+    setAllocatedQuantity("");
     onClose();
   };
 
@@ -142,6 +146,20 @@ export default function CompleteModal({ visible, onClose, onComplete }: Props) {
                   onChangeText={setSellDate}
                   placeholder="YYYY-MM-DD"
                   placeholderTextColor={colors.gray300}
+                />
+              </View>
+            </View>
+
+            <View style={styles.fieldGroup}>
+              <Text style={styles.fieldLabel}>배정 수량</Text>
+              <View style={styles.inputBox}>
+                <TextInput
+                  style={styles.inputText}
+                  value={allocatedQuantity}
+                  onChangeText={setAllocatedQuantity}
+                  placeholder="배정 수량 입력"
+                  placeholderTextColor={colors.gray300}
+                  keyboardType="numeric"
                 />
               </View>
             </View>
