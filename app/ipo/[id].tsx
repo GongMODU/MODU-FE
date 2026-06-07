@@ -77,6 +77,9 @@ export default function IPODetailScreen() {
         queryKey: queryKeys.ipo.detail(ipoEventId),
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.favorites.list() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.subscriptionHistory.list(),
+      });
     },
   });
 

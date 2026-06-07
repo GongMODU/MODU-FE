@@ -1,4 +1,5 @@
 import { withdraw } from "@/lib/api/mypage";
+import queryClient from "@/lib/queryClient";
 import { tokenStore } from "@/lib/tokenStore";
 import { colors, spacing, typography } from "@/styles";
 import { useQuery } from "@tanstack/react-query";
@@ -45,6 +46,7 @@ export default function MypageScreen() {
               return;
             }
             tokenStore.clear();
+            queryClient.clear();
             router.replace("/onboarding");
           },
         },
@@ -61,6 +63,7 @@ export default function MypageScreen() {
     }
     setWithdrawModalVisible(false);
     tokenStore.clear();
+    queryClient.clear();
     router.replace("/onboarding");
   };
 
@@ -100,7 +103,9 @@ export default function MypageScreen() {
         />
 
         <Text style={styles.investmentTitle}>나의 투자 성향</Text>
-        <InvestmentCard personaCode={data.investmentProfile?.personaCode ?? ""} />
+        <InvestmentCard
+          personaCode={data.investmentProfile?.personaCode ?? ""}
+        />
 
         <MenuList />
         <TouchableOpacity

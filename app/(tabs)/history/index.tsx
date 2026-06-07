@@ -7,7 +7,6 @@ import {
   getSubscriptionHistories,
   updateSubscriptionHistory,
 } from "@/lib/api/subscriptionHistory";
-import { getFavorites } from "@/lib/api/ipo";
 import queryClient from "@/lib/queryClient";
 import { queryKeys } from "@/lib/queryKeys";
 import { colors, spacing, typography } from "@/styles";
@@ -301,7 +300,7 @@ export default function HistoryScreen() {
         ) : (
           allHistories.map((item) => (
             <HistoryCard
-              key={item.id}
+              key={`${item.recordStatus}-${item.id}`}
               id={String(item.id)}
               name={getItemName(item)}
               favorite={item.favorited}
