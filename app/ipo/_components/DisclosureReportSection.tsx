@@ -137,11 +137,9 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: spacing.contentArea,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     backgroundColor: colors.white,
-    padding: 16,
-    gap: 36,
+    padding: spacing.md,
+    gap: spacing.xl,
   },
   section: {
     gap: 8,
@@ -152,10 +150,8 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.gray200,
-    backgroundColor: colors.white,
-    padding: 16,
+    backgroundColor: colors.gray50,
+    padding: spacing.md,
     gap: 18,
   },
   companyName: {
@@ -165,7 +161,7 @@ const styles = StyleSheet.create({
   infoGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    rowGap: 12,
+    rowGap: spacing.sm,
   },
   infoItem: {
     gap: 4,
@@ -173,11 +169,11 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     ...typography.captionMedium9,
-    color: colors.gray500,
+    color: colors.gray600,
   },
   infoValue: {
     ...typography.bodyRegular10,
-    color: colors.gray400,
+    color: colors.gray500,
   },
   summaryBox: {
     borderRadius: 2,

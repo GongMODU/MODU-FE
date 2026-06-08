@@ -1,4 +1,4 @@
-import { colors, typography } from "@/styles";
+import { colors, spacing, typography } from "@/styles";
 import { useRef, useState } from "react";
 import {
   StyleSheet,
@@ -146,34 +146,27 @@ export default function CompanyTab({ data, style, ...props }: Props) {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     backgroundColor: colors.white,
-    padding: 16,
-    gap: 12,
+    gap: spacing.xs,
   },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: spacing.xs,
   },
   cell: {
     width: "48%",
-    padding: 12,
+    padding: spacing.sm,
     gap: 4,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.gray50,
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray50,
   },
   cellFull: {
     width: "100%",
-    padding: 12,
-    gap: 8,
+    padding: spacing.sm,
+    gap: spacing.xs,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.gray50,
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray50,
   },
   cellFullCentered: {
     alignItems: "center",
@@ -199,13 +192,13 @@ const styles = StyleSheet.create({
   brokerRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: spacing.xs,
   },
   brokerTag: {
     paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingHorizontal: spacing.xs,
     borderRadius: 4,
-    backgroundColor: colors.gray50,
+    backgroundColor: colors.primary50,
   },
   brokerText: {
     ...typography.labelMedium10,

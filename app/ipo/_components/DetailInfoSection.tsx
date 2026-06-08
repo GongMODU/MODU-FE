@@ -44,11 +44,9 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: spacing.contentArea,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     backgroundColor: colors.white,
-    padding: 16,
-    gap: 12,
+    padding: spacing.md,
+    gap: spacing.sm,
   },
   title: {
     ...typography.subtitleMedium14,

@@ -127,8 +127,6 @@ const styles = StyleSheet.create({
   container: {
     marginHorizontal: spacing.contentArea,
     borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     padding: spacing.md,
     gap: spacing.sm,
     backgroundColor: colors.white,
@@ -147,14 +145,14 @@ const styles = StyleSheet.create({
     color: colors.gray400,
   },
   content: {
-    gap: 8,
+    gap: spacing.xs,
   },
   trafficLight: {
     alignSelf: "center",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: 8,
+    gap: spacing.xs,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.lg,
     backgroundColor: colors.gray50,
@@ -167,7 +165,7 @@ const styles = StyleSheet.create({
   },
   textArea: {
     alignItems: "center",
-    gap: 8,
+    gap: spacing.xs,
   },
   grade: {
     ...typography.footerBold12,
