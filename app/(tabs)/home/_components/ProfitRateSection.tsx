@@ -277,17 +277,16 @@ function ProfitLineChart({ data }: { data: MonthlyReturnRate[] }) {
           const cy = toY(d.averageReturnRate);
           const isLast = i === data.length - 1;
           const label = `${d.averageReturnRate >= 0 ? "+" : ""}${Math.round(d.averageReturnRate)}%`;
-          const labelY = cy <= dynamicZeroY ? cy - 7 : cy + 12;
+          const labelY = cy <= dynamicZeroY ? cy - 14 : cy + 18;
           return (
             <G key={i}>
               <Circle
                 cx={cx}
                 cy={cy}
-                r={5}
-                fill={isLast ? colors.primary600 : colors.white}
-                stroke={isLast ? colors.white : colors.primary200}
-                strokeWidth={2.5}
+                r={6.5}
+                fill={isLast ? colors.primary600 : colors.primary200}
               />
+              <Circle cx={cx} cy={cy} r={3.5} fill={colors.white} />
               <SvgText
                 x={cx}
                 y={labelY}

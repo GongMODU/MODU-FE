@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   closeButton: {
     position: "absolute",
     right: spacing.contentArea,
-    top: 22,
+    top: 44,
   },
   titleArea: {
     paddingHorizontal: spacing.contentArea,

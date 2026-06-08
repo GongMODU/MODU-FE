@@ -1,7 +1,9 @@
 import LogoSvg from "@/assets/images/logo.svg";
+import KakaoIconSvg from "@/assets/images/kakao_login.svg";
+import GoogleIconSvg from "@/assets/images/google_login.svg";
 import { googleLogin, kakaoLogin } from "@/lib/api/auth";
 import { tokenStore } from "@/lib/tokenStore";
-import { colors, spacing } from "@/styles";
+import { colors, spacing, typography } from "@/styles";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -46,33 +48,39 @@ export default function OnboardingScreen() {
         {/* 버튼 영역 */}
         <View style={styles.buttonSection}>
           <TouchableOpacity
-            style={styles.loginButton}
+            style={styles.emailButton}
             onPress={() => router.push("/(auth)/email-login")}
           >
-            <Text style={styles.loginButtonText}>이메일로 로그인</Text>
+            <Text style={styles.emailButtonText}>이메일로 로그인</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.loginButton}
-            onPress={() => handleSocialLogin("google")}
-            disabled={!!loadingProvider}
-          >
-            {loadingProvider === "google" ? (
-              <ActivityIndicator size="small" color={colors.gray700} />
-            ) : (
-              <Text style={styles.loginButtonText}>구글 아이디로 로그인</Text>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.loginButton}
+            style={styles.kakaoButton}
             onPress={() => handleSocialLogin("kakao")}
             disabled={!!loadingProvider}
           >
             {loadingProvider === "kakao" ? (
               <ActivityIndicator size="small" color={colors.gray700} />
             ) : (
-              <Text style={styles.loginButtonText}>카카오 아이디로 로그인</Text>
+              <>
+                <KakaoIconSvg width={18} height={18} />
+                <Text style={styles.kakaoButtonText}>카카오 로그인</Text>
+              </>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={() => handleSocialLogin("google")}
+            disabled={!!loadingProvider}
+          >
+            {loadingProvider === "google" ? (
+              <ActivityIndicator size="small" color={colors.gray700} />
+            ) : (
+              <>
+                <GoogleIconSvg width={18} height={18} />
+                <Text style={styles.googleButtonText}>Google로 로그인</Text>
+              </>
             )}
           </TouchableOpacity>
 
@@ -118,18 +126,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 60,
   },
-  loginButton: {
+  emailButton: {
     width: "100%",
     height: 46,
-    borderRadius: 10,
+    borderRadius: 12,
     backgroundColor: colors.primary50,
     justifyContent: "center",
     alignItems: "center",
   },
-  loginButtonText: {
-    fontSize: 14,
-    fontWeight: "500",
+  emailButtonText: {
+    ...typography.subtitleMedium14,
     color: colors.gray700,
+  },
+  kakaoButton: {
+    width: "100%",
+    height: 46,
+    borderRadius: 12,
+    backgroundColor: "#FEE500",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+  },
+  kakaoButtonText: {
+    ...typography.subtitleMedium14,
+    color: "rgba(0,0,0,0.85)",
+  },
+  googleButton: {
+    width: "100%",
+    height: 46,
+    borderRadius: 12,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: "#747775",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+  },
+  googleButtonText: {
+    ...typography.subtitleMedium14,
+    color: "#1F1F1F",
   },
   signupTextWrapper: {
     flexDirection: "row",
@@ -138,13 +175,11 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   signupBrand: {
-    fontSize: 14,
-    fontWeight: "500",
+    ...typography.labelMedium10,
     color: colors.primary600,
   },
   signupGray: {
-    fontSize: 14,
-    fontWeight: "500",
+    ...typography.bodyRegular10,
     color: colors.gray600,
   },
   signupUnderline: {
