@@ -266,10 +266,7 @@ export default function HistoryScreen() {
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={[
-          styles.scrollContent,
-          allHistories.length === 0 && styles.scrollContentEmpty,
-        ]}
+        contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.titleRow}>
@@ -357,8 +354,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 72,
     paddingBottom: spacing.xl,
-  },
-  scrollContentEmpty: {
     flexGrow: 1,
   },
   emptyContainer: {

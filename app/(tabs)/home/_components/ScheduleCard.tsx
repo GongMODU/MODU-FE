@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   brokerTag: {
     alignSelf: "flex-start",
-    backgroundColor: colors.gray100,
+    backgroundColor: colors.primary50,
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 4,

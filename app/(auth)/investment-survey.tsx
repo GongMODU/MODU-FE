@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
   },
   optionButtonSelected: {
     borderColor: colors.primary600,
+    backgroundColor: colors.primary50,
   },
   radio: {
     width: 24,
@@ -232,7 +233,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   optionTextSelected: {
-    color: colors.gray800,
+    color: colors.primary600,
   },
   completeButton: {
     width: "100%",

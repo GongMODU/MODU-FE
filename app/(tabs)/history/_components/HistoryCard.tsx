@@ -281,10 +281,10 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.gray500,
+    backgroundColor: colors.calender.refundSlate,
   },
   dotOngoing: {
-    backgroundColor: colors.primary600,
+    backgroundColor: colors.calender.listingGreen,
   },
   completeText: {
     color: colors.primary600,
