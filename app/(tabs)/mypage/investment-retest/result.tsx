@@ -3,8 +3,10 @@ import { colors, spacing, typography } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import {
   Image,
+  LayoutChangeEvent,
   ScrollView,
   StyleSheet,
   Text,
@@ -37,6 +39,8 @@ export default function InvestmentRetestResultScreen() {
     : [];
 
   const personaImage = getPersonaResultImage(personaCode ?? "");
+  const [imageWidth, setImageWidth] = useState(0);
+  const imageHeight = imageWidth * (322 / 312);
 
   return (
     <SafeAreaView edges={["top"]} style={styles.container}>
@@ -48,7 +52,6 @@ export default function InvestmentRetestResultScreen() {
           <Ionicons name="chevron-back" size={24} color={colors.gray800} />
         </TouchableOpacity>
 
-        {/* 인사 텍스트 */}
         <View style={styles.greetingSection}>
           <Text style={styles.greetingTitle}>{koreanName}</Text>
           <Text style={styles.greetingNickname}>
@@ -60,14 +63,21 @@ export default function InvestmentRetestResultScreen() {
         {personaImage != null ? (
           <Image
             source={personaImage}
-            style={styles.personaImage}
+            style={[styles.personaImage, { height: imageHeight }]}
             resizeMode="cover"
+            onLayout={(e: LayoutChangeEvent) =>
+              setImageWidth(e.nativeEvent.layout.width)
+            }
           />
         ) : (
-          <View style={styles.personaImage} />
+          <View
+            style={[styles.personaImage, { height: imageHeight }]}
+            onLayout={(e: LayoutChangeEvent) =>
+              setImageWidth(e.nativeEvent.layout.width)
+            }
+          />
         )}
 
-        {/* 투자 성향 키워드 */}
         <Text style={styles.keywordTitle}>투자 성향 키워드</Text>
         <View style={styles.chipRow}>
           {keywordTags.map((tag) => (
@@ -77,7 +87,6 @@ export default function InvestmentRetestResultScreen() {
           ))}
         </View>
 
-        {/* 검사 완료 버튼 */}
         <TouchableOpacity
           style={styles.completeButton}
           onPress={() => router.dismiss(2)}
@@ -125,10 +134,10 @@ const styles = StyleSheet.create({
   },
   personaImage: {
     width: "100%",
-    height: 322,
     borderRadius: 10,
     marginTop: spacing.lg,
     alignSelf: "center",
+    backgroundColor: colors.gray200,
   },
   keywordTitle: {
     ...typography.subtitleMedium14,

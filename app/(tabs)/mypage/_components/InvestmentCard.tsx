@@ -1,7 +1,15 @@
 import { getPersonaMypageImage } from "@/lib/personaImage";
 import { colors, spacing, typography } from "@/styles";
 import { useRouter } from "expo-router";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useState } from "react";
+import {
+  Image,
+  LayoutChangeEvent,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 type InvestmentCardProps = {
   personaCode: string;
@@ -11,16 +19,27 @@ export default function InvestmentCard({ personaCode }: InvestmentCardProps) {
   const router = useRouter();
   const personaImage = getPersonaMypageImage(personaCode);
 
+  const [imageWidth, setImageWidth] = useState(0);
+  const imageHeight = imageWidth * (260 / 280);
+
   return (
     <View style={styles.investmentCard}>
       {personaImage != null ? (
         <Image
           source={personaImage}
-          style={styles.personaImage}
+          style={[styles.personaImage, { height: imageHeight }]}
           resizeMode="cover"
+          onLayout={(e: LayoutChangeEvent) =>
+            setImageWidth(e.nativeEvent.layout.width)
+          }
         />
       ) : (
-        <View style={styles.personaImage} />
+        <View
+          style={[styles.personaImage, { height: imageHeight }]}
+          onLayout={(e: LayoutChangeEvent) =>
+            setImageWidth(e.nativeEvent.layout.width)
+          }
+        />
       )}
 
       <TouchableOpacity
@@ -37,13 +56,11 @@ const styles = StyleSheet.create({
   investmentCard: {
     padding: spacing.md,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     marginBottom: 20,
+    backgroundColor: colors.white,
   },
   personaImage: {
     width: "100%",
-    height: 260,
     borderRadius: 8,
     backgroundColor: colors.gray200,
     marginBottom: 7,

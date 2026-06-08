@@ -89,12 +89,17 @@ export default function MypageScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      {/* 헤더 - white */}
+      <View style={styles.header}>
+        <Text style={styles.sectionTitle}>내 프로필</Text>
+      </View>
+
+      {/* 나머지 - gray50 */}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={styles.sectionTitle}>내 프로필</Text>
         <ProfileCard
           nickname={data.nickname}
           email={data.email}
@@ -170,24 +175,30 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
+  header: {
+    paddingTop: 72,
+    paddingHorizontal: spacing.contentArea,
+    paddingBottom: spacing.md,
+    backgroundColor: colors.white,
+  },
   scrollView: {
     flex: 1,
+    backgroundColor: colors.gray50,
   },
   contentContainer: {
     paddingHorizontal: spacing.contentArea,
-    paddingTop: 72,
-    paddingBottom: 60,
-    gap: 12,
+    paddingTop: spacing.md,
+    paddingBottom: 30,
+    gap: spacing.sm,
   },
   sectionTitle: {
     ...typography.largeTitleMedium20,
-    color: colors.gray900,
+    color: colors.gray800,
     marginBottom: 4,
   },
   investmentTitle: {
     ...typography.subtitleMedium14,
-    color: colors.gray900,
-    marginBottom: 8,
+    color: colors.gray800,
   },
   loader: {
     flex: 1,
