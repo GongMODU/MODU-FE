@@ -51,9 +51,7 @@ export default function YoutubeCard({
 const styles = StyleSheet.create({
   card: {
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.gray200,
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray50,
     padding: spacing.md,
     gap: spacing.md,
   },
@@ -90,7 +88,7 @@ const styles = StyleSheet.create({
   },
   detailButton: {
     borderRadius: 2,
-    backgroundColor: colors.gray400,
+    backgroundColor: colors.primary600,
     paddingVertical: 8,
     paddingHorizontal: 10,
     alignItems: "center",

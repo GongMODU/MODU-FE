@@ -100,7 +100,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* 이번주 청약 일정 */}
-        <View style={styles.section}>
+        <View style={styles.scheduleSection}>
           <TouchableOpacity
             style={styles.sectionHeader}
             onPress={() => router.push("/schedule")}
@@ -110,7 +110,9 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           {ipoItems.length === 0 ? (
-            <Text style={styles.emptyScheduleText}>이번주 청약 일정이 없어요.</Text>
+            <Text style={styles.emptyScheduleText}>
+              이번주 청약 일정이 없어요.
+            </Text>
           ) : (
             <ScrollView
               horizontal
@@ -130,7 +132,7 @@ export default function HomeScreen() {
         </View>
 
         {/* 오늘의 유튜브 핵심 요약 */}
-        <View style={styles.section}>
+        <View style={styles.youtubeSection}>
           <Text style={styles.sectionTitle}>오늘의 유튜브 핵심 요약</Text>
 
           <ScrollView
@@ -197,7 +199,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingTop: 72,
     paddingBottom: spacing.xl,
-    gap: spacing.xl,
+  },
+  scheduleSection: {
+    gap: spacing.sm,
+  },
+  youtubeSection: {
+    gap: spacing.md,
+    marginTop: 16,
+    marginBottom: spacing.xl,
   },
   section: {
     gap: spacing.md,
