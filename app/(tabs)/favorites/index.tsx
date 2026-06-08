@@ -62,18 +62,20 @@ export default function FavoritesScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      {/* 헤더 - white 배경, ScrollView 밖 */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>관심 공모주</Text>
+        <TouchableOpacity ref={infoButtonRef} onPress={handleInfoPress}>
+          <Text style={styles.infoIcon}>ⓘ</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 리스트 영역 - gray50 배경 */}
       <ScrollView
+        style={styles.listArea}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 헤더 */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>관심 공모주</Text>
-          <TouchableOpacity ref={infoButtonRef} onPress={handleInfoPress}>
-            <Text style={styles.infoIcon}>ⓘ</Text>
-          </TouchableOpacity>
-        </View>
-
         <View style={styles.cardList}>{renderContent()}</View>
       </ScrollView>
 
@@ -101,16 +103,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
-  listContent: {
-    paddingHorizontal: spacing.contentArea,
-    paddingTop: 72,
-    paddingBottom: 60,
-  },
   header: {
+    paddingTop: 72,
+    paddingHorizontal: spacing.contentArea,
+    paddingBottom: spacing.md,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: spacing.md, // 16
+    backgroundColor: colors.white,
+  },
+  listArea: {
+    flex: 1,
+    backgroundColor: colors.gray50,
+  },
+  listContent: {
+    paddingHorizontal: spacing.contentArea,
+    paddingTop: 16,
+    paddingBottom: 60,
   },
   cardList: {
     gap: 12,
