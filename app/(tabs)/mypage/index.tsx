@@ -129,7 +129,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     ...typography.largeTitleMedium20,
     color: colors.gray800,
-    marginBottom: 4,
   },
   investmentTitle: {
     ...typography.subtitleMedium14,

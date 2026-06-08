@@ -1,3 +1,4 @@
+import StarIcon from "@/assets/images/Star.svg";
 import { colors, spacing, typography } from "@/styles";
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -49,8 +50,14 @@ export default function FavoritesScreen() {
 
     if (favorites.length === 0) {
       return (
-        <View style={styles.center}>
-          <Text style={styles.errorText}>관심 공모주가 없어요.</Text>
+        <View style={styles.emptyContainer}>
+          <StarIcon width={56} height={54} />
+          <View style={styles.emptyTextGroup}>
+            <Text style={styles.emptyTitle}>아직 관심 공모주가 없어요.</Text>
+            <Text style={styles.emptyDesc}>
+              이번주 청약 일정을 확인하고 추가해보세요.
+            </Text>
+          </View>
         </View>
       );
     }
@@ -117,11 +124,13 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray50,
   },
   listContent: {
+    flexGrow: 1,
     paddingHorizontal: spacing.contentArea,
     paddingTop: 16,
     paddingBottom: 60,
   },
   cardList: {
+    flex: 1,
     gap: 12,
   },
   headerTitle: {
@@ -143,5 +152,26 @@ const styles = StyleSheet.create({
   errorText: {
     ...typography.bodyRegular10,
     color: colors.gray400,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 37,
+    gap: 8,
+  },
+  emptyTextGroup: {
+    gap: 4,
+    alignItems: "center",
+  },
+  emptyTitle: {
+    ...typography.bodyMedium11,
+    color: colors.gray400,
+    textAlign: "center",
+  },
+  emptyDesc: {
+    ...typography.bodyMedium11,
+    color: colors.gray400,
+    textAlign: "center",
   },
 });
