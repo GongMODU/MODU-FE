@@ -280,40 +280,42 @@ export default function HistoryScreen() {
           </TouchableOpacity>
         </View>
 
-        {isLoading ? (
-          <View style={styles.emptyContainer}>
-            <ActivityIndicator color={colors.primary600} />
-          </View>
-        ) : allHistories.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <EmptyHistoryIcon width={71} height={68} />
-            <View style={styles.emptyTextGroup}>
-              <Text style={styles.emptyText}>아직 청약 이력이 없어요.</Text>
-              <Text style={styles.emptyText}>
-                버튼을 눌러 이력을 추가해보세요.
-              </Text>
+        <View style={styles.listArea}>
+          {isLoading ? (
+            <View style={styles.emptyContainer}>
+              <ActivityIndicator color={colors.primary600} />
             </View>
-          </View>
-        ) : (
-          allHistories.map((item) => (
-            <HistoryCard
-              key={`${item.recordStatus}-${item.id}`}
-              id={String(item.id)}
-              name={getItemName(item)}
-              favorite={item.favorited}
-              recordStatus={item.recordStatus}
-              isOpen={openId === String(item.id)}
-              data={toDetailData(item)}
-              onPress={() =>
-                setOpenId(openId === String(item.id) ? null : String(item.id))
-              }
-              onChange={() => {}}
-              onEditPress={handleEditPress}
-              onDeletePress={handleDeletePress}
-              onCompletePress={handleCompletePress}
-            />
-          ))
-        )}
+          ) : allHistories.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <EmptyHistoryIcon width={71} height={68} />
+              <View style={styles.emptyTextGroup}>
+                <Text style={styles.emptyText}>아직 청약 이력이 없어요.</Text>
+                <Text style={styles.emptyText}>
+                  버튼을 눌러 이력을 추가해보세요.
+                </Text>
+              </View>
+            </View>
+          ) : (
+            allHistories.map((item) => (
+              <HistoryCard
+                key={`${item.recordStatus}-${item.id}`}
+                id={String(item.id)}
+                name={getItemName(item)}
+                favorite={item.favorited}
+                recordStatus={item.recordStatus}
+                isOpen={openId === String(item.id)}
+                data={toDetailData(item)}
+                onPress={() =>
+                  setOpenId(openId === String(item.id) ? null : String(item.id))
+                }
+                onChange={() => {}}
+                onEditPress={handleEditPress}
+                onDeletePress={handleDeletePress}
+                onCompletePress={handleCompletePress}
+              />
+            ))
+          )}
+        </View>
       </ScrollView>
 
       {editId && draftData && (
@@ -350,11 +352,17 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: colors.white,
   },
   scrollContent: {
     paddingTop: 72,
-    paddingBottom: spacing.xl,
     flexGrow: 1,
+  },
+  listArea: {
+    flexGrow: 1,
+    backgroundColor: colors.gray50,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl,
   },
   emptyContainer: {
     flex: 1,

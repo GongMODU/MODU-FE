@@ -229,12 +229,10 @@ const styles = StyleSheet.create({
   },
   detailBox: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray50,
     gap: 6,
   },
   detailBoxGap: {

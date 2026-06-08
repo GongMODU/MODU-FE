@@ -311,12 +311,10 @@ const styles = StyleSheet.create({
   },
   detailBox: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 12,
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray50,
     gap: 6,
   },
   detailBoxGap: {
@@ -363,6 +361,7 @@ const styles = StyleSheet.create({
     color: "#EF4444",
   },
   cardCompleted: {
-    backgroundColor: colors.gray100,
+    backgroundColor: colors.gray200,
+    borderColor: colors.gray200,
   },
 });
