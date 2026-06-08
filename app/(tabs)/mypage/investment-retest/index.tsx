@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     gap: spacing.xs,
   },
-  optionButtonSelected: { borderColor: colors.primary600 },
+  optionButtonSelected: { borderColor: colors.primary600, backgroundColor: colors.primary50 },
   radio: {
     width: 24,
     height: 24,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     color: colors.gray600,
     flex: 1,
   },
-  optionTextSelected: { color: colors.gray800 },
+  optionTextSelected: { color: colors.primary600 },
   completeButton: {
     width: "100%",
     height: 48,

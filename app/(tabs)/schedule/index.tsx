@@ -189,7 +189,7 @@ export default function SubscriptionScheduleScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -234,42 +234,44 @@ export default function SubscriptionScheduleScreen() {
         />
 
         {/* 오늘 주요 일정 */}
-        <Text style={styles.sectionTitle}>오늘 주요 일정</Text>
-        <View style={styles.todayScheduleList}>
-          {todaySchedule.length === 0 ? (
-            <View style={styles.emptyToday}>
-              <Text style={styles.emptyTodayText}>
-                오늘 예정된 일정이 없어요.
-              </Text>
-            </View>
-          ) : (
-            todaySchedule.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.scheduleCard}
-                onPress={() => router.push(`/ipo/${item.ipoId}`)}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.scheduleCompanyName}>
-                  {item.companyName}
+        <View style={styles.todaySection}>
+          <Text style={styles.sectionTitle}>오늘 주요 일정</Text>
+          <View style={styles.todayScheduleList}>
+            {todaySchedule.length === 0 ? (
+              <View style={styles.emptyToday}>
+                <Text style={styles.emptyTodayText}>
+                  오늘 예정된 일정이 없어요.
                 </Text>
-                <View style={styles.tagRow}>
-                  {item.tags.map((tag) => (
-                    <View
-                      key={tag}
-                      style={[styles.tag, { borderColor: TAG_COLORS[tag] }]}
-                    >
-                      <Text
-                        style={[styles.tagText, { color: TAG_COLORS[tag] }]}
+              </View>
+            ) : (
+              todaySchedule.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.scheduleCard}
+                  onPress={() => router.push(`/ipo/${item.ipoId}`)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.scheduleCompanyName}>
+                    {item.companyName}
+                  </Text>
+                  <View style={styles.tagRow}>
+                    {item.tags.map((tag) => (
+                      <View
+                        key={tag}
+                        style={[styles.tag, { borderColor: TAG_COLORS[tag] }]}
                       >
-                        {tag}
-                      </Text>
-                    </View>
-                  ))}
-                </View>
-              </TouchableOpacity>
-            ))
-          )}
+                        <Text
+                          style={[styles.tagText, { color: TAG_COLORS[tag] }]}
+                        >
+                          {tag}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </View>
         </View>
       </ScrollView>
 
@@ -340,11 +342,11 @@ export default function SubscriptionScheduleScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: colors.white,
   },
   scrollContent: {
     paddingTop: 120,
-    paddingBottom: 24,
+    flexGrow: 1,
   },
   fixedHeader: {
     position: "absolute",
@@ -384,16 +386,19 @@ const styles = StyleSheet.create({
   chipText: {
     ...typography.labelMedium10,
   },
+  todaySection: {
+    backgroundColor: colors.gray50,
+    paddingHorizontal: spacing.contentArea,
+    paddingVertical: 16,
+    gap: 12,
+    flexGrow: 1,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    paddingHorizontal: 25,
-    marginBottom: 10,
   },
   todayScheduleList: {
-    paddingHorizontal: 20,
     gap: 8,
-    marginBottom: 24,
   },
   emptyToday: {
     paddingVertical: 20,

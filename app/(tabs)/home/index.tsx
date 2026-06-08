@@ -115,6 +115,7 @@ export default function HomeScreen() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
+              style={styles.scheduleScroll}
               contentContainerStyle={styles.scheduleScrollContent}
             >
               {ipoItems.map((item) => (
@@ -210,8 +211,14 @@ const styles = StyleSheet.create({
     ...typography.largeTitleMedium20,
     color: colors.gray800,
   },
+  scheduleScroll: {
+    marginHorizontal: -spacing.lg,
+    backgroundColor: colors.gray50,
+  },
   scheduleScrollContent: {
     gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 16,
   },
   emptyScheduleText: {
     fontSize: 13,
