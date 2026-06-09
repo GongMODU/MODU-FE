@@ -1,4 +1,4 @@
-import { colors, typography } from "@/styles";
+import { colors, spacing, typography } from "@/styles";
 import { useRef, useState } from "react";
 import {
   StyleSheet,
@@ -150,35 +150,28 @@ export default function PredictionTab({ data, style, ...props }: Props) {
 const styles = StyleSheet.create({
   container: {
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     backgroundColor: colors.white,
-    padding: 16,
-    gap: 12,
+    gap: spacing.xs,
   },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: spacing.xs,
   },
   cellFull: {
     width: "100%",
-    padding: 12,
+    padding: spacing.sm,
     gap: 4,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.gray50,
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray50,
     alignItems: "center",
   },
   cell: {
     width: "48%",
-    padding: 12,
+    padding: spacing.sm,
     gap: 4,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.gray50,
-    backgroundColor: colors.white,
+    backgroundColor: colors.gray50,
   },
   labelRow: {
     flexDirection: "row",

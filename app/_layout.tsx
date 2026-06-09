@@ -49,6 +49,7 @@ export default function RootLayout() {
               options={{ presentation: "modal", title: "Modal" }}
             />
             <Stack.Screen name="ipo/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="mypage" options={{ headerShown: false }} />
           </Stack>
           <StatusBar style="auto" />
         </ThemeProvider>

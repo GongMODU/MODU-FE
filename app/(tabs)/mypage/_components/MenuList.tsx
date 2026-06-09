@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1,
     borderColor: colors.gray200,
+    backgroundColor: colors.white,
     overflow: "hidden",
   },
   menuItem: {

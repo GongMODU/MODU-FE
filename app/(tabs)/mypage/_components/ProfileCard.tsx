@@ -65,10 +65,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: spacing.md,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.gray200,
-    gap: 12,
+    gap: spacing.sm,
     marginBottom: 20,
+    backgroundColor: colors.white,
   },
   editButtonWrapper: {
     position: "absolute",

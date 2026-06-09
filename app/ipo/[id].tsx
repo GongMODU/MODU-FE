@@ -125,13 +125,15 @@ export default function IPODetailScreen() {
           item={detail}
           onToggleFavorite={() => toggleFavorite(detail.favorited)}
         />
-        <KeyIndicatorSection keyIndicator={keyIndicator} />
-        <DetailInfoSection
-          subscription={subscription}
-          prediction={prediction}
-          companyTab={companyTab}
-        />
-        <DisclosureReportSection data={disclosureReport} />
+        <View style={styles.contentArea}>
+          <KeyIndicatorSection keyIndicator={keyIndicator} />
+          <DetailInfoSection
+            subscription={subscription}
+            prediction={prediction}
+            companyTab={companyTab}
+          />
+          <DisclosureReportSection data={disclosureReport} />
+        </View>
 
         {/* 면책 문구 */}
         <View style={styles.disclaimer}>
@@ -161,10 +163,16 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 48,
     paddingBottom: spacing.xl,
+  },
+  contentArea: {
+    backgroundColor: colors.gray50,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.md,
     gap: spacing.lg,
   },
   disclaimer: {
     paddingLeft: 32,
+    marginTop: spacing.lg,
     gap: 4,
   },
   disclaimerText: {

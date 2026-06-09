@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     paddingRight: 32,
     gap: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 4,

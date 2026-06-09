@@ -84,8 +84,6 @@ const styles = StyleSheet.create({
   card: {
     padding: spacing.md,
     borderRadius: 10,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     backgroundColor: colors.white,
     gap: 12,
   },
@@ -119,7 +117,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingHorizontal: 8,
     borderRadius: 4,
-    backgroundColor: colors.gray50,
+    backgroundColor: colors.primary50,
   },
   brokerTagText: {
     ...typography.labelMedium10,
