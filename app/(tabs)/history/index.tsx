@@ -44,12 +44,10 @@ const INITIAL_DETAIL: DetailData = {
   매도가: "",
 };
 
-// API 응답 → UI DetailData 변환
 function toDetailData(item: SubscriptionHistoryItem): DetailData {
   return {
     증권사: item.securityCompany ?? "",
     매도일: item.sellDate ?? "",
-
     청약수량:
       item.subscribedQuantity != null ? String(item.subscribedQuantity) : "",
     수수료: item.fee != null ? String(item.fee) : "",
@@ -61,13 +59,11 @@ function toDetailData(item: SubscriptionHistoryItem): DetailData {
   };
 }
 
-// 문자열 → 숫자 파싱 (단위 제거)
 function parseNum(val: string): number | undefined {
   const n = Number(val.replace(/[^0-9.-]/g, ""));
   return val.trim() === "" || isNaN(n) ? undefined : n;
 }
 
-// 문자열 → YYYY-MM-DD 파싱 ("5.2", "2026.5.2", "5/2" 등 지원)
 function parseDate(val: string): string | undefined {
   if (!val.trim()) return undefined;
   if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
@@ -264,23 +260,26 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea} edges={["top"]}>
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.titleRow}>
-          <Text style={styles.pageTitle}>청약 이력</Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            hitSlop={8}
-            onPress={handleAddPress}
-          >
-            <Ionicons name="add" size={20} color={colors.gray400} />
-          </TouchableOpacity>
-        </View>
+      {/* 헤더 - white 배경, ScrollView 밖 */}
+      <View style={styles.header}>
+        <Text style={styles.pageTitle}>청약 이력</Text>
+        <TouchableOpacity
+          style={styles.addButton}
+          hitSlop={8}
+          onPress={handleAddPress}
+        >
+          <Ionicons name="add" size={14} color={colors.gray400} />
+        </TouchableOpacity>
+      </View>
 
-        <View style={styles.listArea}>
+      {/* 리스트 영역 - gray50 배경 */}
+      <ScrollView
+        style={styles.listArea}
+        contentContainerStyle={styles.listContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.cardList}>
           {isLoading ? (
             <View style={styles.emptyContainer}>
               <ActivityIndicator color={colors.primary600} />
@@ -350,19 +349,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.white,
   },
-  container: {
-    flex: 1,
+  header: {
+    paddingTop: 72,
+    paddingHorizontal: spacing.contentArea,
+    paddingBottom: spacing.md,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: colors.white,
   },
-  scrollContent: {
-    paddingTop: 72,
-    flexGrow: 1,
-  },
   listArea: {
-    flexGrow: 1,
+    flex: 1,
     backgroundColor: colors.gray50,
+  },
+  listContent: {
+    flexGrow: 1,
     paddingTop: spacing.md,
     paddingBottom: spacing.xl,
+  },
+  cardList: {
+    flex: 1,
   },
   emptyContainer: {
     flex: 1,
@@ -379,21 +385,14 @@ const styles = StyleSheet.create({
     color: colors.gray400,
     textAlign: "center",
   },
-  titleRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingHorizontal: spacing.contentArea,
-    paddingBottom: spacing.lg,
-  },
   pageTitle: {
     ...typography.largeTitleMedium20,
     color: colors.gray800,
   },
   addButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
+    width: 19,
+    height: 19,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: colors.gray400,
     alignItems: "center",

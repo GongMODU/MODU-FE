@@ -252,8 +252,6 @@ const styles = StyleSheet.create({
     marginHorizontal: spacing.contentArea,
     marginBottom: spacing.xs,
     borderRadius: 4,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     backgroundColor: colors.white,
@@ -315,7 +313,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 12,
     backgroundColor: colors.gray50,
-    gap: 6,
   },
   detailBoxGap: {
     marginRight: 8,
@@ -325,7 +322,7 @@ const styles = StyleSheet.create({
     color: colors.gray500,
   },
   detailValue: {
-    ...typography.subtitleMedium14,
+    ...typography.labelMedium10,
     color: colors.gray700,
     padding: 0,
     minHeight: 24,
