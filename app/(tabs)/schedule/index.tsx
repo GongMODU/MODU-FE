@@ -413,8 +413,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: colors.white,
-    borderWidth: 1,
-    borderColor: colors.gray200,
     borderRadius: 10,
     paddingVertical: 16,
     paddingHorizontal: 16,

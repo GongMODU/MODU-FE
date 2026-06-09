@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     color: colors.gray800,
   },
   infoIcon: {
-    fontSize: 17,
+    fontSize: 19,
     color: colors.gray400,
   },
   overlay: {
