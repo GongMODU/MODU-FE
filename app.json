@@ -12,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.gongmodu.fe",
       "adaptiveIcon": {
         "backgroundColor": "#4A40B8",
         "foregroundImage": "./assets/images/android-icon-foreground.png"
@@ -42,6 +43,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a539203a-0370-4df6-af61-6ab08274a1ad"
+      }
     }
   }
 }
