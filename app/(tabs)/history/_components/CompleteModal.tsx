@@ -297,6 +297,8 @@ const styles = StyleSheet.create({
     ...typography.bodyMedium11,
     color: colors.gray500,
     padding: 0,
+    flex: 1,
+    textAlignVertical: "center",
   },
   completeButton: {
     marginHorizontal: spacing.contentArea,
