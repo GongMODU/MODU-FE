@@ -1,33 +1,63 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { TabBarIcon, TabBarLabel } from "@/app/_components/TabBarIcon";
+import { Tabs } from "expo-router";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-      }}>
+        tabBarStyle: { justifyContent: "space-around" },
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon name="home" focused={focused} />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <TabBarLabel label="홈" focused={focused} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="history"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon name="history" focused={focused} />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <TabBarLabel label="청약 이력" focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="favorites"
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon name="favorites" focused={focused} />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <TabBarLabel label="관심 공모주" focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="mypage"
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <TabBarIcon name="mypage" focused={focused} />
+          ),
+          tabBarLabel: ({ focused }) => (
+            <TabBarLabel label="마이페이지" focused={focused} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="schedule"
+        options={{
+          href: null,
+          headerShown: false,
         }}
       />
     </Tabs>

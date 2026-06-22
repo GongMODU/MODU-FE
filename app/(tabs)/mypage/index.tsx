@@ -1,0 +1,160 @@
+import { withdraw } from "@/lib/api/mypage";
+import queryClient from "@/lib/queryClient";
+import { tokenStore } from "@/lib/tokenStore";
+import { colors, spacing, typography } from "@/styles";
+import { useQuery } from "@tanstack/react-query";
+import { router } from "expo-router";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import InvestmentCard from "./_components/InvestmentCard";
+import MenuList from "./_components/MenuList";
+import ProfileCard from "./_components/ProfileCard";
+import { mypageHomeOptions } from "./_components/queries";
+
+export default function MypageScreen() {
+  const { data, isLoading, isError } = useQuery(mypageHomeOptions());
+
+  const handleWithdraw = () => {
+    if (!data) return;
+    if (data.provider === "LOCAL") {
+      router.push("/mypage/withdraw");
+    } else {
+      Alert.alert("회원탈퇴", "정말 탈퇴하시겠어요?", [
+        { text: "취소", style: "cancel" },
+        {
+          text: "탈퇴",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await withdraw("");
+            } catch {
+              Alert.alert("오류", "탈퇴 처리 중 문제가 발생했습니다.");
+              return;
+            }
+            tokenStore.clear();
+            queryClient.clear();
+            router.replace("/onboarding");
+          },
+        },
+      ]);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+        <ActivityIndicator style={styles.loader} color={colors.primary600} />
+      </SafeAreaView>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={["top"]}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>
+            정보를 불러오지 못했습니다. 다시 시도해주세요.
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea} edges={["top"]}>
+      {/* 헤더 - white */}
+      <View style={styles.header}>
+        <Text style={styles.sectionTitle}>내 프로필</Text>
+      </View>
+
+      {/* 나머지 - gray50 */}
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        <ProfileCard
+          nickname={data.nickname}
+          email={data.email}
+          provider={data.provider}
+          personaCode={data.investmentProfile?.personaCode ?? ""}
+        />
+
+        <Text style={styles.investmentTitle}>나의 투자 성향</Text>
+        <InvestmentCard
+          personaCode={data.investmentProfile?.personaCode ?? ""}
+        />
+
+        <MenuList />
+        <TouchableOpacity
+          onPress={handleWithdraw}
+          style={styles.withdrawButton}
+        >
+          <Text style={styles.withdrawText}>회원탈퇴</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  header: {
+    paddingTop: 72,
+    paddingHorizontal: spacing.contentArea,
+    paddingBottom: spacing.md,
+    backgroundColor: colors.white,
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: colors.gray50,
+  },
+  contentContainer: {
+    paddingHorizontal: spacing.contentArea,
+    paddingTop: spacing.md,
+    paddingBottom: 30,
+    gap: spacing.sm,
+  },
+  sectionTitle: {
+    ...typography.largeTitleMedium20,
+    color: colors.gray800,
+  },
+  investmentTitle: {
+    ...typography.subtitleMedium14,
+    color: colors.gray800,
+  },
+  loader: {
+    flex: 1,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: spacing.contentArea,
+  },
+  errorText: {
+    fontSize: 14,
+    color: colors.gray600,
+    textAlign: "center",
+  },
+  withdrawButton: {
+    alignItems: "center",
+    paddingVertical: spacing.sm,
+  },
+  withdrawText: {
+    ...typography.bodyMedium11,
+    color: colors.gray400,
+    textDecorationLine: "underline",
+  },
+});
